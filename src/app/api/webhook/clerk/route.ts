@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Webhook } from 'svix';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 
 export async function POST(req: NextRequest) {
     const webhookSecret = process.env.CLERK_WEBHOOK_SECRET;
@@ -41,7 +36,7 @@ export async function POST(req: NextRequest) {
             const { id, email_addresses, first_name, last_name } = event.data;
             const email = email_addresses?.[0]?.email_address || null;
 
-            const { error } = await supabaseAdmin.from('profiles').upsert({
+            const { error } = await getSupabaseAdmin().from('profiles').upsert({
                 id,
                 email,
                 full_name: [first_name, last_name].filter(Boolean).join(' ') || null,
@@ -60,7 +55,7 @@ export async function POST(req: NextRequest) {
         case 'user.deleted': {
             const { id } = event.data;
             if (id) {
-                const { error } = await supabaseAdmin
+                const { error } = await getSupabaseAdmin()
                     .from('profiles')
                     .delete()
                     .eq('id', id);

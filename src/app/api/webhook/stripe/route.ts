@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getStripe } from '@/lib/stripe';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 
 export async function POST(req: NextRequest) {
     const body = await req.text();
@@ -39,7 +34,7 @@ export async function POST(req: NextRequest) {
                 break;
             }
 
-            const { error } = await supabaseAdmin
+            const { error } = await getSupabaseAdmin()
                 .from('profiles')
                 .update({
                     is_premium: true,
@@ -60,7 +55,7 @@ export async function POST(req: NextRequest) {
             const subscription = event.data.object;
             const isActive = subscription.status === 'active' || subscription.status === 'trialing';
 
-            const { error } = await supabaseAdmin
+            const { error } = await getSupabaseAdmin()
                 .from('profiles')
                 .update({ is_premium: isActive })
                 .eq('stripe_subscription_id', subscription.id);
