@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getStripe } from '@/lib/stripe';
 import { auth } from '@clerk/nextjs/server';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { z } from 'zod';
 
 const checkoutSchema = z.object({
@@ -19,6 +20,14 @@ export async function POST(req: NextRequest) {
         if (!result.success) {
             return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
         }
+
+        // Ensure profile exists before checkout so the Stripe webhook can update it
+        await getSupabaseAdmin().from('profiles').upsert({
+            id: userId,
+            is_premium: false,
+            exercises_solved: 0,
+            onboarding_completed: false,
+        }, { onConflict: 'id', ignoreDuplicates: true });
 
         const origin = req.headers.get('origin');
         const session = await getStripe().checkout.sessions.create({

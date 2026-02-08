@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 import { motion } from 'framer-motion';
@@ -8,7 +8,6 @@ import { Zap, Trophy, Settings } from 'lucide-react';
 import MathRenderer from '@/components/ui/MathRenderer';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/client';
 
 import UpgradeButton from '@/components/UpgradeButton';
 import { curriculum } from '@/data/curriculum';
@@ -22,7 +21,6 @@ export default function DashboardClient() {
     const [isPremium, setIsPremium] = useState(false);
     const [loading, setLoading] = useState(true);
     const [exercisesSolved, setExercisesSolved] = useState(0);
-    const supabaseRef = useRef(createClient());
 
     useEffect(() => {
         const checkUser = async () => {
@@ -34,14 +32,12 @@ export default function DashboardClient() {
                 return;
             }
 
-            const { data } = await supabaseRef.current
-                .from('profiles')
-                .select('is_premium, exercises_solved')
-                .eq('id', user.id)
-                .single();
-            if (data) {
-                if (data.is_premium) setIsPremium(true);
-                setExercisesSolved(data.exercises_solved || 0);
+            // Ensure profile exists in Supabase (creates it if missing)
+            const res = await fetch('/api/profile/ensure', { method: 'POST' });
+            const { profile } = await res.json();
+            if (profile) {
+                if (profile.is_premium) setIsPremium(true);
+                setExercisesSolved(profile.exercises_solved || 0);
             }
             setLoading(false);
         };
