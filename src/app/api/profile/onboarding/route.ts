@@ -29,8 +29,8 @@ export async function POST(req: NextRequest) {
             }, { onConflict: 'id' });
 
         if (error) {
-            console.error('Failed to save onboarding:', error.message);
-            return NextResponse.json({ error: 'Failed to save profile' }, { status: 500 });
+            console.error('Failed to save onboarding:', error.message, error.details, error.hint);
+            return NextResponse.json({ error: `Failed to save profile: ${error.message}` }, { status: 500 });
         }
 
         return NextResponse.json({ success: true });
