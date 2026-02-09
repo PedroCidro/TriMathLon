@@ -39,12 +39,12 @@ export async function POST(req: NextRequest) {
 
             const { error } = await getSupabaseAdmin()
                 .from('profiles')
-                .update({
+                .upsert({
+                    id: clerkUserId,
                     is_premium: true,
                     stripe_customer_id: customerId,
                     stripe_subscription_id: subscriptionId,
-                })
-                .eq('id', clerkUserId);
+                }, { onConflict: 'id' });
 
             if (error) {
                 console.error('Failed to update premium status:', error.message);

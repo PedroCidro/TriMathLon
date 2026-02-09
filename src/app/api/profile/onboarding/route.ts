@@ -22,11 +22,11 @@ export async function POST(req: NextRequest) {
 
         const { error } = await getSupabaseAdmin()
             .from('profiles')
-            .update({
+            .upsert({
+                id: userId,
                 academic_level: parsed.data.academic_level,
                 onboarding_completed: true,
-            })
-            .eq('id', userId);
+            }, { onConflict: 'id' });
 
         if (error) {
             console.error('Failed to save onboarding:', error.message);
