@@ -36,14 +36,22 @@ export async function POST(req: NextRequest) {
             const { id, email_addresses, first_name, last_name } = event.data;
             const email = email_addresses?.[0]?.email_address || null;
 
-            const { error } = await getSupabaseAdmin().from('profiles').upsert({
+            const supabase = getSupabaseAdmin();
+            const fullName = [first_name, last_name].filter(Boolean).join(' ') || null;
+
+            // Create profile if it doesn't exist (don't overwrite accumulated data)
+            await supabase.from('profiles').upsert({
                 id,
-                email,
-                full_name: [first_name, last_name].filter(Boolean).join(' ') || null,
                 is_premium: false,
                 exercises_solved: 0,
                 onboarding_completed: false,
             }, { onConflict: 'id', ignoreDuplicates: true });
+
+            // Always sync email and name from Clerk
+            const { error } = await supabase.from('profiles').update({
+                email,
+                full_name: fullName,
+            }).eq('id', id);
 
             if (error) {
                 console.error('Failed to create profile:', error.message);
