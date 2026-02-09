@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
                 is_premium: false,
                 exercises_solved: 0,
                 onboarding_completed: false,
-            }, { onConflict: 'id' });
+            }, { onConflict: 'id', ignoreDuplicates: true });
 
             if (error) {
                 console.error('Failed to create profile:', error.message);

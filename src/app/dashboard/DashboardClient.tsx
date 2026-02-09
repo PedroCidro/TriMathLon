@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Zap, Trophy, Settings } from 'lucide-react';
 import MathRenderer from '@/components/ui/MathRenderer';
@@ -12,28 +11,12 @@ import { curriculum } from '@/data/curriculum';
 
 const modules = curriculum;
 
+interface DashboardClientProps {
+    isPremium: boolean;
+    exercisesSolved: number;
+}
 
-export default function DashboardClient() {
-    const [isPremium, setIsPremium] = useState(false);
-    const [loading, setLoading] = useState(true);
-    const [exercisesSolved, setExercisesSolved] = useState(0);
-
-    useEffect(() => {
-        const ensureProfile = async () => {
-            const res = await fetch('/api/profile/ensure', { method: 'POST' });
-            const { profile } = await res.json();
-            if (profile) {
-                if (profile.is_premium) setIsPremium(true);
-                setExercisesSolved(profile.exercises_solved || 0);
-            }
-            setLoading(false);
-        };
-
-        ensureProfile();
-    }, []);
-
-    if (loading) return <div className="min-h-screen flex items-center justify-center bg-gray-50 text-gray-400">Carregando Arena...</div>;
-
+export default function DashboardClient({ isPremium, exercisesSolved }: DashboardClientProps) {
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
 

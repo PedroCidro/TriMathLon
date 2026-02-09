@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
             ],
             mode: 'subscription',
             metadata: { clerk_user_id: userId },
-            success_url: `${origin}/dashboard`,
+            success_url: `${origin}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${origin}/dashboard`,
         });
 
