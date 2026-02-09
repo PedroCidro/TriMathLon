@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { auth, currentUser } from '@clerk/nextjs/server'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { getStripe } from '@/lib/stripe'
+import { curriculum } from '@/data/curriculum'
 import DashboardClient from './DashboardClient'
 
 export default async function DashboardPage({
@@ -52,15 +53,38 @@ export default async function DashboardPage({
         full_name: fullName,
     }).eq('id', userId)
 
-    // Read current profile
+    // Read current profile (with engagement data)
     const { data } = await supabase
         .from('profiles')
-        .select('is_premium, exercises_solved')
+        .select('is_premium, exercises_solved, current_streak, xp_total, xp_today, last_xp_reset_date')
         .eq('id', userId)
         .single()
+
+    // Reset xp_today if it's a new day
+    const today = new Date().toISOString().slice(0, 10)
+    const xpToday = data?.last_xp_reset_date === today ? (data?.xp_today ?? 0) : 0
+
+    // Fetch mastery data for progress bars
+    const { data: mastery } = await supabase
+        .from('user_topic_mastery')
+        .select('subcategory, attempts')
+        .eq('user_id', userId)
+
+    // Compute per-module progress
+    const moduleProgress: Record<string, { practiced: number; total: number }> = {}
+    for (const mod of curriculum) {
+        const practiced = mod.topics.filter(t =>
+            mastery?.some(m => m.subcategory === t.id && m.attempts > 0)
+        ).length
+        moduleProgress[mod.id] = { practiced, total: mod.topics.length }
+    }
 
     return <DashboardClient
         isPremium={data?.is_premium ?? false}
         exercisesSolved={data?.exercises_solved ?? 0}
+        currentStreak={data?.current_streak ?? 0}
+        xpTotal={data?.xp_total ?? 0}
+        xpToday={xpToday}
+        moduleProgress={moduleProgress}
     />
 }

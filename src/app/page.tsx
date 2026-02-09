@@ -15,8 +15,6 @@ export default function LandingPage() {
 
         </div>
         <div className="flex items-center gap-6">
-          <Link href="#" className="hidden md:block font-medium text-gray-500 hover:text-black transition-colors">Método</Link>
-          <Link href="#" className="hidden md:block font-medium text-gray-500 hover:text-black transition-colors">Preços</Link>
           <Link
             href="/sign-in"
             className="font-bold text-gray-900 hover:text-blue-600 transition-colors mr-4"

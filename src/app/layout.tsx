@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
-import { Inter, Outfit } from "next/font/google"; // Using Google Fonts
+import { Inter, Outfit } from "next/font/google";
+import { Toaster } from "sonner";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
@@ -8,8 +9,21 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 export const metadata: Metadata = {
-  title: "Trimathlon | Calculus Training",
-  description: "Physics training for mental math. Master Derivatives, Integrals, and ODEs.",
+  title: "Trimathlon | Plataforma de Treinamento em Cálculo",
+  description: "Domine Derivadas, Integrais e EDOs com prática deliberada e interativa. Treine cálculo como um atleta treina seu esporte.",
+  keywords: ["cálculo", "derivadas", "integrais", "EDO", "matemática", "treino", "prática", "universidade"],
+  openGraph: {
+    title: "Trimathlon | Treinamento em Cálculo",
+    description: "Domine Derivadas, Integrais e EDOs com prática deliberada e interativa.",
+    type: "website",
+    locale: "pt_BR",
+    siteName: "Trimathlon",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Trimathlon | Treinamento em Cálculo",
+    description: "Domine Derivadas, Integrais e EDOs com prática deliberada e interativa.",
+  },
 };
 
 export default function RootLayout({
@@ -22,6 +36,7 @@ export default function RootLayout({
       <body className={cn(inter.variable, outfit.variable, "font-sans antialiased bg-white text-gray-900 selection:bg-blue-100")}>
         <ClerkProvider>
           {children}
+          <Toaster richColors position="top-right" />
         </ClerkProvider>
       </body>
     </html>

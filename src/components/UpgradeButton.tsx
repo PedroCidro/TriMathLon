@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Zap } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function UpgradeButton() {
     const [loading, setLoading] = useState(false);
@@ -25,9 +26,9 @@ export default function UpgradeButton() {
             } else {
                 throw new Error("No URL returned from checkout session");
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Checkout error:', error);
-            alert(`Erro no checkout: ${error.message || JSON.stringify(error)}`);
+            toast.error('Erro no checkout. Tente novamente.');
         } finally {
             setLoading(false);
         }

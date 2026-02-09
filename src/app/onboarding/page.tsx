@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Check, GraduationCap, School, BookOpen, Brain, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 type Level = {
     id: string;
@@ -44,7 +45,7 @@ export default function OnboardingPage() {
             router.push('/dashboard');
         } catch (error) {
             console.error('Error saving profile:', error);
-            alert('Erro ao salvar perfil. Tente novamente.');
+            toast.error('Erro ao salvar perfil. Tente novamente.');
         } finally {
             setLoading(false);
         }
