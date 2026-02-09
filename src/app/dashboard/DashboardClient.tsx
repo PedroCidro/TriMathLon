@@ -1,8 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useUser } from '@clerk/nextjs';
 import { motion } from 'framer-motion';
 import { Zap, Trophy, Settings } from 'lucide-react';
 import MathRenderer from '@/components/ui/MathRenderer';
@@ -16,23 +14,12 @@ const modules = curriculum;
 
 
 export default function DashboardClient() {
-    const router = useRouter();
-    const { user, isLoaded } = useUser();
     const [isPremium, setIsPremium] = useState(false);
     const [loading, setLoading] = useState(true);
     const [exercisesSolved, setExercisesSolved] = useState(0);
 
     useEffect(() => {
-        const checkUser = async () => {
-            if (!isLoaded) {
-                return;
-            }
-            if (!user) {
-                router.push('/sign-in');
-                return;
-            }
-
-            // Ensure profile exists in Supabase (creates it if missing)
+        const ensureProfile = async () => {
             const res = await fetch('/api/profile/ensure', { method: 'POST' });
             const { profile } = await res.json();
             if (profile) {
@@ -42,8 +29,8 @@ export default function DashboardClient() {
             setLoading(false);
         };
 
-        checkUser();
-    }, [isLoaded, router, user]);
+        ensureProfile();
+    }, []);
 
     if (loading) return <div className="min-h-screen flex items-center justify-center bg-gray-50 text-gray-400">Carregando Arena...</div>;
 

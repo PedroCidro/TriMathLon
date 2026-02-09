@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { auth } from '@clerk/nextjs/server'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import ModuleClient from './ModuleClient'
 
 export default async function ModulePage() {
@@ -8,5 +9,11 @@ export default async function ModulePage() {
         return redirect('/sign-in')
     }
 
-    return <ModuleClient />
+    const { data } = await getSupabaseAdmin()
+        .from('profiles')
+        .select('is_premium')
+        .eq('id', userId)
+        .single()
+
+    return <ModuleClient isPremium={data?.is_premium ?? false} />
 }

@@ -1,42 +1,14 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { ArrowLeft, Play, BookOpen, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import MathRenderer from '@/components/ui/MathRenderer';
 import { curriculum } from '@/data/curriculum';
-import { useUser } from '@clerk/nextjs';
 
-import { createClient } from '@/lib/supabase/client';
-import { useState, useEffect } from 'react';
-
-export default function ModuleClient() {
+export default function ModuleClient({ isPremium }: { isPremium: boolean }) {
     const params = useParams();
-    const router = useRouter();
-    const { user, isLoaded } = useUser();
-    const [isPremium, setIsPremium] = useState(false);
-
-    // Fetch Premium Status
-    useEffect(() => {
-        const checkPremium = async () => {
-            if (!isLoaded) {
-                return;
-            }
-            if (!user) {
-                router.push('/sign-in');
-                return;
-            }
-            const supabase = createClient();
-            const { data } = await supabase
-                .from('profiles')
-                .select('is_premium')
-                .eq('id', user.id)
-                .single();
-            if (data?.is_premium) setIsPremium(true);
-        };
-        checkPremium();
-    }, [isLoaded, router, user]);
 
     const moduleId = typeof params.module === 'string' ? params.module : '';
     const moduleData = curriculum.find(m => m.id === moduleId);
@@ -66,7 +38,6 @@ export default function ModuleClient() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {moduleData.topics.map((topic, i) => {
                         // Lock logic: Lock 'Hard' topics if not premium
-                        // You can adjust this logic as needed
                         const isLocked = topic.difficulty === 'Hard' && !isPremium;
 
                         return (

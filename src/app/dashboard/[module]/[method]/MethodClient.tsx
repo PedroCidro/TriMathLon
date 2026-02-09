@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { ArrowLeft, BookOpen, Dumbbell, Eye, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -9,7 +9,6 @@ import MathRenderer from '@/components/ui/MathRenderer';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
 import { curriculum } from '@/data/curriculum';
-import { useUser } from '@clerk/nextjs';
 
 type Tab = 'learn' | 'practice' | 'recognize';
 
@@ -23,8 +22,6 @@ type Question = {
 export default function MethodClient() {
     const [activeTab, setActiveTab] = useState<Tab>('learn');
     const params = useParams();
-    const router = useRouter();
-    const { user, isLoaded } = useUser();
 
     // Find Topic Data
     const moduleId = typeof params.module === 'string' ? params.module : '';
@@ -70,59 +67,13 @@ export default function MethodClient() {
         }
     }, [activeTab, fetchQuestions]);
 
-    const handleNext = async () => {
+    const handleNext = () => {
         setShowAnswer(false);
         setCurrentIndex((prev) => (prev + 1) % questions.length);
 
-        if (!user) return;
-
-        try {
-            const supabase = supabaseRef.current;
-            // Atomic increment via Postgres RPC
-            const { error } = await supabase.rpc('increment_exercises_solved', {
-                user_id: user.id,
-            });
-
-            if (error) {
-                // Fallback: direct update with increment if RPC doesn't exist
-                if (error.message.includes('function') || error.code === '42883') {
-                    const { data: profile, error: fetchError } = await supabase
-                        .from('profiles')
-                        .select('exercises_solved')
-                        .eq('id', user.id)
-                        .single();
-
-                    if (fetchError) {
-                        console.error('Failed to fetch exercise count:', fetchError.message);
-                        return;
-                    }
-
-                    const currentCount = profile?.exercises_solved || 0;
-                    const { error: updateError } = await supabase
-                        .from('profiles')
-                        .update({ exercises_solved: currentCount + 1 })
-                        .eq('id', user.id);
-
-                    if (updateError) {
-                        console.error('Failed to update exercise count:', updateError.message);
-                    }
-                } else {
-                    console.error('Failed to increment exercises:', error.message);
-                }
-            }
-        } catch (err) {
-            console.error('Error updating exercise count:', err instanceof Error ? err.message : 'Unknown error');
-        }
+        // Fire-and-forget increment via server API route
+        fetch('/api/exercises/increment', { method: 'POST' }).catch(() => {});
     };
-
-    useEffect(() => {
-        if (!isLoaded) {
-            return;
-        }
-        if (!user) {
-            router.push('/sign-in');
-        }
-    }, [isLoaded, router, user]);
 
     // Helper to render mixed text and LaTeX (e.g. "Derive $f(x)$")
     const renderFormattedText = (text: string, className: string = "") => {

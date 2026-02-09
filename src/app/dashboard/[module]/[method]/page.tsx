@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { auth } from '@clerk/nextjs/server'
-import { createClient } from '@/lib/supabase/server'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { curriculum } from '@/data/curriculum'
 import MethodClient from './MethodClient'
 
@@ -24,8 +24,7 @@ export default async function MethodPage({ params }: { params: Params }) {
     }
 
     if (topic.difficulty === 'Hard') {
-        const supabase = await createClient()
-        const { data } = await supabase
+        const { data } = await getSupabaseAdmin()
             .from('profiles')
             .select('is_premium')
             .eq('id', userId)

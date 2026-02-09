@@ -34,12 +34,15 @@ export async function POST(req: NextRequest) {
                 break;
             }
 
+            const customerId = typeof session.customer === 'string' ? session.customer : null;
+            const subscriptionId = typeof session.subscription === 'string' ? session.subscription : null;
+
             const { error } = await getSupabaseAdmin()
                 .from('profiles')
                 .update({
                     is_premium: true,
-                    stripe_customer_id: session.customer as string,
-                    stripe_subscription_id: session.subscription as string,
+                    stripe_customer_id: customerId,
+                    stripe_subscription_id: subscriptionId,
                 })
                 .eq('id', clerkUserId);
 
@@ -62,6 +65,7 @@ export async function POST(req: NextRequest) {
 
             if (error) {
                 console.error('Failed to update subscription status:', error.message);
+                return NextResponse.json({ error: 'Database update failed' }, { status: 500 });
             }
             break;
         }

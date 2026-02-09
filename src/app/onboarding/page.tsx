@@ -1,12 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Check, ChevronRight, GraduationCap, School, BookOpen, Brain, Users } from 'lucide-react';
+import { Check, GraduationCap, School, BookOpen, Brain, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
-import { useUser } from '@clerk/nextjs';
 
 type Level = {
     id: string;
@@ -28,27 +26,20 @@ const VALID_LEVELS = levels.map(l => l.id);
 export default function OnboardingPage() {
     const [selectedLevel, setSelectedLevel] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
-    const supabase = createClient();
     const router = useRouter();
-    const { user, isLoaded } = useUser();
 
     const handleContinue = async () => {
         if (!selectedLevel || !VALID_LEVELS.includes(selectedLevel)) return;
         setLoading(true);
 
         try {
-            if (!user) {
-                router.push('/sign-in');
-                return;
-            }
+            const res = await fetch('/api/profile/onboarding', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ academic_level: selectedLevel }),
+            });
 
-            const { error } = await supabase.from('profiles').upsert({
-                id: user.id,
-                academic_level: selectedLevel,
-                onboarding_completed: true,
-            }, { onConflict: 'id' });
-
-            if (error) throw error;
+            if (!res.ok) throw new Error('Failed to save');
 
             router.push('/dashboard');
         } catch (error) {
@@ -58,20 +49,6 @@ export default function OnboardingPage() {
             setLoading(false);
         }
     };
-
-    useEffect(() => {
-        if (isLoaded && !user) {
-            router.push('/sign-in');
-        }
-    }, [isLoaded, router, user]);
-
-    if (!isLoaded || !user) {
-        return (
-            <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50 text-gray-400">
-                Carregando...
-            </div>
-        );
-    }
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
