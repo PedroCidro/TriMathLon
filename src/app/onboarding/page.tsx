@@ -40,12 +40,16 @@ export default function OnboardingPage() {
                 body: JSON.stringify({ academic_level: selectedLevel }),
             });
 
-            if (!res.ok) throw new Error('Failed to save');
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                throw new Error(data.error || `HTTP ${res.status}`);
+            }
 
             router.push('/dashboard');
         } catch (error) {
             console.error('Error saving profile:', error);
-            toast.error('Erro ao salvar perfil. Tente novamente.');
+            const msg = error instanceof Error ? error.message : 'Unknown error';
+            toast.error(`Erro ao salvar perfil: ${msg}`);
         } finally {
             setLoading(false);
         }
