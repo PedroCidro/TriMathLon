@@ -25,10 +25,15 @@ export const explanations: Record<string, TopicExplanation> = {
         formulaLatex: "\\frac{d}{dx}\\left[x^n\\right] = n \\cdot x^{n-1}",
         proofTitle: "Por que funciona?",
         proof:
-            "Pela definição de derivada, calculamos $\\lim_{h \\to 0} \\frac{(x+h)^n - x^n}{h}$. " +
-            "Expandindo $(x+h)^n$ pelo Binômio de Newton, o primeiro termo é $x^n$ (que cancela) e o segundo " +
-            "é $n \\cdot x^{n-1} \\cdot h$. Ao dividir por $h$ e tomar o limite, todos os termos com $h$ " +
-            "somem, restando exatamente $n \\cdot x^{n-1}$.",
+            "Vamos direto à definição de derivada: $\\lim_{h \\to 0} \\frac{(x+h)^n - x^n}{h}$. " +
+            "Pense em $(x+h)^n$ como o produto $(x+h)(x+h)\\cdots(x+h)$, com $n$ fatores. Ao expandir, " +
+            "cada termo vem de escolher $x$ ou $h$ em cada fator. O termo principal é $x^n$ (escolher $x$ em todos). " +
+            "O próximo grupo é quando escolhemos $h$ em exatamente um fator e $x$ nos outros $n-1$: " +
+            "são $n$ formas de fazer isso, cada uma dando $x^{n-1} \\cdot h$. Somados: $n \\cdot x^{n-1} \\cdot h$. " +
+            "Todos os outros termos têm $h^2$ ou potências maiores. Subtraindo $x^n$, dividindo por $h$ e fazendo $h \\to 0$, " +
+            "os termos com $h$ desaparecem e sobra $n \\cdot x^{n-1}$. " +
+            "O expoente \"desce\" por causa de combinatória pura — o $n$ conta de quantas maneiras " +
+            "podemos escolher qual dos $n$ fatores contribui com o $h$.",
         examples: [
             {
                 problem: "Encontre a derivada de $f(x) = x^5$.",
@@ -53,10 +58,15 @@ export const explanations: Record<string, TopicExplanation> = {
         formulaLatex: "\\frac{d}{dx}\\left[u \\cdot v\\right] = u' \\cdot v + u \\cdot v'",
         proofTitle: "Por que funciona?",
         proof:
-            "Partindo da definição, $\\frac{d}{dx}[u \\cdot v] = \\lim_{h \\to 0} \\frac{u(x+h)v(x+h) - u(x)v(x)}{h}$. " +
-            "O truque é somar e subtrair $u(x+h)v(x)$ no numerador. Isso separa a expressão em " +
-            "$u(x+h)\\frac{v(x+h)-v(x)}{h} + v(x)\\frac{u(x+h)-u(x)}{h}$. Tomando o limite, como $u$ " +
-            "é contínua, obtemos $u \\cdot v' + v \\cdot u'$.",
+            "Pela definição, queremos $\\lim_{h \\to 0} \\frac{u(x+h)v(x+h) - u(x)v(x)}{h}$. " +
+            "O problema é que dois fatores estão mudando ao mesmo tempo. Para isolar cada variação, " +
+            "somamos e subtraímos $u(x+h)v(x)$ no numerador — isso não muda o valor, mas separa em duas partes: " +
+            "$u(x+h)\\frac{v(x+h)-v(x)}{h} + v(x)\\frac{u(x+h)-u(x)}{h}$. " +
+            "A primeira parte captura a variação de $v$ enquanto $u$ está \"quase parado\" em $x+h$; " +
+            "a segunda captura a variação de $u$ enquanto $v$ está parado em $x$. " +
+            "Quando $h \\to 0$, $u(x+h) \\to u(x)$ por continuidade, e os quocientes viram $v'(x)$ e $u'(x)$. " +
+            "Resultado: $u \\cdot v' + u' \\cdot v$. É a versão rigorosa da intuição do retângulo: " +
+            "cada dimensão varia por vez, e a variação total é a soma dessas contribuições.",
         examples: [
             {
                 problem: "Derive $f(x) = x^2 \\cdot \\sin(x)$.",
@@ -84,10 +94,15 @@ export const explanations: Record<string, TopicExplanation> = {
             "\\frac{d}{dx}\\!\\left[\\frac{u}{v}\\right] = \\frac{u' \\cdot v - u \\cdot v'}{v^2}",
         proofTitle: "Por que funciona?",
         proof:
-            "Podemos deduzir a regra do quociente a partir da regra do produto. Escrevemos $u = \\frac{u}{v} \\cdot v$ " +
-            "e aplicamos a regra do produto: $u' = \\left(\\frac{u}{v}\\right)' \\cdot v + \\frac{u}{v} \\cdot v'$. " +
-            "Isolando $\\left(\\frac{u}{v}\\right)'$, obtemos $\\frac{u' \\cdot v - u \\cdot v'}{v^2}$. " +
-            "Note que o sinal de menos aparece naturalmente ao isolar o termo.",
+            "Em vez de partir da definição, vamos derivar a regra do quociente da regra do produto — " +
+            "mostrando que não é uma fórmula separada para decorar, mas uma consequência lógica. " +
+            "Se $u = \\frac{u}{v} \\cdot v$, aplicamos a regra do produto: " +
+            "$u' = \\left(\\frac{u}{v}\\right)' \\cdot v + \\frac{u}{v} \\cdot v'$. " +
+            "Isolamos $\\left(\\frac{u}{v}\\right)'$: " +
+            "$\\left(\\frac{u}{v}\\right)' = \\frac{u' - \\frac{u}{v} \\cdot v'}{v} = \\frac{u'v - uv'}{v^2}$. " +
+            "O sinal de menos aparece naturalmente: quando o denominador $v$ cresce, a fração diminui — " +
+            "esse efeito negativo é o $-uv'$. O $v^2$ no denominador mantém as unidades consistentes. " +
+            "Se você esquecer a fórmula numa prova, basta lembrar da regra do produto e isolar.",
         examples: [
             {
                 problem: "Derive $f(x) = \\frac{x^2 + 1}{x - 3}$.",
@@ -115,11 +130,16 @@ export const explanations: Record<string, TopicExplanation> = {
             "\\frac{d}{dx}\\left[f(g(x))\\right] = f'(g(x)) \\cdot g'(x)",
         proofTitle: "Por que funciona?",
         proof:
-            "Se $y = f(u)$ e $u = g(x)$, uma pequena variação $\\Delta x$ causa $\\Delta u \\approx g'(x)\\Delta x$ " +
-            "e, por sua vez, $\\Delta y \\approx f'(u)\\Delta u$. Substituindo: " +
-            "$\\Delta y \\approx f'(g(x)) \\cdot g'(x) \\cdot \\Delta x$. Dividindo por $\\Delta x$ e tomando " +
-            "o limite, obtemos $\\frac{dy}{dx} = f'(g(x)) \\cdot g'(x)$. A prova rigorosa usa " +
-            "a definição de diferenciabilidade para evitar divisão por $\\Delta u = 0$.",
+            "A lógica é surpreendentemente simples. Se $y = f(u)$ e $u = g(x)$, uma pequena variação $\\Delta x$ " +
+            "primeiro causa $\\Delta u \\approx g'(x) \\cdot \\Delta x$ (pela definição de derivada de $g$). " +
+            "Essa variação $\\Delta u$, por sua vez, causa $\\Delta y \\approx f'(u) \\cdot \\Delta u$ " +
+            "(pela definição de derivada de $f$). Substituindo: " +
+            "$\\Delta y \\approx f'(g(x)) \\cdot g'(x) \\cdot \\Delta x$. Dividindo por $\\Delta x$: " +
+            "$\\frac{\\Delta y}{\\Delta x} \\approx f'(g(x)) \\cdot g'(x)$. No limite, a aproximação vira igualdade. " +
+            "É como engrenagens conectadas: a taxa total é o produto das taxas de cada elo. " +
+            "Se a função de dentro triplica a variação e a de fora dobra, a variação total é $\\times 6$. " +
+            "A prova rigorosa exige cuidado quando $\\Delta u = 0$ (não podemos dividir por zero), " +
+            "mas a ideia central é essa: taxas de variação se multiplicam ao longo da composição.",
         examples: [
             {
                 problem: "Derive $f(x) = (3x^2 + 1)^5$.",
@@ -147,11 +167,17 @@ export const explanations: Record<string, TopicExplanation> = {
             "\\frac{d}{dx}[\\sin x] = \\cos x \\qquad \\frac{d}{dx}[\\cos x] = -\\sin x",
         proofTitle: "Por que funciona?",
         proof:
-            "Para $\\sin(x)$, usamos $\\lim_{h \\to 0}\\frac{\\sin(x+h)-\\sin(x)}{h}$. " +
-            "Pela fórmula de soma: $\\sin(x+h) = \\sin x \\cos h + \\cos x \\sin h$. " +
-            "Substituindo e usando os limites fundamentais $\\lim_{h \\to 0}\\frac{\\sin h}{h} = 1$ e " +
-            "$\\lim_{h \\to 0}\\frac{\\cos h - 1}{h} = 0$, obtemos $\\cos x$. " +
-            "Para $\\cos(x)$, o procedimento é análogo e resulta em $-\\sin x$.",
+            "Vamos provar que a derivada de $\\sin x$ é $\\cos x$ direto da definição. " +
+            "Calculamos $\\lim_{h \\to 0}\\frac{\\sin(x+h)-\\sin(x)}{h}$. Pela fórmula de soma: " +
+            "$\\sin(x+h) = \\sin x \\cos h + \\cos x \\sin h$. Substituindo no limite: " +
+            "$\\sin x \\cdot \\frac{\\cos h - 1}{h} + \\cos x \\cdot \\frac{\\sin h}{h}$. " +
+            "Tudo depende de dois limites fundamentais. Primeiro: $\\lim_{h \\to 0}\\frac{\\sin h}{h} = 1$ — " +
+            "para ângulos muito pequenos, o arco e a corda do círculo unitário são praticamente iguais. " +
+            "Segundo: $\\lim_{h \\to 0}\\frac{\\cos h - 1}{h} = 0$ — o cosseno se afasta de $1$ " +
+            "muito mais devagar que $h$ se afasta de $0$. Com esses limites, o primeiro termo zera " +
+            "e o segundo dá $\\cos x$. Para $\\cos x$, o argumento é análogo, mas " +
+            "$\\cos(x+h) = \\cos x \\cos h - \\sin x \\sin h$ — o sinal de menos na fórmula de soma " +
+            "é o responsável pelo $-\\sin x$ na derivada.",
         examples: [
             {
                 problem: "Derive $f(x) = 3\\sin(x) + 2\\cos(x)$.",
@@ -178,10 +204,14 @@ export const explanations: Record<string, TopicExplanation> = {
             "\\frac{d}{dx}[e^x] = e^x \\qquad \\frac{d}{dx}[\\ln x] = \\frac{1}{x}",
         proofTitle: "Por que funciona?",
         proof:
-            "Para $e^x$: $\\lim_{h \\to 0}\\frac{e^{x+h}-e^x}{h} = e^x \\cdot \\lim_{h \\to 0}\\frac{e^h - 1}{h}$. " +
-            "O número $e$ é definido de modo que esse último limite vale $1$, logo a derivada é $e^x$. " +
-            "Para $\\ln(x)$, usamos a derivada da função inversa: se $y = \\ln x$, então $x = e^y$. " +
-            "Derivando implicitamente: $1 = e^y \\cdot \\frac{dy}{dx}$, portanto $\\frac{dy}{dx} = \\frac{1}{e^y} = \\frac{1}{x}$.",
+            "O que torna $e^x$ especial? Calculamos pela definição: " +
+            "$\\lim_{h \\to 0}\\frac{e^{x+h}-e^x}{h} = e^x \\cdot \\lim_{h \\to 0}\\frac{e^h - 1}{h}$. " +
+            "O número $e \\approx 2{,}718$ é o único valor de base para o qual $\\lim_{h \\to 0}\\frac{b^h - 1}{h} = 1$. " +
+            "Para qualquer outra base, esse limite seria uma constante diferente de $1$, e a derivada teria um fator extra. " +
+            "Com base $e$, o fator é $1$ e a derivada é simplesmente $e^x$ — a função é igual à sua própria taxa de variação. " +
+            "Para $\\ln(x)$, usamos que ela é a inversa de $e^x$: se $y = \\ln x$, então $x = e^y$. " +
+            "Derivando implicitamente: $1 = e^y \\cdot \\frac{dy}{dx}$, logo $\\frac{dy}{dx} = \\frac{1}{e^y} = \\frac{1}{x}$. " +
+            "Quanto maior o $x$, mais devagar $\\ln x$ cresce — e a fórmula $\\frac{1}{x}$ captura isso com precisão.",
         examples: [
             {
                 problem: "Derive $f(x) = 5e^x - 3\\ln(x)$.",
@@ -207,10 +237,16 @@ export const explanations: Record<string, TopicExplanation> = {
             "\\frac{d}{dx}[F(x,y)] = 0 \\implies \\frac{dy}{dx} = -\\frac{F_x}{F_y}",
         proofTitle: "Por que funciona?",
         proof:
-            "Se $F(x,y) = 0$ define $y$ implicitamente como função de $x$, pela regra da cadeia " +
-            "para funções de várias variáveis temos $\\frac{\\partial F}{\\partial x} + \\frac{\\partial F}{\\partial y}\\cdot\\frac{dy}{dx} = 0$. " +
-            "Isolando: $\\frac{dy}{dx} = -\\frac{F_x}{F_y}$ (desde que $F_y \\neq 0$). " +
-            "Isso é o Teorema da Função Implícita aplicado ao caso bidimensional.",
+            "A derivação implícita não é uma técnica nova — é a regra da cadeia aplicada com um detalhe crucial: " +
+            "$y$ depende de $x$, mesmo que não saibamos explicitar como. " +
+            "Quando temos $F(x,y) = 0$, derivamos ambos os lados em relação a $x$. " +
+            "Termos com $x$ puro são derivados normalmente. Mas cada termo com $y$ recebe um fator " +
+            "$\\frac{dy}{dx}$ pela regra da cadeia — porque $y$ é uma função de $x$, mesmo escondida. " +
+            "Isso dá: $F_x + F_y \\cdot \\frac{dy}{dx} = 0$. Isolando: $\\frac{dy}{dx} = -\\frac{F_x}{F_y}$ " +
+            "(desde que $F_y \\neq 0$). O Teorema da Função Implícita garante que, nessas condições, " +
+            "$y$ de fato é uma função diferenciável de $x$ na vizinhança do ponto. " +
+            "Ou seja: não precisamos isolar $y$ para encontrar sua taxa de variação — " +
+            "basta derivar a equação inteira respeitando a dependência e resolver para $\\frac{dy}{dx}$.",
         examples: [
             {
                 problem: "Encontre $\\frac{dy}{dx}$ para $x^2 + y^2 = 25$.",
@@ -240,11 +276,15 @@ export const explanations: Record<string, TopicExplanation> = {
             "\\frac{dV}{dt} = \\frac{dV}{dr} \\cdot \\frac{dr}{dt}",
         proofTitle: "Por que funciona?",
         proof:
-            "Tudo se baseia na regra da cadeia aplicada ao tempo. Se $V = \\frac{4}{3}\\pi r^3$ e $r$ " +
-            "varia com o tempo, então $\\frac{dV}{dt} = 4\\pi r^2 \\cdot \\frac{dr}{dt}$. " +
-            "Em geral, qualquer equação $F(x,y) = 0$ onde $x$ e $y$ dependem de $t$ dá " +
-            "$F_x \\frac{dx}{dt} + F_y \\frac{dy}{dt} = 0$, conectando as taxas. " +
-            "A justificativa formal é a regra da cadeia para funções compostas com variável temporal.",
+            "Se duas grandezas estão conectadas por uma equação, suas taxas de variação no tempo também estão. " +
+            "É a regra da cadeia aplicada ao tempo $t$. Se temos $F(x, y) = 0$ onde $x = x(t)$ e $y = y(t)$, " +
+            "derivando em relação a $t$: $F_x \\frac{dx}{dt} + F_y \\frac{dy}{dt} = 0$. " +
+            "Essa equação conecta as duas taxas — conhecendo uma, encontramos a outra. " +
+            "No caso do balão: $V = \\frac{4}{3}\\pi r^3$ vale em todos os instantes. Derivando em $t$: " +
+            "$\\frac{dV}{dt} = 4\\pi r^2 \\frac{dr}{dt}$. Conhecendo $\\frac{dV}{dt}$ e $r$ num instante, " +
+            "encontramos $\\frac{dr}{dt}$. O método funciona porque a equação geométrica ou física " +
+            "é verdadeira em todo instante — e portanto sua derivada temporal também é. " +
+            "Essa derivada é exatamente o que conecta as taxas de variação entre si.",
         examples: [
             {
                 problem:
@@ -280,10 +320,15 @@ export const explanations: Record<string, TopicExplanation> = {
             "\\int x^n\\,dx = \\frac{x^{n+1}}{n+1} + C \\quad (n \\neq -1)",
         proofTitle: "Por que funciona?",
         proof:
-            "A verificação é direta: derivando $\\frac{x^{n+1}}{n+1} + C$, pela regra da potência obtemos " +
-            "$(n+1) \\cdot \\frac{x^n}{n+1} = x^n$, que é exatamente o integrando. " +
-            "A constante $C$ aparece porque a derivada de qualquer constante é zero, então há infinitas " +
-            "antiderivadas que diferem apenas por uma constante aditiva.",
+            "A verificação revela a essência da integração. Se derivamos $\\frac{x^{n+1}}{n+1} + C$, " +
+            "pela regra da potência obtemos $(n+1) \\cdot \\frac{x^n}{n+1} = x^n$ — exatamente o integrando. " +
+            "Integrar é literalmente desfazer a derivada. Mas por que aparece o $C$? " +
+            "Porque a derivada de qualquer constante é zero: as funções $x^3 + 5$ e $x^3 - 100$ " +
+            "têm a mesma derivada $3x^2$, então ambas são antiderivadas válidas de $3x^2$. " +
+            "A integral indefinida representa uma família infinita de funções paralelas, " +
+            "diferindo apenas por um deslocamento vertical. Essa é a conexão fundamental do Cálculo: " +
+            "derivar e integrar são operações inversas, e a constante $C$ absorve " +
+            "a informação que a derivada \"apaga\".",
         examples: [
             {
                 problem: "Calcule $\\int (3x^2 + 4x - 1)\\,dx$.",
@@ -309,10 +354,14 @@ export const explanations: Record<string, TopicExplanation> = {
             "\\int f(g(x))\\,g'(x)\\,dx = \\int f(u)\\,du \\quad \\text{com } u = g(x)",
         proofTitle: "Por que funciona?",
         proof:
-            "Se $F$ é a antiderivada de $f$ (ou seja, $F' = f$), então pela regra da cadeia " +
+            "A substituição é a regra da cadeia lida ao contrário — e entender isso é a chave de tudo. " +
+            "Se $F$ é a antiderivada de $f$ (ou seja, $F' = f$), então pela regra da cadeia: " +
             "$\\frac{d}{dx}[F(g(x))] = f(g(x)) \\cdot g'(x)$. " +
-            "Portanto $\\int f(g(x))g'(x)\\,dx = F(g(x)) + C = F(u) + C$. " +
-            "A substituição $u = g(x)$, $du = g'(x)\\,dx$ é apenas uma forma organizada de enxergar esse fato.",
+            "Lendo essa igualdade de trás para frente: $\\int f(g(x)) \\cdot g'(x)\\,dx = F(g(x)) + C$. " +
+            "A notação $u = g(x)$, $du = g'(x)\\,dx$ é apenas uma forma organizada de enxergar esse fato: " +
+            "o $g'(x)\\,dx$ se transforma em $du$, e a integral complicada em $x$ vira uma simples em $u$. " +
+            "É por isso que procuramos uma função \"de dentro\" cuja derivada aparece como fator \"do lado de fora\": " +
+            "quando isso acontece, a regra da cadeia garante que a substituição vai funcionar.",
         examples: [
             {
                 problem: "Calcule $\\int 2x \\cdot e^{x^2}\\,dx$.",
@@ -341,8 +390,14 @@ export const explanations: Record<string, TopicExplanation> = {
         proof:
             "Pela regra do produto: $\\frac{d}{dx}[u \\cdot v] = u'v + uv'$. " +
             "Integrando ambos os lados: $uv = \\int u'v\\,dx + \\int uv'\\,dx$. " +
-            "Rearranjando: $\\int uv'\\,dx = uv - \\int u'v\\,dx$, que na notação " +
-            "diferencial fica $\\int u\\,dv = uv - \\int v\\,du$.",
+            "Rearranjando: $\\int uv'\\,dx = uv - \\int u'v\\,dx$, ou na notação diferencial: " +
+            "$\\int u\\,dv = uv - \\int v\\,du$. Mas por que isso é útil? " +
+            "Porque transfere a derivada de uma função para a outra. Se $u$ é algo que simplifica ao derivar " +
+            "(como $x^2 \\to 2x \\to 2 \\to 0$) e $dv$ é algo fácil de integrar (como $e^x$ ou $\\sin x$), " +
+            "então a nova integral $\\int v\\,du$ é mais simples que a original. " +
+            "A regra LIATE (Logarítmica, Inversa trig, Algébrica, Trigonométrica, Exponencial) ordena " +
+            "de \"mais quer ser $u$\" para \"mais quer ser $dv$\": logaritmos simplificam muito ao derivar, " +
+            "enquanto exponenciais nem mudam ao integrar. Não é um truque — é a regra do produto ao contrário.",
         examples: [
             {
                 problem: "Calcule $\\int x e^x\\,dx$.",
@@ -371,11 +426,15 @@ export const explanations: Record<string, TopicExplanation> = {
             "\\sin^2(x) = \\frac{1 - \\cos(2x)}{2} \\qquad \\cos^2(x) = \\frac{1 + \\cos(2x)}{2}",
         proofTitle: "Por que funciona?",
         proof:
-            "As identidades de redução de potência vêm da fórmula do cosseno do ângulo duplo: " +
-            "$\\cos(2x) = \\cos^2(x) - \\sin^2(x) = 2\\cos^2(x) - 1 = 1 - 2\\sin^2(x)$. " +
-            "Isolando $\\sin^2(x)$ ou $\\cos^2(x)$, obtemos as fórmulas. " +
-            "Para expoentes ímpares, a estratégia algébrica funciona porque a identidade pitagórica " +
-            "converte tudo para uma variável, possibilitando $u = \\cos(x)$ ou $u = \\sin(x)$.",
+            "A estratégia depende de uma observação sobre paridade. Quando um dos expoentes é ímpar, " +
+            "separamos um fator de $\\sin x$ ou $\\cos x$ e usamos $\\sin^2 x + \\cos^2 x = 1$ para converter o resto. " +
+            "Exemplo: $\\sin^3 x = (1 - \\cos^2 x) \\cdot \\sin x$. Com $u = \\cos x$, " +
+            "$du = -\\sin x\\,dx$, tudo vira polinômio em $u$. Funciona porque a identidade pitagórica " +
+            "converte entre $\\sin^2$ e $\\cos^2$, e o fator separado fornece exatamente o $du$ da substituição. " +
+            "Quando ambos os expoentes são pares, não sobra fator para separar. " +
+            "Aí usamos as fórmulas de ângulo duplo: de $\\cos(2x) = 1 - 2\\sin^2 x = 2\\cos^2 x - 1$ " +
+            "isolamos $\\sin^2 x = \\frac{1-\\cos(2x)}{2}$ e $\\cos^2 x = \\frac{1+\\cos(2x)}{2}$. " +
+            "Cada aplicação reduz a potência pela metade, até chegarmos a integrais de $\\cos$ e $\\sin$ simples.",
         examples: [
             {
                 problem: "Calcule $\\int \\sin^3(x)\\,dx$.",
@@ -402,11 +461,16 @@ export const explanations: Record<string, TopicExplanation> = {
             "\\sqrt{a^2 - x^2} \\Rightarrow x = a\\sin\\theta \\qquad \\sqrt{a^2 + x^2} \\Rightarrow x = a\\tan\\theta",
         proofTitle: "Por que funciona?",
         proof:
-            "Para $\\sqrt{a^2 - x^2}$: se $x = a\\sin\\theta$, então $a^2 - x^2 = a^2(1 - \\sin^2\\theta) = a^2\\cos^2\\theta$, " +
-            "logo $\\sqrt{a^2-x^2} = a\\cos\\theta$ (um monômio simples!). " +
-            "Analogamente, para $\\sqrt{a^2+x^2}$ com $x = a\\tan\\theta$: " +
-            "$a^2 + a^2\\tan^2\\theta = a^2\\sec^2\\theta$, então $\\sqrt{a^2+x^2} = a\\sec\\theta$. " +
-            "As identidades pitagóricas são a base de todas essas simplificações.",
+            "A ideia parte de um triângulo retângulo. Quando vemos $\\sqrt{a^2 - x^2}$, pensamos: " +
+            "isso parece o cateto de um triângulo com hipotenusa $a$. Se $x = a\\sin\\theta$, " +
+            "então $a^2 - x^2 = a^2(1 - \\sin^2\\theta) = a^2\\cos^2\\theta$ pela identidade pitagórica, " +
+            "logo $\\sqrt{a^2 - x^2} = a\\cos\\theta$ — a raiz desaparece e vira um monômio simples. " +
+            "Para $\\sqrt{a^2 + x^2}$, o triângulo tem catetos $a$ e $x$ e hipotenusa $\\sqrt{a^2+x^2}$. " +
+            "Com $x = a\\tan\\theta$: $a^2 + a^2\\tan^2\\theta = a^2\\sec^2\\theta$, logo $\\sqrt{a^2+x^2} = a\\sec\\theta$. " +
+            "Para $\\sqrt{x^2 - a^2}$, usamos $x = a\\sec\\theta$ e $\\sec^2\\theta - 1 = \\tan^2\\theta$. " +
+            "Em todos os casos, a mesma lógica: a identidade pitagórica \"absorve\" a raiz quadrada, " +
+            "transformando-a num monômio trigonométrico. " +
+            "A substituição não é arbitrária — cada forma de raiz corresponde a um lado do triângulo retângulo.",
         examples: [
             {
                 problem: "Calcule $\\int \\frac{dx}{\\sqrt{4-x^2}}$.",
@@ -436,11 +500,17 @@ export const explanations: Record<string, TopicExplanation> = {
             "\\frac{P(x)}{(x-a)(x-b)} = \\frac{A}{x-a} + \\frac{B}{x-b}",
         proofTitle: "Por que funciona?",
         proof:
-            "O Teorema da Decomposição em Frações Parciais garante que toda fração racional própria " +
-            "(grau do numerador menor que o do denominador) pode ser escrita como soma de frações com " +
-            "denominadores sendo potências dos fatores irredutíveis. " +
-            "Os coeficientes são determinados igualando numeradores e resolvendo o sistema linear resultante. " +
-            "Depois, cada fração parcial $\\frac{A}{x-a}$ integra como $A\\ln|x-a| + C$.",
+            "A ideia é que frações de polinômios podem ser desmontadas em peças mais simples — " +
+            "assim como $\\frac{5}{6} = \\frac{1}{2} + \\frac{1}{3}$. " +
+            "O Teorema da Decomposição garante: se o grau do numerador é menor que o do denominador " +
+            "e o denominador está fatorado, existe uma decomposição única em frações parciais. " +
+            "Para encontrar os coeficientes, multiplicamos ambos os lados pelo denominador original, " +
+            "obtendo uma igualdade entre polinômios. Substituindo valores estratégicos de $x$ " +
+            "(as raízes do denominador), cada equação revela um coeficiente diretamente. " +
+            "Depois, cada fração $\\frac{A}{x-a}$ integra como $A\\ln|x-a|$ — " +
+            "algo muito mais simples que a fração original. " +
+            "Não estamos simplificando a função — estamos reescrevendo-a numa forma " +
+            "onde cada pedaço é integrável imediatamente.",
         examples: [
             {
                 problem: "Calcule $\\int \\frac{5x+1}{x^2-x-2}\\,dx$.",
@@ -471,11 +541,16 @@ export const explanations: Record<string, TopicExplanation> = {
             "\\int_a^{\\infty} f(x)\\,dx = \\lim_{b \\to \\infty} \\int_a^b f(x)\\,dx",
         proofTitle: "Por que funciona?",
         proof:
-            "A integral imprópria é definida como o limite da integral definida quando o extremo tende ao " +
-            "infinito (ou ao ponto de descontinuidade). Se esse limite existe e é finito, dizemos que a " +
-            "integral converge. Caso contrário, diverge. " +
-            "Um critério útil: $\\int_1^{\\infty} \\frac{1}{x^p}dx$ converge se e somente se $p > 1$ " +
-            "(teste $p$). Isso vem do fato de que $\\frac{x^{1-p}}{1-p}\\big|_1^b$ tem limite finito apenas quando $1-p < 0$.",
+            "Como pode uma região infinita ter área finita? A resposta está em quão rápido a função vai a zero. " +
+            "Definimos $\\int_a^{\\infty} f(x)\\,dx = \\lim_{b \\to \\infty} \\int_a^b f(x)\\,dx$: " +
+            "calculamos a integral até $b$ e vemos se o resultado se estabiliza quando $b$ cresce. " +
+            "O exemplo revelador: $\\int_1^{\\infty} \\frac{1}{x^p}\\,dx$ converge se $p > 1$ e diverge se $p \\leq 1$. " +
+            "Por quê? A antiderivada é $\\frac{x^{1-p}}{1-p}$, e quando $1-p < 0$ (ou seja, $p > 1$), " +
+            "$x^{1-p} \\to 0$ quando $x \\to \\infty$ — a função cai rápido o suficiente para que " +
+            "a soma de todas as fatias de área convirja. Com $p = 1$ temos $\\ln x$, que cresce sem limite. " +
+            "Para integrais com assíntota vertical (como $\\int_0^1 \\frac{1}{\\sqrt{x}}\\,dx$), a lógica é a mesma: " +
+            "substituímos o ponto problemático por um limite e verificamos se a área se estabiliza. " +
+            "Infinito não significa automaticamente divergente — depende de quão rápido a função se comporta.",
         examples: [
             {
                 problem: "Calcule $\\int_1^{\\infty} \\frac{1}{x^2}\\,dx$.",
@@ -505,10 +580,16 @@ export const explanations: Record<string, TopicExplanation> = {
             "\\frac{dy}{dx} = f(x)g(y) \\implies \\int \\frac{dy}{g(y)} = \\int f(x)\\,dx",
         proofTitle: "Por que funciona?",
         proof:
-            "Se $\\frac{dy}{dx} = f(x)g(y)$, dividimos ambos os lados por $g(y)$ (supondo $g(y) \\neq 0$): " +
-            "$\\frac{1}{g(y)}\\frac{dy}{dx} = f(x)$. Integrando em $x$: $\\int \\frac{1}{g(y)}\\frac{dy}{dx}dx = \\int f(x)dx$. " +
-            "Pelo teorema da substituição, o lado esquerdo é $\\int \\frac{dy}{g(y)}$. " +
-            "Assim, a separação de variáveis é rigorosamente justificada pela regra da cadeia e substituição.",
+            "A separação de variáveis parece informal — \"passamos $dx$ para o outro lado\" — " +
+            "mas tem fundamento rigoroso. Se $\\frac{dy}{dx} = f(x)g(y)$ e $g(y) \\neq 0$, " +
+            "dividimos: $\\frac{1}{g(y)}\\frac{dy}{dx} = f(x)$. " +
+            "Integrando ambos os lados em $x$: $\\int \\frac{1}{g(y)}\\frac{dy}{dx}\\,dx = \\int f(x)\\,dx$. " +
+            "Pelo teorema da substituição (com $y = y(x)$), o lado esquerdo é $\\int \\frac{1}{g(y)}\\,dy$. " +
+            "Pronto: $\\int \\frac{dy}{g(y)} = \\int f(x)\\,dx$, de forma completamente rigorosa. " +
+            "A \"separação\" não é manipulação mágica com diferenciais — é integração dos dois lados " +
+            "seguida de uma substituição. O resultado é o mesmo da notação informal, " +
+            "mas agora sabemos exatamente por que é válido: a regra da cadeia e o teorema da substituição " +
+            "trabalhando juntos.",
         examples: [
             {
                 problem: "Resolva $\\frac{dy}{dx} = xy$ com $y(0) = 2$.",
@@ -536,10 +617,14 @@ export const explanations: Record<string, TopicExplanation> = {
             "y' + P(x)y = Q(x) \\implies y = \\frac{1}{\\mu}\\int \\mu\\,Q\\,dx, \\quad \\mu = e^{\\int P\\,dx}",
         proofTitle: "Por que funciona?",
         proof:
-            "Multiplicando $y' + Py = Q$ por $\\mu = e^{\\int P\\,dx}$: $\\mu y' + \\mu Py = \\mu Q$. " +
-            "Observe que $\\mu' = P\\mu$ (pela definição de $\\mu$). " +
-            "Logo, $\\mu y' + \\mu' y = \\mu Q$, e o lado esquerdo é exatamente $(\\mu y)' $ pela regra do produto. " +
-            "Integrando: $\\mu y = \\int \\mu Q\\,dx + C$, e isolamos $y$.",
+            "De onde vem o fator integrante $\\mu = e^{\\int P\\,dx}$? Não é mágica — é engenharia reversa. " +
+            "Queremos multiplicar $y' + Py = Q$ por alguma função $\\mu(x)$ tal que o lado esquerdo vire $(\\mu y)'$. " +
+            "Expandindo pela regra do produto: $(\\mu y)' = \\mu' y + \\mu y'$. " +
+            "Comparando com $\\mu(y' + Py) = \\mu y' + \\mu P y$, precisamos de $\\mu' = \\mu P$, " +
+            "ou seja, $\\frac{\\mu'}{\\mu} = P$. Integrando: $\\ln|\\mu| = \\int P\\,dx$, logo $\\mu = e^{\\int P\\,dx}$. " +
+            "Com esse $\\mu$, a equação vira $(\\mu y)' = \\mu Q$. Integrando: $\\mu y = \\int \\mu Q\\,dx + C$. " +
+            "O fator integrante é a única função que transforma a equação numa derivada de produto — " +
+            "e a beleza é que $\\frac{\\mu'}{\\mu} = P$ é, ela mesma, uma EDO separável que já sabemos resolver.",
         examples: [
             {
                 problem: "Resolva $y' + 2y = e^{-x}$.",
@@ -568,10 +653,15 @@ export const explanations: Record<string, TopicExplanation> = {
             "M\\,dx + N\\,dy = 0 \\text{ é exata se } \\frac{\\partial M}{\\partial y} = \\frac{\\partial N}{\\partial x}",
         proofTitle: "Por que funciona?",
         proof:
-            "Se existe $F$ tal que $F_x = M$ e $F_y = N$, então pelo teorema de Schwarz (igualdade das derivadas mistas): " +
-            "$\\frac{\\partial M}{\\partial y} = F_{xy} = F_{yx} = \\frac{\\partial N}{\\partial x}$. " +
+            "Imagine uma superfície $F(x,y)$ no espaço. As curvas de nível $F(x,y) = C$ são como linhas " +
+            "de altitude num mapa topográfico. Se nos movemos ao longo de uma curva de nível, $F$ não muda: " +
+            "$dF = F_x\\,dx + F_y\\,dy = 0$. Essa é exatamente a forma $M\\,dx + N\\,dy = 0$ com $M = F_x$ e $N = F_y$. " +
+            "A condição $M_y = N_x$ verifica se tal superfície $F$ existe: pelo teorema de Schwarz, " +
+            "se $F$ existe, então $F_{xy} = F_{yx}$, logo $M_y = N_x$. " +
             "Para encontrar $F$, integramos $M$ em $x$: $F = \\int M\\,dx + g(y)$, " +
-            "e determinamos $g(y)$ exigindo que $F_y = N$. A solução é $F(x,y) = C$.",
+            "onde $g(y)$ é uma \"constante\" que pode depender de $y$. " +
+            "Determinamos $g(y)$ exigindo $F_y = N$: isso dá uma equação para $g'(y)$ que envolve apenas $y$. " +
+            "A solução da EDO é $F(x,y) = C$ — estamos encontrando as curvas de nível da superfície.",
         examples: [
             {
                 problem: "Resolva $(2xy + 3)dx + (x^2 + 4y)dy = 0$.",
@@ -603,10 +693,16 @@ export const explanations: Record<string, TopicExplanation> = {
             "\\frac{dy}{dx} = \\phi\\!\\left(\\frac{y}{x}\\right) \\implies v + x\\frac{dv}{dx} = \\phi(v), \\quad v = \\frac{y}{x}",
         proofTitle: "Por que funciona?",
         proof:
-            "Se $f(tx,ty) = f(x,y)$ para todo $t > 0$ (homogeneidade de grau 0), " +
-            "fazendo $t = 1/x$: $f(x,y) = f(1, y/x) = \\phi(y/x)$, confirmando que só depende de $v = y/x$. " +
-            "Com $y = vx$: $\\frac{dy}{dx} = v + x\\frac{dv}{dx}$. Substituindo na EDO: " +
-            "$v + x\\frac{dv}{dx} = \\phi(v)$, que é separável: $\\frac{dv}{\\phi(v) - v} = \\frac{dx}{x}$.",
+            "Uma EDO homogênea de grau 0 tem a propriedade $f(tx,ty) = f(x,y)$ para todo $t > 0$: " +
+            "multiplicar $x$ e $y$ pelo mesmo fator não muda nada. " +
+            "Fazendo $t = 1/x$: $f(x,y) = f(1, y/x) = \\phi(y/x)$. Isso prova que $\\frac{dy}{dx}$ " +
+            "depende apenas da razão $v = y/x$, não de $x$ e $y$ separadamente. " +
+            "A substituição $y = vx$ é natural: se a razão é o que importa, fazemos dela a nova variável. " +
+            "Derivando $y = vx$ pela regra do produto: $\\frac{dy}{dx} = v + x\\frac{dv}{dx}$. " +
+            "Substituindo na EDO: $v + x\\frac{dv}{dx} = \\phi(v)$, logo $x\\frac{dv}{dx} = \\phi(v) - v$. " +
+            "Essa equação é separável: $\\frac{dv}{\\phi(v) - v} = \\frac{dx}{x}$. " +
+            "A invariância de escala é o que garantiu que $v = y/x$ reduziria a equação a algo mais simples — " +
+            "não foi uma substituição aleatória, foi a substituição natural do problema.",
         examples: [
             {
                 problem: "Resolva $\\frac{dy}{dx} = \\frac{x + y}{x}$.",
@@ -637,11 +733,18 @@ export const explanations: Record<string, TopicExplanation> = {
             "ay'' + by' + cy = 0 \\implies ar^2 + br + c = 0",
         proofTitle: "Por que funciona?",
         proof:
-            "Substituindo $y = e^{rx}$ na EDO: $ae^{rx}r^2 + be^{rx}r + ce^{rx} = 0$. " +
-            "Como $e^{rx} \\neq 0$, dividimos por ele: $ar^2 + br + c = 0$. " +
-            "Se as raízes são reais distintas $r_1, r_2$: $y = C_1 e^{r_1 x} + C_2 e^{r_2 x}$. " +
-            "Se a raiz é dupla $r$: $y = (C_1 + C_2 x)e^{rx}$. " +
-            "Se as raízes são complexas $\\alpha \\pm \\beta i$: $y = e^{\\alpha x}(C_1 \\cos \\beta x + C_2 \\sin \\beta x)$.",
+            "Por que tentamos $y = e^{rx}$? Porque derivar uma exponencial devolve uma exponencial: " +
+            "$y' = re^{rx}$, $y'' = r^2 e^{rx}$. Substituindo em $ay'' + by' + cy = 0$: " +
+            "$e^{rx}(ar^2 + br + c) = 0$. Como $e^{rx}$ nunca é zero, devemos ter $ar^2 + br + c = 0$ — " +
+            "a equação característica, uma simples equação do 2o grau. " +
+            "Se há duas raízes reais distintas $r_1, r_2$: a solução geral é $y = C_1 e^{r_1 x} + C_2 e^{r_2 x}$. " +
+            "Se a raiz é dupla $r$: uma solução é $e^{rx}$, mas precisamos de duas independentes; " +
+            "a segunda é $xe^{rx}$, onde o fator $x$ garante independência. " +
+            "Se as raízes são complexas $\\alpha \\pm \\beta i$: pela fórmula de Euler, " +
+            "$e^{(\\alpha + \\beta i)x} = e^{\\alpha x}(\\cos \\beta x + i\\sin \\beta x)$. " +
+            "Tomando partes real e imaginária: $e^{\\alpha x}\\cos \\beta x$ e $e^{\\alpha x}\\sin \\beta x$. " +
+            "O $\\alpha$ controla crescimento ou decaimento e o $\\beta$ controla a oscilação — " +
+            "exatamente o que observamos em molas, pêndulos e circuitos elétricos.",
         examples: [
             {
                 problem: "Resolva $y'' - 5y' + 6y = 0$.",
@@ -670,11 +773,17 @@ export const explanations: Record<string, TopicExplanation> = {
             "y = y_h + y_p \\quad \\text{onde } y_p \\text{ tem a forma de } g(x)",
         proofTitle: "Por que funciona?",
         proof:
-            "Pelo princípio da superposição para EDOs lineares, se $y_h$ resolve a parte homogênea " +
-            "e $y_p$ resolve a completa, então $y = y_h + y_p$ é a solução geral. " +
-            "O \"chute\" funciona porque derivadas de polinômios, exponenciais e trigonométricas " +
-            "produzem funções do mesmo tipo. Quando $g(x)$ é solução da homogênea, multiplicamos " +
-            "o chute por $x$ (ou $x^2$) para garantir independência linear.",
+            "O \"chute\" tem uma lógica precisa por trás. Derivar um polinômio dá outro polinômio; " +
+            "derivar $e^{kx}$ dá um múltiplo de $e^{kx}$; derivar $\\sin$ e $\\cos$ dá $\\cos$ e $-\\sin$. " +
+            "Essas famílias são fechadas sob derivação — não escapam de si mesmas. " +
+            "Se $g(x) = e^{5x}$, então $y_p$, $y_p'$, $y_p''$ são todos múltiplos de $e^{5x}$, " +
+            "e a equação $ay_p'' + by_p' + cy_p = g(x)$ vira uma equação algébrica para o coeficiente. " +
+            "O princípio da superposição garante que $y = y_h + y_p$ é a solução geral: " +
+            "$y_h$ captura todas as soluções da homogênea, e $y_p$ ajusta para o termo forçante. " +
+            "Caso especial: se $g(x)$ já é solução da homogênea (por exemplo $g(x) = e^{r_1 x}$), " +
+            "o chute $Ae^{r_1 x}$ dá zero ao substituir na homogênea. Multiplicamos por $x$: " +
+            "$y_p = Axe^{r_1 x}$. Se a raiz for dupla, por $x^2$. " +
+            "Cada fator de $x$ garante independência linear, fornecendo uma solução particular genuína.",
         examples: [
             {
                 problem: "Resolva $y'' - 3y' + 2y = 4e^{5x}$.",
@@ -706,11 +815,16 @@ export const explanations: Record<string, TopicExplanation> = {
             "\\mathcal{L}\\{f(t)\\} = F(s) = \\int_0^{\\infty} e^{-st} f(t)\\,dt",
         proofTitle: "Por que funciona?",
         proof:
-            "A propriedade chave é que $\\mathcal{L}\\{f'(t)\\} = sF(s) - f(0)$, obtida integrando por partes: " +
-            "$\\int_0^\\infty e^{-st}f'(t)dt = [e^{-st}f(t)]_0^\\infty + s\\int_0^\\infty e^{-st}f(t)dt = -f(0) + sF(s)$. " +
-            "Isso transforma $y'' + ay' + by = g(t)$ em $(s^2 + as + b)Y(s) = G(s) + \\text{condições iniciais}$, " +
-            "uma equação algébrica em $Y(s)$. A linearidade da transformada garante que " +
-            "a solução no domínio $s$ corresponde à solução no domínio $t$.",
+            "A ideia genial é converter derivadas em multiplicações — transformando equações diferenciais em álgebra. " +
+            "A propriedade central: $\\mathcal{L}\\{f'(t)\\} = sF(s) - f(0)$, obtida por integração por partes: " +
+            "$\\int_0^\\infty e^{-st}f'(t)\\,dt = [e^{-st}f(t)]_0^\\infty + s\\int_0^\\infty e^{-st}f(t)\\,dt = -f(0) + sF(s)$ " +
+            "(supondo $f(t)e^{-st} \\to 0$ quando $t \\to \\infty$). " +
+            "Cada derivada vira multiplicação por $s$, e as condições iniciais entram automaticamente. " +
+            "Assim, $y'' + ay' + by = g(t)$ vira $(s^2Y - sy(0) - y'(0)) + a(sY - y(0)) + bY = G(s)$ — " +
+            "uma equação algébrica em $Y(s)$ que resolvemos com álgebra básica. " +
+            "Depois, consultando uma tabela de pares conhecidos, aplicamos a transformada inversa " +
+            "para voltar ao domínio do tempo. É como traduzir um problema difícil para um idioma " +
+            "onde ele fica fácil, resolver lá, e traduzir a resposta de volta.",
         examples: [
             {
                 problem: "Resolva $y' + 2y = 0$, $y(0) = 3$, usando Laplace.",

@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Dumbbell, Eye, BookOpen, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import MathRenderer from '@/components/ui/MathRenderer';
@@ -15,6 +15,12 @@ export default function LandingPage() {
 
         </div>
         <div className="flex items-center gap-6">
+          <Link
+            href="/sobre"
+            className="font-bold text-gray-500 hover:text-gray-900 transition-colors"
+          >
+            Sobre
+          </Link>
           <Link
             href="/sign-in"
             className="font-bold text-gray-900 hover:text-blue-600 transition-colors mr-4"
@@ -103,9 +109,134 @@ export default function LandingPage() {
           ))}
         </div>
 
-
-
       </main>
+
+      {/* How it Works */}
+      <section className="bg-gray-50 px-6 py-24">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-4xl font-bold text-gray-900 text-center mb-4">
+            Como funciona
+          </h2>
+          <p className="text-gray-500 text-center text-lg mb-16 max-w-2xl mx-auto">
+            Cada tópico tem três modos de estudo, pensados para levar você da teoria à fluência.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            {[
+              {
+                icon: <BookOpen className="w-6 h-6 text-blue-600" />,
+                title: 'Aprender',
+                desc: 'Entenda a intuição por trás de cada técnica com explicações claras, provas e exemplos resolvidos passo a passo.',
+                color: 'bg-blue-50',
+              },
+              {
+                icon: <Dumbbell className="w-6 h-6 text-green-600" />,
+                title: 'Treinar',
+                desc: 'Resolva problemas no seu ritmo. Veja dicas quando precisar, confira a resposta e avalie sua confiança — o sistema se adapta a você.',
+                color: 'bg-green-50',
+              },
+              {
+                icon: <Eye className="w-6 h-6 text-purple-600" />,
+                title: 'Reconhecer',
+                desc: 'Dado um problema, identifique qual técnica usar. Essa é a habilidade que separa quem sabe a matéria de quem passa na prova.',
+                color: 'bg-purple-50',
+              },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="text-center"
+              >
+                <div className={`w-14 h-14 ${item.color} rounded-2xl flex items-center justify-center mx-auto mb-5`}>
+                  {item.icon}
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">{item.title}</h3>
+                <p className="text-gray-500 leading-relaxed">{item.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* What's inside */}
+      <section className="px-6 py-24">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-4xl font-bold text-gray-900 text-center mb-16">
+            O que oferecemos
+          </h2>
+
+          <div className="space-y-12">
+            {[
+              {
+                title: '22 tópicos de Cálculo I, II e III',
+                desc: 'De regra da potência até transformada de Laplace — derivadas, integrais e EDOs organizados em ordem crescente de dificuldade.',
+              },
+              {
+                title: 'Problemas com feedback na hora',
+                desc: 'Cada exercício tem resposta, dica passo a passo e autoavaliação. Você sabe exatamente onde errou antes de ir para o próximo.',
+              },
+              {
+                title: 'Feito para quem aprende fazendo',
+                desc: 'Menos teoria passiva, mais resolução. O foco é colocar a caneta no papel desde o primeiro minuto.',
+              },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="flex gap-5"
+              >
+                <div className="mt-1.5 shrink-0">
+                  <div className="w-3 h-3 rounded-full bg-blue-600" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
+                  <p className="text-gray-500 leading-relaxed text-lg">{item.desc}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Blitz Mode highlight */}
+      <section className="bg-gray-50 px-6 py-24">
+        <div className="max-w-3xl mx-auto text-center">
+          <div className="w-14 h-14 bg-yellow-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <Zap className="w-6 h-6 text-yellow-600 fill-yellow-600" />
+          </div>
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            Modo Blitz
+          </h2>
+          <p className="text-gray-500 text-lg leading-relaxed max-w-xl mx-auto">
+            3 minutos no relógio. Máximo de problemas. 3 erros e acabou. Teste sua velocidade e consistência sob pressão — do jeito que a prova vai cobrar.
+          </p>
+        </div>
+      </section>
+
+      {/* Bottom CTA */}
+      <section className="px-6 py-24">
+        <div className="max-w-2xl mx-auto text-center">
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            Comece agora, de graça.
+          </h2>
+          <p className="text-gray-500 text-lg mb-8">
+            9 tópicos liberados. Sem cartão de crédito.
+          </p>
+          <Link
+            href="/sign-up"
+            className="inline-flex items-center gap-2 text-lg px-10 py-4 bg-blue-600 text-white font-bold rounded-full shadow-[0_4px_0_0_rgb(29,78,216)] active:shadow-none active:translate-y-[4px] transition-all hover:bg-blue-500 hover:-translate-y-1 hover:shadow-[0_6px_0_0_rgb(29,78,216)]"
+          >
+            Criar Conta Grátis
+            <ArrowRight className="w-5 h-5" />
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }

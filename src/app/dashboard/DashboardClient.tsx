@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Flame, Trophy, Zap } from 'lucide-react';
+import { Flame, Trophy, Zap, Settings } from 'lucide-react';
 import MathRenderer from '@/components/ui/MathRenderer';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
@@ -59,11 +59,16 @@ export default function DashboardClient({
                         <span>{xpTotal}</span>
                     </div>
 
-                    {/* Exercise count */}
-                    <div className="flex items-center gap-1.5 text-gray-500 font-medium text-sm">
+                    {/* Exercise count — links to stats */}
+                    <Link href="/dashboard/stats" className="flex items-center gap-1.5 text-gray-500 font-medium text-sm hover:text-green-600 transition-colors">
                         <Trophy className="w-4 h-4 text-green-500" />
                         <span>{exercisesSolved}</span>
-                    </div>
+                    </Link>
+
+                    {/* Settings */}
+                    <Link href="/dashboard/settings" className="text-gray-400 hover:text-gray-700 transition-colors">
+                        <Settings className="w-4.5 h-4.5" />
+                    </Link>
 
                     <UserButton afterSignOutUrl="/" />
                 </div>

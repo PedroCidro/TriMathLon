@@ -15,25 +15,24 @@ export default async function MethodPage({ params }: { params: Params }) {
     const { module: moduleId, method: methodId } = await params
 
     // Server-side premium enforcement
-    const topic = curriculum
-        .find(m => m.id === moduleId)
-        ?.topics.find(t => t.id === methodId)
+    const moduleData = curriculum.find(m => m.id === moduleId)
+    const topicIndex = moduleData?.topics.findIndex(t => t.id === methodId) ?? -1
 
-    if (!topic) {
+    if (topicIndex === -1) {
         return redirect(`/dashboard/${moduleId}`)
     }
 
-    if (topic.difficulty === 'Hard') {
-        const { data } = await getSupabaseAdmin()
-            .from('profiles')
-            .select('is_premium')
-            .eq('id', userId)
-            .single()
+    const { data } = await getSupabaseAdmin()
+        .from('profiles')
+        .select('is_premium')
+        .eq('id', userId)
+        .single()
 
-        if (!data?.is_premium) {
-            return redirect(`/dashboard/${moduleId}`)
-        }
+    const isPremium = !!data?.is_premium
+
+    if (topicIndex >= 3 && !isPremium) {
+        return redirect('/premium')
     }
 
-    return <MethodClient />
+    return <MethodClient isPremium={isPremium} />
 }

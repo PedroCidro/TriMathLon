@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { ArrowLeft, Play, BookOpen, Lock } from 'lucide-react';
+import { ArrowLeft, Play, BookOpen, Lock, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import MathRenderer from '@/components/ui/MathRenderer';
@@ -35,14 +35,37 @@ export default function ModuleClient({ isPremium }: { isPremium: boolean }) {
                     <p className="text-gray-500 text-lg">{moduleData.description}</p>
                 </header>
 
+                {/* Blitz Mode Card */}
+                <Link
+                    href={`/dashboard/${moduleId}/blitz`}
+                    className="block mb-8"
+                >
+                    <div className="group relative p-6 bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-200 rounded-2xl transition-all hover:border-yellow-400 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="p-3 bg-yellow-100 rounded-xl">
+                                    <Zap className="w-6 h-6 text-yellow-600 fill-yellow-600" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-gray-900">Modo Blitz</h3>
+                                    <p className="text-gray-500 font-medium">3 minutos. Máximo de problemas. 3 erros e acabou.</p>
+                                </div>
+                            </div>
+                            <div className="inline-flex items-center gap-2 text-xs font-bold text-yellow-600 bg-yellow-100 px-3 py-1 rounded-full uppercase tracking-wider group-hover:bg-yellow-600 group-hover:text-white transition-colors">
+                                <Play className="w-3 h-3 fill-current" />
+                                Jogar
+                            </div>
+                        </div>
+                    </div>
+                </Link>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {moduleData.topics.map((topic, i) => {
-                        // Lock logic: Lock 'Hard' topics if not premium
-                        const isLocked = topic.difficulty === 'Hard' && !isPremium;
+                        const isLocked = i >= 3 && !isPremium;
 
                         return (
                             <Link
-                                href={isLocked ? '#' : `/dashboard/${moduleId}/${topic.id}`}
+                                href={isLocked ? '/premium' : `/dashboard/${moduleId}/${topic.id}`}
                                 key={topic.id}
                                 className={cn(
                                     "group relative p-6 bg-white border-2 rounded-2xl transition-all",
@@ -59,7 +82,7 @@ export default function ModuleClient({ isPremium }: { isPremium: boolean }) {
                                         {isLocked ? (
                                             <div className="inline-flex items-center gap-2 text-xs font-bold text-gray-400 bg-gray-100 px-3 py-1 rounded-full uppercase tracking-wider">
                                                 <Lock className="w-3 h-3" />
-                                                Premium ({topic.difficulty})
+                                                Premium
                                             </div>
                                         ) : (
                                             <div className="inline-flex items-center gap-2 text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full uppercase tracking-wider group-hover:bg-blue-600 group-hover:text-white transition-colors">

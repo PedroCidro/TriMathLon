@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useParams } from 'next/navigation';
-import { ArrowLeft, BookOpen, Dumbbell, Eye, Check, X, RotateCcw, Camera } from 'lucide-react';
+import { ArrowLeft, BookOpen, Dumbbell, Eye, Check, X, RotateCcw, Camera, Lock, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import MathRenderer from '@/components/ui/MathRenderer';
@@ -17,6 +17,7 @@ type Question = {
     id: string;
     problem: string;
     solution_latex: string;
+    step_by_step: string | null;
     difficulty: number;
 };
 
@@ -26,7 +27,7 @@ type RecognizeQuestion = {
     subcategory: string;
 };
 
-export default function MethodClient() {
+export default function MethodClient({ isPremium }: { isPremium: boolean }) {
     const [activeTab, setActiveTab] = useState<Tab>('learn');
     const params = useParams();
 
@@ -42,6 +43,7 @@ export default function MethodClient() {
     // ── Practice Tab State ──
     const [questions, setQuestions] = useState<Question[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [showHint, setShowHint] = useState(false);
     const [showAnswer, setShowAnswer] = useState(false);
     const [loading, setLoading] = useState(false);
     const [xpPopup, setXpPopup] = useState<number | null>(null);
@@ -75,7 +77,7 @@ export default function MethodClient() {
 
         const { data, error } = await supabase
             .from('questions')
-            .select('id, problem, solution_latex, difficulty')
+            .select('id, problem, solution_latex, step_by_step, difficulty')
             .eq('subcategory', params.method)
             .limit(20);
 
@@ -120,6 +122,7 @@ export default function MethodClient() {
 
         // Advance to next question after brief delay
         setTimeout(() => {
+            setShowHint(false);
             setShowAnswer(false);
             setRatingSubmitted(false);
             setCurrentIndex((prev) => (prev + 1) % questions.length);
@@ -233,24 +236,29 @@ export default function MethodClient() {
                 {/* Tabs */}
                 <div className="flex bg-gray-100 p-1 rounded-xl">
                     {[
-                        { id: 'learn', label: 'Aprender', icon: BookOpen },
-                        { id: 'practice', label: 'Treinar', icon: Dumbbell },
-                        { id: 'recognize', label: 'Reconhecer', icon: Eye }
-                    ].map((tab) => (
-                        <button
-                            key={tab.id}
-                            onClick={() => setActiveTab(tab.id as Tab)}
-                            className={cn(
-                                "flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm transition-all",
-                                activeTab === tab.id
-                                    ? "bg-white text-black shadow-sm"
-                                    : "text-gray-500 hover:text-gray-900"
-                            )}
-                        >
-                            <tab.icon className="w-4 h-4" />
-                            <span className="hidden sm:block">{tab.label}</span>
-                        </button>
-                    ))}
+                        { id: 'learn', label: 'Aprender', icon: BookOpen, premium: false },
+                        { id: 'practice', label: 'Treinar', icon: Dumbbell, premium: false },
+                        { id: 'recognize', label: 'Reconhecer', icon: Eye, premium: true }
+                    ].map((tab) => {
+                        const locked = tab.premium && !isPremium;
+                        return (
+                            <button
+                                key={tab.id}
+                                onClick={() => !locked && setActiveTab(tab.id as Tab)}
+                                className={cn(
+                                    "flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm transition-all",
+                                    locked
+                                        ? "text-gray-300 cursor-not-allowed"
+                                        : activeTab === tab.id
+                                        ? "bg-white text-black shadow-sm"
+                                        : "text-gray-500 hover:text-gray-900"
+                                )}
+                            >
+                                {locked ? <Lock className="w-3.5 h-3.5" /> : <tab.icon className="w-4 h-4" />}
+                                <span className="hidden sm:block">{tab.label}</span>
+                            </button>
+                        );
+                    })}
                 </div>
             </header>
 
@@ -296,7 +304,7 @@ export default function MethodClient() {
                                             {/* Proof / formal explanation */}
                                             <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-200">
                                                 <h2 className="text-2xl font-bold mb-4">{explanation.proofTitle}</h2>
-                                                <div className="text-gray-600 leading-relaxed text-lg">
+                                                <div className="text-gray-600 leading-loose text-[1.175rem]">
                                                     {renderFormattedText(explanation.proof, "")}
                                                 </div>
                                             </div>
@@ -353,6 +361,19 @@ export default function MethodClient() {
                                         </div>
 
                                         <AnimatePresence>
+                                            {showHint && questions[currentIndex].step_by_step && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, height: 0 }}
+                                                    animate={{ opacity: 1, height: 'auto' }}
+                                                    exit={{ opacity: 0, height: 0 }}
+                                                    className="mb-4"
+                                                >
+                                                    <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-5">
+                                                        <span className="text-xs font-bold text-yellow-600 uppercase mb-2 block">Dica</span>
+                                                        {renderFormattedText(questions[currentIndex].step_by_step!, "text-base text-yellow-800 font-medium")}
+                                                    </div>
+                                                </motion.div>
+                                            )}
                                             {showAnswer && (
                                                 <motion.div
                                                     initial={{ opacity: 0, height: 0 }}
@@ -369,12 +390,22 @@ export default function MethodClient() {
                                         </AnimatePresence>
 
                                         {!showAnswer ? (
-                                            <button
-                                                onClick={() => setShowAnswer(true)}
-                                                className="px-8 py-3 bg-white border-2 border-gray-200 hover:border-blue-500 hover:text-blue-600 text-gray-600 rounded-xl font-bold transition-all"
-                                            >
-                                                Mostrar Resposta
-                                            </button>
+                                            <div className="flex gap-3 justify-center">
+                                                {!showHint && questions[currentIndex].step_by_step && (
+                                                    <button
+                                                        onClick={() => setShowHint(true)}
+                                                        className="px-8 py-3 bg-white border-2 border-yellow-200 hover:border-yellow-500 hover:text-yellow-600 text-gray-500 rounded-xl font-bold transition-all"
+                                                    >
+                                                        Ver Dica
+                                                    </button>
+                                                )}
+                                                <button
+                                                    onClick={() => setShowAnswer(true)}
+                                                    className="px-8 py-3 bg-white border-2 border-gray-200 hover:border-blue-500 hover:text-blue-600 text-gray-600 rounded-xl font-bold transition-all"
+                                                >
+                                                    Mostrar Resposta
+                                                </button>
+                                            </div>
                                         ) : (
                                             <div className="space-y-4 relative">
                                                 {/* XP popup animation */}
