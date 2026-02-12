@@ -9,19 +9,19 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 export const metadata: Metadata = {
-  title: "Trimathlon | Plataforma de Treinamento em Cálculo",
+  title: "JustMathing | Plataforma de Treinamento em Cálculo",
   description: "Domine Derivadas, Integrais e EDOs com prática deliberada e interativa. Treine cálculo como um atleta treina seu esporte.",
   keywords: ["cálculo", "derivadas", "integrais", "EDO", "matemática", "treino", "prática", "universidade"],
   openGraph: {
-    title: "Trimathlon | Treinamento em Cálculo",
+    title: "JustMathing | Treinamento em Cálculo",
     description: "Domine Derivadas, Integrais e EDOs com prática deliberada e interativa.",
     type: "website",
     locale: "pt_BR",
-    siteName: "Trimathlon",
+    siteName: "JustMathing",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Trimathlon | Treinamento em Cálculo",
+    title: "JustMathing | Treinamento em Cálculo",
     description: "Domine Derivadas, Integrais e EDOs com prática deliberada e interativa.",
   },
 };

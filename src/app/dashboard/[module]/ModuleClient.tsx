@@ -31,7 +31,7 @@ export default function ModuleClient({ isPremium }: { isPremium: boolean }) {
                 </Link>
 
                 <header className="mb-12">
-                    <h1 className="text-4xl font-bold text-gray-900 mb-2">{moduleData.title}</h1>
+                    <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">{moduleData.title}</h1>
                     <p className="text-gray-500 text-lg">{moduleData.description}</p>
                 </header>
 
@@ -48,7 +48,7 @@ export default function ModuleClient({ isPremium }: { isPremium: boolean }) {
                                 </div>
                                 <div>
                                     <h3 className="text-xl font-bold text-gray-900">Modo Blitz</h3>
-                                    <p className="text-gray-500 font-medium">3 minutos. Máximo de problemas. 3 erros e acabou.</p>
+                                    <p className="text-gray-500 font-medium hidden sm:block">3 minutos. Máximo de problemas. 3 erros e acabou.</p>
                                 </div>
                             </div>
                             <div className="inline-flex items-center gap-2 text-xs font-bold text-yellow-600 bg-yellow-100 px-3 py-1 rounded-full uppercase tracking-wider group-hover:bg-yellow-600 group-hover:text-white transition-colors">
@@ -93,7 +93,7 @@ export default function ModuleClient({ isPremium }: { isPremium: boolean }) {
                                     </div>
 
                                     {/* Using a generic icon or the module icon for topics since we don't have individual topic icons yet */}
-                                    <div className="h-14 w-14 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 group-hover:text-blue-500 transition-colors">
+                                    <div className="h-10 w-10 sm:h-14 sm:w-14 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 group-hover:text-blue-500 transition-colors">
                                         <MathRenderer latex={moduleData.iconLatex} className="font-bold text-lg" />
                                     </div>
                                 </div>

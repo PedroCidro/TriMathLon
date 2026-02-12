@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useParams } from 'next/navigation';
-import { ArrowLeft, BookOpen, Dumbbell, Eye, Check, X, RotateCcw, Camera, Lock, Zap } from 'lucide-react';
+import { ArrowLeft, BookOpen, Dumbbell, Eye, Check, X, RotateCcw, Lock, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import MathRenderer from '@/components/ui/MathRenderer';
+
 import { motion, AnimatePresence } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
 import { curriculum } from '@/data/curriculum';
@@ -17,7 +18,6 @@ type Question = {
     id: string;
     problem: string;
     solution_latex: string;
-    step_by_step: string | null;
     difficulty: number;
 };
 
@@ -43,7 +43,6 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
     // ── Practice Tab State ──
     const [questions, setQuestions] = useState<Question[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [showHint, setShowHint] = useState(false);
     const [showAnswer, setShowAnswer] = useState(false);
     const [loading, setLoading] = useState(false);
     const [xpPopup, setXpPopup] = useState<number | null>(null);
@@ -77,7 +76,7 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
 
         const { data, error } = await supabase
             .from('questions')
-            .select('id, problem, solution_latex, step_by_step, difficulty')
+            .select('id, problem, solution_latex, difficulty')
             .eq('subcategory', params.method)
             .limit(20);
 
@@ -122,7 +121,6 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
 
         // Advance to next question after brief delay
         setTimeout(() => {
-            setShowHint(false);
             setShowAnswer(false);
             setRatingSubmitted(false);
             setCurrentIndex((prev) => (prev + 1) % questions.length);
@@ -222,14 +220,14 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
             {/* Top Bar */}
-            <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0 z-20">
+            <header className="bg-white border-b border-gray-200 px-3 sm:px-6 py-3 sm:py-4 flex items-center justify-between sticky top-0 z-20">
                 <div className="flex items-center gap-4">
                     <Link href={`/dashboard/${params.module}`} className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500">
-                        <ArrowLeft className="w-6 h-6" />
+                        <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6" />
                     </Link>
                     <div className="flex flex-col">
                         <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{moduleData?.title || params.module}</span>
-                        <h1 className="text-lg font-bold text-gray-900">{topicData?.title || 'Tópico'}</h1>
+                        <h1 className="text-base sm:text-lg font-bold text-gray-900">{topicData?.title || 'Tópico'}</h1>
                     </div>
                 </div>
 
@@ -246,7 +244,7 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
                                 key={tab.id}
                                 onClick={() => !locked && setActiveTab(tab.id as Tab)}
                                 className={cn(
-                                    "flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm transition-all",
+                                    "flex items-center gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg font-bold text-xs sm:text-sm transition-all",
                                     locked
                                         ? "text-gray-300 cursor-not-allowed"
                                         : activeTab === tab.id
@@ -276,41 +274,30 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
                             const explanation = explanations[methodId];
                             return (
                                 <div className="space-y-6">
-                                    {/* Video placeholder */}
-                                    <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-200">
-                                        <div className="aspect-video bg-gray-900 rounded-2xl flex items-center justify-center relative overflow-hidden">
-                                            <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900" />
-                                            <div className="relative text-center">
-                                                <div className="text-gray-500 text-sm font-bold uppercase tracking-widest mb-2">Em Breve</div>
-                                                <div className="text-gray-400 text-sm">Animação Manim</div>
-                                            </div>
-                                        </div>
-                                    </div>
-
                                     {explanation ? (
                                         <>
                                             {/* Intuition section */}
-                                            <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-200">
-                                                <h2 className="text-2xl font-bold mb-4">{explanation.intuitionTitle}</h2>
+                                            <div className="bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-gray-200">
+                                                <h2 className="text-xl sm:text-2xl font-bold mb-4">{explanation.intuitionTitle}</h2>
                                                 <div className="text-gray-600 leading-relaxed text-lg mb-6">
                                                     {renderFormattedText(explanation.intuition, "")}
                                                 </div>
                                                 <div className="bg-blue-50 p-6 rounded-xl border border-blue-100 text-center">
                                                     <span className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-3 block">Fórmula Principal</span>
-                                                    <MathRenderer latex={explanation.formulaLatex} className="text-3xl text-blue-700" />
+                                                    <MathRenderer latex={explanation.formulaLatex} className="text-xl sm:text-3xl text-blue-700" />
                                                 </div>
                                             </div>
 
                                             {/* Proof / formal explanation */}
-                                            <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-200">
-                                                <h2 className="text-2xl font-bold mb-4">{explanation.proofTitle}</h2>
-                                                <div className="text-gray-600 leading-loose text-[1.175rem]">
+                                            <div className="bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-gray-200">
+                                                <h2 className="text-xl sm:text-2xl font-bold mb-4">{explanation.proofTitle}</h2>
+                                                <div className="text-gray-600 leading-loose text-base sm:text-[1.175rem]">
                                                     {renderFormattedText(explanation.proof, "")}
                                                 </div>
                                             </div>
 
                                             {/* Worked examples */}
-                                            <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-200">
+                                            <div className="bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-gray-200">
                                                 <h2 className="text-2xl font-bold mb-6">Exemplos Resolvidos</h2>
                                                 <div className="space-y-6">
                                                     {explanation.examples.map((example, i) => (
@@ -343,7 +330,7 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
                         })()}
 
                         {activeTab === 'practice' && (
-                            <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-200 text-center min-h-[400px] flex flex-col items-center justify-center relative">
+                            <div className="bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-gray-200 text-center min-h-[400px] flex flex-col items-center justify-center relative">
                                 {loading ? (
                                     <div className="text-gray-400 animate-pulse">Carregando questões...</div>
                                 ) : questions.length > 0 ? (
@@ -357,23 +344,10 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
                                         </span>
 
                                         <div className="mb-12 min-h-[120px] flex items-center justify-center">
-                                            {renderFormattedText(questions[currentIndex].problem.replace('Derive', ''), "text-4xl md:text-5xl font-bold text-blue-600")}
+                                            {renderFormattedText(questions[currentIndex].problem.replace('Derive', ''), "text-2xl sm:text-4xl md:text-5xl font-bold text-blue-600")}
                                         </div>
 
                                         <AnimatePresence>
-                                            {showHint && questions[currentIndex].step_by_step && (
-                                                <motion.div
-                                                    initial={{ opacity: 0, height: 0 }}
-                                                    animate={{ opacity: 1, height: 'auto' }}
-                                                    exit={{ opacity: 0, height: 0 }}
-                                                    className="mb-4"
-                                                >
-                                                    <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-5">
-                                                        <span className="text-xs font-bold text-yellow-600 uppercase mb-2 block">Dica</span>
-                                                        {renderFormattedText(questions[currentIndex].step_by_step!, "text-base text-yellow-800 font-medium")}
-                                                    </div>
-                                                </motion.div>
-                                            )}
                                             {showAnswer && (
                                                 <motion.div
                                                     initial={{ opacity: 0, height: 0 }}
@@ -383,7 +357,7 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
                                                 >
                                                     <div className="bg-green-50 border border-green-100 rounded-xl p-6">
                                                         <span className="text-xs font-bold text-green-600 uppercase mb-2 block">Resposta</span>
-                                                        {renderFormattedText(questions[currentIndex].solution_latex, "text-2xl text-green-700 font-bold")}
+                                                        {renderFormattedText(questions[currentIndex].solution_latex, "text-xl sm:text-2xl text-green-700 font-bold")}
                                                     </div>
                                                 </motion.div>
                                             )}
@@ -391,17 +365,9 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
 
                                         {!showAnswer ? (
                                             <div className="flex gap-3 justify-center">
-                                                {!showHint && questions[currentIndex].step_by_step && (
-                                                    <button
-                                                        onClick={() => setShowHint(true)}
-                                                        className="px-8 py-3 bg-white border-2 border-yellow-200 hover:border-yellow-500 hover:text-yellow-600 text-gray-500 rounded-xl font-bold transition-all"
-                                                    >
-                                                        Ver Dica
-                                                    </button>
-                                                )}
                                                 <button
                                                     onClick={() => setShowAnswer(true)}
-                                                    className="px-8 py-3 bg-white border-2 border-gray-200 hover:border-blue-500 hover:text-blue-600 text-gray-600 rounded-xl font-bold transition-all"
+                                                    className="px-6 sm:px-8 py-2.5 sm:py-3 bg-white border-2 border-gray-200 hover:border-blue-500 hover:text-blue-600 text-gray-600 rounded-xl font-bold transition-all"
                                                 >
                                                     Mostrar Resposta
                                                 </button>
@@ -422,21 +388,11 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
                                                     )}
                                                 </AnimatePresence>
 
-                                                {/* Photo upload placeholder */}
-                                                <button
-                                                    disabled
-                                                    className="flex items-center gap-2 mx-auto text-sm text-gray-400 border border-dashed border-gray-200 rounded-lg px-4 py-2 cursor-not-allowed"
-                                                    title="Em breve: envie uma foto da sua resolução para feedback com IA"
-                                                >
-                                                    <Camera className="w-4 h-4" />
-                                                    Enviar tentativa (em breve)
-                                                </button>
-
                                                 {/* Self-rating buttons */}
                                                 <span className="text-sm font-bold text-gray-400 uppercase tracking-widest block">
                                                     Como foi?
                                                 </span>
-                                                <div className="flex gap-3 justify-center">
+                                                <div className="flex flex-wrap gap-2 sm:gap-3 justify-center">
                                                     {[
                                                         { id: 'wrong' as const, label: 'Errei', color: 'border-red-200 hover:border-red-500 hover:bg-red-50 text-red-600' },
                                                         { id: 'hard' as const, label: 'Difícil', color: 'border-orange-200 hover:border-orange-500 hover:bg-orange-50 text-orange-600' },
@@ -448,7 +404,7 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
                                                             onClick={() => handleRate(btn.id)}
                                                             disabled={ratingSubmitted}
                                                             className={cn(
-                                                                "px-5 py-3 rounded-xl border-2 font-bold transition-all text-sm",
+                                                                "px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-xl border-2 font-bold transition-all text-xs sm:text-sm",
                                                                 ratingSubmitted
                                                                     ? "opacity-50 cursor-not-allowed border-gray-200 text-gray-400"
                                                                     : btn.color
@@ -492,7 +448,7 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
                                             <div className="mb-12 min-h-[120px] flex items-center justify-center">
                                                 {renderFormattedText(
                                                     recognizeQuestions[recognizeIndex].problem,
-                                                    "text-3xl md:text-4xl font-bold text-gray-900"
+                                                    "text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900"
                                                 )}
                                             </div>
 
@@ -529,7 +485,7 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
                                     ) : (
                                         /* Summary screen */
                                         <div className="text-center">
-                                            <div className="text-6xl font-bold mb-2">
+                                            <div className="text-4xl sm:text-6xl font-bold mb-2">
                                                 <span className="text-green-500">{recognizeScore.correct}</span>
                                                 <span className="text-gray-300"> / </span>
                                                 <span className="text-gray-400">{recognizeScore.total}</span>

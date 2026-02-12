@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Flame, Trophy, Zap, Settings } from 'lucide-react';
+import { Flame, Trophy, Zap, Settings, Building2, ArrowRight } from 'lucide-react';
 import MathRenderer from '@/components/ui/MathRenderer';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
@@ -21,6 +21,7 @@ interface DashboardClientProps {
     xpTotal: number;
     xpToday: number;
     moduleProgress: Record<string, { practiced: number; total: number }>;
+    uniRankingBalloon: { institutionName: string; totalExercises: number; qualified: boolean } | null;
 }
 
 export default function DashboardClient({
@@ -30,6 +31,7 @@ export default function DashboardClient({
     xpTotal,
     xpToday,
     moduleProgress,
+    uniRankingBalloon,
 }: DashboardClientProps) {
     const xpPercent = Math.min(100, Math.round((xpToday / DAILY_XP_GOAL) * 100));
 
@@ -37,12 +39,12 @@ export default function DashboardClient({
         <div className="min-h-screen bg-gray-50 flex flex-col">
 
             {/* Top Navigation */}
-            <nav className="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center sticky top-0 z-10">
+            <nav className="bg-white border-b border-gray-200 px-3 sm:px-6 py-3 sm:py-4 flex justify-between items-center sticky top-0 z-10">
                 <div className="flex items-center gap-2 font-bold text-xl tracking-tight text-gray-900">
-                    <img src="/logo-icon.png" alt="Trimathlon Logo" className="h-10 w-auto" />
+                    <img src="/logo-icon.png" alt="JustMathing Logo" className="h-8 sm:h-10 w-auto" />
                 </div>
 
-                <div className="flex items-center gap-5">
+                <div className="flex items-center gap-3 sm:gap-5">
                     {!isPremium && <UpgradeButton />}
 
                     {/* Streak */}
@@ -56,13 +58,13 @@ export default function DashboardClient({
                     {/* XP Total */}
                     <div className="flex items-center gap-1.5 font-bold text-sm text-yellow-600">
                         <Zap className="w-4 h-4 fill-yellow-500 text-yellow-500" />
-                        <span>{xpTotal}</span>
+                        <span className="hidden sm:inline">{xpTotal}</span>
                     </div>
 
                     {/* Exercise count — links to stats */}
                     <Link href="/dashboard/stats" className="flex items-center gap-1.5 text-gray-500 font-medium text-sm hover:text-green-600 transition-colors">
                         <Trophy className="w-4 h-4 text-green-500" />
-                        <span>{exercisesSolved}</span>
+                        <span className="hidden sm:inline">{exercisesSolved}</span>
                     </Link>
 
                     {/* Settings */}
@@ -75,15 +77,15 @@ export default function DashboardClient({
             </nav>
 
             {/* Main Content */}
-            <main className="flex-1 max-w-5xl mx-auto w-full p-6 md:p-12">
+            <main className="flex-1 max-w-5xl mx-auto w-full p-4 sm:p-6 md:p-12">
 
                 <header className="mb-10">
-                    <h1 className="text-3xl font-bold text-gray-900">Sua Arena de Treino</h1>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Sua Arena de Treino</h1>
                     <p className="text-gray-500 mt-2">Escolha uma modalidade para começar.</p>
                 </header>
 
                 {/* Daily XP goal bar */}
-                <div className="mb-10 bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
+                <div className="mb-10 bg-white rounded-2xl p-4 sm:p-5 border border-gray-200 shadow-sm">
                     <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
                             <Zap className="w-5 h-5 fill-yellow-500 text-yellow-500" />
@@ -111,6 +113,30 @@ export default function DashboardClient({
                         <p className="text-sm text-green-600 font-bold mt-2">Meta concluída! Continue treinando para subir no ranking.</p>
                     )}
                 </div>
+
+                {/* Uni Ranking Balloon */}
+                {uniRankingBalloon && (
+                    <Link href="/dashboard/stats" className="block mb-10">
+                        <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow flex items-center gap-4">
+                            <div className="p-2.5 bg-purple-50 rounded-xl shrink-0">
+                                <Building2 className="w-5 h-5 text-purple-600" />
+                            </div>
+                            <div className="flex-1">
+                                {uniRankingBalloon.qualified ? (
+                                    <p className="text-sm font-bold text-gray-900">
+                                        {uniRankingBalloon.institutionName} tem {uniRankingBalloon.totalExercises} exercicios resolvidos!{' '}
+                                        <span className="text-purple-600">Ver ranking completo</span>
+                                    </p>
+                                ) : (
+                                    <p className="text-sm font-bold text-gray-900">
+                                        Faltam {100 - uniRankingBalloon.totalExercises} exercicios para a {uniRankingBalloon.institutionName} entrar no ranking!
+                                    </p>
+                                )}
+                            </div>
+                            <ArrowRight className="w-4 h-4 text-gray-400 shrink-0" />
+                        </div>
+                    </Link>
+                )}
 
                 {/* Module Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -150,7 +176,7 @@ export default function DashboardClient({
                                     <div className="mt-2 text-sm text-gray-500 font-medium text-right">
                                         {progressPercent}% Completo
                                     </div>
-                                    <div className="mt-4 space-y-1">
+                                    <div className="mt-4 space-y-1 hidden sm:block">
                                         {module.topics.map((topic) => (
                                             <div key={topic.id} className="text-xs text-gray-500 flex items-center gap-1">
                                                 <div className={cn("w-1 h-1 rounded-full", module.barColor)} />

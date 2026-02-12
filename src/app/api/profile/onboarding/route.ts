@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { auth, currentUser } from '@clerk/nextjs/server';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
+import { detectInstitution } from '@/data/institutions';
 import { z } from 'zod';
 
 const bodySchema = z.object({
     academic_level: z.enum(['fundamental', 'medio', 'graduacao', 'pos', 'enthusiast']),
+    institution: z.string().nullable().optional(),
+    institution_department: z.string().nullable().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -17,16 +20,43 @@ export async function POST(req: NextRequest) {
         const body = await req.json();
         const parsed = bodySchema.safeParse(body);
         if (!parsed.success) {
-            return NextResponse.json({ error: 'Invalid academic_level' }, { status: 400 });
+            return NextResponse.json({ error: 'Invalid body' }, { status: 400 });
+        }
+
+        const { academic_level, institution, institution_department } = parsed.data;
+
+        // Server-side validation: verify claimed institution matches email domain
+        let validatedInstitution: string | null = null;
+        let validatedDepartment: string | null = null;
+
+        if (institution) {
+            const user = await currentUser();
+            const email = user?.emailAddresses?.[0]?.emailAddress || '';
+            const detected = detectInstitution(email);
+
+            if (detected && detected.id === institution) {
+                validatedInstitution = institution;
+                if (institution_department && detected.departments?.some(d => d.id === institution_department)) {
+                    validatedDepartment = institution_department;
+                }
+            }
+            // If institution doesn't match email, silently ignore it
+        }
+
+        const upsertData: Record<string, unknown> = {
+            id: userId,
+            academic_level,
+            onboarding_completed: true,
+        };
+
+        if (validatedInstitution !== null) {
+            upsertData.institution = validatedInstitution;
+            upsertData.institution_department = validatedDepartment;
         }
 
         const { error } = await getSupabaseAdmin()
             .from('profiles')
-            .upsert({
-                id: userId,
-                academic_level: parsed.data.academic_level,
-                onboarding_completed: true,
-            }, { onConflict: 'id' });
+            .upsert(upsertData, { onConflict: 'id' });
 
         if (error) {
             console.error('Failed to save onboarding:', error.message, error.details, error.hint);

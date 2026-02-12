@@ -9,27 +9,26 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       {/* Navigation */}
-      <nav className="w-full flex justify-between items-center max-w-7xl mx-auto p-6">
+      <nav className="w-full flex justify-between items-center max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
         <div className="flex items-center gap-2 text-2xl font-bold tracking-tighter text-gray-900">
-          <img src="/logo-icon.png" alt="Trimathlon Logo" className="h-16 w-auto" />
-
+          <img src="/logo-icon.png" alt="JustMathing Logo" className="h-10 sm:h-16 w-auto" />
         </div>
         <div className="flex items-center gap-6">
           <Link
             href="/sobre"
-            className="font-bold text-gray-500 hover:text-gray-900 transition-colors"
+            className="hidden sm:flex font-bold text-gray-500 hover:text-gray-900 transition-colors"
           >
             Sobre
           </Link>
           <Link
             href="/sign-in"
-            className="font-bold text-gray-900 hover:text-blue-600 transition-colors mr-4"
+            className="hidden sm:flex font-bold text-gray-900 hover:text-blue-600 transition-colors mr-4"
           >
             Entrar
           </Link>
           <Link
             href="/sign-up"
-            className="bg-blue-600 text-white font-bold py-3 px-8 rounded-full shadow-[0_4px_0_0_rgb(29,78,216)] active:shadow-none active:translate-y-[4px] transition-all hover:bg-blue-500 hover:-translate-y-1 hover:shadow-[0_6px_0_0_rgb(29,78,216)]"
+            className="bg-blue-600 text-white font-bold py-2.5 px-6 sm:py-3 sm:px-8 text-sm sm:text-base rounded-full shadow-[0_4px_0_0_rgb(29,78,216)] active:shadow-none active:translate-y-[4px] transition-all hover:bg-blue-500 hover:-translate-y-1 hover:shadow-[0_6px_0_0_rgb(29,78,216)]"
           >
             Começar Agora
           </Link>
@@ -44,7 +43,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-6xl md:text-8xl font-bold tracking-tight text-gray-900 leading-[1.1]"
+            className="text-4xl sm:text-6xl md:text-8xl font-bold tracking-tight text-gray-900 leading-[1.1]"
           >
             Masterize o <span className="text-blue-600">Cálculo</span>.
           </motion.h1>
@@ -53,7 +52,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-xl md:text-2xl text-gray-500 max-w-2xl mx-auto leading-relaxed"
+            className="text-lg sm:text-xl md:text-2xl text-gray-500 max-w-2xl mx-auto leading-relaxed"
           >
             A melhor maneira de aprender a <em>fazer</em> matemática. Substitua palestras passivas por resolução de problemas interativa e prática deliberada.
           </motion.p>
@@ -98,9 +97,9 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 + (i * 0.1) }}
-              className="bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer p-8 text-left group"
+              className="bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer p-5 sm:p-8 text-left group"
             >
-              <div className="mb-6 h-16 w-16 flex items-center justify-center rounded-2xl bg-gray-50/80 group-hover:bg-blue-50 transition-colors">
+              <div className="mb-6 h-12 w-12 sm:h-16 sm:w-16 flex items-center justify-center rounded-2xl bg-gray-50/80 group-hover:bg-blue-50 transition-colors">
                 {item.icon}
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-2">{item.title}</h3>
@@ -114,7 +113,7 @@ export default function LandingPage() {
       {/* How it Works */}
       <section className="bg-gray-50 px-6 py-24">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-4xl font-bold text-gray-900 text-center mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-4">
             Como funciona
           </h2>
           <p className="text-gray-500 text-center text-lg mb-16 max-w-2xl mx-auto">
@@ -132,7 +131,7 @@ export default function LandingPage() {
               {
                 icon: <Dumbbell className="w-6 h-6 text-green-600" />,
                 title: 'Treinar',
-                desc: 'Resolva problemas no seu ritmo. Veja dicas quando precisar, confira a resposta e avalie sua confiança — o sistema se adapta a você.',
+                desc: 'Resolva problemas no seu ritmo. Confira a resposta e avalie sua confiança — o sistema se adapta a você.',
                 color: 'bg-green-50',
               },
               {
@@ -164,7 +163,7 @@ export default function LandingPage() {
       {/* What's inside */}
       <section className="px-6 py-24">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-4xl font-bold text-gray-900 text-center mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-16">
             O que oferecemos
           </h2>
 
@@ -176,7 +175,7 @@ export default function LandingPage() {
               },
               {
                 title: 'Problemas com feedback na hora',
-                desc: 'Cada exercício tem resposta, dica passo a passo e autoavaliação. Você sabe exatamente onde errou antes de ir para o próximo.',
+                desc: 'Cada exercício tem resposta e autoavaliação. Você sabe exatamente onde está antes de ir para o próximo.',
               },
               {
                 title: 'Feito para quem aprende fazendo',
@@ -210,7 +209,7 @@ export default function LandingPage() {
           <div className="w-14 h-14 bg-yellow-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
             <Zap className="w-6 h-6 text-yellow-600 fill-yellow-600" />
           </div>
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
             Modo Blitz
           </h2>
           <p className="text-gray-500 text-lg leading-relaxed max-w-xl mx-auto">
@@ -222,7 +221,7 @@ export default function LandingPage() {
       {/* Bottom CTA */}
       <section className="px-6 py-24">
         <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
             Comece agora, de graça.
           </h2>
           <p className="text-gray-500 text-lg mb-8">

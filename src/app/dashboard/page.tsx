@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { auth, currentUser } from '@clerk/nextjs/server'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { getStripe } from '@/lib/stripe'
+import { getInstitutionById } from '@/data/institutions'
 import { curriculum } from '@/data/curriculum'
 import DashboardClient from './DashboardClient'
 
@@ -53,10 +54,10 @@ export default async function DashboardPage({
         full_name: fullName,
     }).eq('id', userId)
 
-    // Read current profile (with engagement data)
+    // Read current profile (with engagement data + institution)
     const { data } = await supabase
         .from('profiles')
-        .select('is_premium, exercises_solved, current_streak, xp_total, xp_today, last_xp_reset_date')
+        .select('is_premium, exercises_solved, current_streak, xp_total, xp_today, last_xp_reset_date, institution')
         .eq('id', userId)
         .single()
 
@@ -79,6 +80,25 @@ export default async function DashboardPage({
         moduleProgress[mod.id] = { practiced, total: mod.topics.length }
     }
 
+    // Compute uni ranking balloon for institutional users
+    let uniRankingBalloon: { institutionName: string; totalExercises: number; qualified: boolean } | null = null
+    if (data?.institution) {
+        const instConfig = getInstitutionById(data.institution)
+        if (instConfig) {
+            const { data: uniProfiles } = await supabase
+                .from('profiles')
+                .select('exercises_solved')
+                .eq('institution', data.institution)
+
+            const totalExercises = (uniProfiles ?? []).reduce((sum, p) => sum + (p.exercises_solved ?? 0), 0)
+            uniRankingBalloon = {
+                institutionName: instConfig.name,
+                totalExercises,
+                qualified: totalExercises >= 100,
+            }
+        }
+    }
+
     return <DashboardClient
         isPremium={data?.is_premium ?? false}
         exercisesSolved={data?.exercises_solved ?? 0}
@@ -86,5 +106,6 @@ export default async function DashboardPage({
         xpTotal={data?.xp_total ?? 0}
         xpToday={xpToday}
         moduleProgress={moduleProgress}
+        uniRankingBalloon={uniRankingBalloon}
     />
 }

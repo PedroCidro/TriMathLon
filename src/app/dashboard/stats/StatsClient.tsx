@@ -1,9 +1,13 @@
 'use client';
 
-import { ArrowLeft, Trophy, Flame, Zap, Target, BarChart3, TrendingUp, TrendingDown, Award } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowLeft, Trophy, Flame, Zap, Target, BarChart3, TrendingUp, TrendingDown, Award, Crown, Users, Building2 } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { curriculum } from '@/data/curriculum';
+import { getInstitutionById } from '@/data/institutions';
+import { toast } from 'sonner';
+import type { RankingData } from '@/lib/rankings';
 import {
     BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
     RadarChart, PolarGrid, PolarAngleAxis, Radar,
@@ -26,13 +30,16 @@ interface StatsClientProps {
     longestStreak: number;
     xpTotal: number;
     mastery: MasteryRow[];
+    rankingData: RankingData;
+    rankingOptIn: boolean;
+    blitzBests: Record<string, number>;
 }
 
 const RATING_LABELS: Record<number, string> = {
     1: 'Errei',
-    2: 'Difícil',
+    2: 'Dificil',
     3: 'Bom',
-    4: 'Fácil',
+    4: 'Facil',
 };
 
 const MODULE_COLORS: Record<string, { accent: string; bg: string; text: string; fill: string }> = {
@@ -40,6 +47,8 @@ const MODULE_COLORS: Record<string, { accent: string; bg: string; text: string; 
     integrais: { accent: 'border-purple-500', bg: 'bg-purple-50', text: 'text-purple-700', fill: '#8b5cf6' },
     edos: { accent: 'border-yellow-500', bg: 'bg-yellow-50', text: 'text-yellow-700', fill: '#eab308' },
 };
+
+const RANK_BADGES = ['🥇', '🥈', '🥉'];
 
 function formatDate(dateStr: string | null): string {
     if (!dateStr) return '—';
@@ -75,7 +84,13 @@ export default function StatsClient({
     longestStreak,
     xpTotal,
     mastery,
+    rankingData,
+    rankingOptIn: initialOptIn,
+    blitzBests,
 }: StatsClientProps) {
+    const [optIn, setOptIn] = useState(initialOptIn);
+    const [togglingOptIn, setTogglingOptIn] = useState(false);
+
     const masteryMap = new Map(mastery.map(m => [m.subcategory, m]));
     const practicedMastery = mastery.filter(m => m.attempts > 0);
     const topicsPracticed = practicedMastery.length;
@@ -142,8 +157,28 @@ export default function StatsClient({
 
     const hasAnyData = practicedMastery.length > 0;
 
+    const institutionConfig = rankingData.institution ? getInstitutionById(rankingData.institution) : null;
+
+    const handleToggleOptIn = async () => {
+        setTogglingOptIn(true);
+        try {
+            const res = await fetch('/api/profile/ranking-opt-in', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            });
+            if (!res.ok) throw new Error();
+            const data = await res.json();
+            setOptIn(data.ranking_opt_in);
+            toast.success(data.ranking_opt_in ? 'Voce entrou no ranking!' : 'Voce saiu do ranking.');
+        } catch {
+            toast.error('Erro ao atualizar preferencia.');
+        } finally {
+            setTogglingOptIn(false);
+        }
+    };
+
     return (
-        <div className="min-h-screen bg-gray-50 p-6 md:p-12">
+        <div className="min-h-screen bg-gray-50 p-4 sm:p-6 md:p-12">
             <div className="max-w-4xl mx-auto">
                 <Link href="/dashboard" className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 font-bold mb-8 transition-colors">
                     <ArrowLeft className="w-5 h-5" />
@@ -151,26 +186,26 @@ export default function StatsClient({
                 </Link>
 
                 <header className="mb-10">
-                    <h1 className="text-3xl font-bold text-gray-900">Suas Estatísticas</h1>
+                    <h1 className="text-3xl font-bold text-gray-900">Suas Estatisticas</h1>
                     <p className="text-gray-500 mt-2">Acompanhe seu progresso e identifique pontos de melhoria.</p>
                 </header>
 
                 {/* Section 1 — Overview Cards */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-10">
                     <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                         <div className="flex items-center gap-2 mb-2">
                             <Trophy className="w-5 h-5 text-green-500" />
-                            <span className="text-sm font-medium text-gray-500">Exercícios</span>
+                            <span className="text-sm font-medium text-gray-500">Exercicios</span>
                         </div>
-                        <p className="text-2xl font-bold text-gray-900">{exercisesSolved}</p>
+                        <p className="text-xl sm:text-2xl font-bold text-gray-900">{exercisesSolved}</p>
                     </div>
 
                     <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                         <div className="flex items-center gap-2 mb-2">
                             <Flame className="w-5 h-5 text-orange-500" />
-                            <span className="text-sm font-medium text-gray-500">Sequência</span>
+                            <span className="text-sm font-medium text-gray-500">Sequencia</span>
                         </div>
-                        <p className="text-2xl font-bold text-gray-900">
+                        <p className="text-xl sm:text-2xl font-bold text-gray-900">
                             {currentStreak}
                             <span className="text-sm font-medium text-gray-400 ml-1">/ {longestStreak} max</span>
                         </p>
@@ -181,15 +216,15 @@ export default function StatsClient({
                             <Zap className="w-5 h-5 text-yellow-500" />
                             <span className="text-sm font-medium text-gray-500">XP Total</span>
                         </div>
-                        <p className="text-2xl font-bold text-gray-900">{xpTotal}</p>
+                        <p className="text-xl sm:text-2xl font-bold text-gray-900">{xpTotal}</p>
                     </div>
 
                     <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                         <div className="flex items-center gap-2 mb-2">
                             <Target className="w-5 h-5 text-blue-500" />
-                            <span className="text-sm font-medium text-gray-500">Tópicos</span>
+                            <span className="text-sm font-medium text-gray-500">Topicos</span>
                         </div>
-                        <p className="text-2xl font-bold text-gray-900">
+                        <p className="text-xl sm:text-2xl font-bold text-gray-900">
                             {topicsPracticed}
                             <span className="text-sm font-medium text-gray-400 ml-1">/ {TOTAL_TOPICS}</span>
                         </p>
@@ -245,7 +280,7 @@ export default function StatsClient({
 
                         {/* Radar: per-module accuracy */}
                         <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-                            <h3 className="text-sm font-bold text-gray-900 mb-4">Acerto por Módulo</h3>
+                            <h3 className="text-sm font-bold text-gray-900 mb-4">Acerto por Modulo</h3>
                             <div className="h-52">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="75%">
@@ -268,10 +303,10 @@ export default function StatsClient({
                                     </RadarChart>
                                 </ResponsiveContainer>
                             </div>
-                            <div className="flex justify-center gap-4 mt-2">
+                            <div className="flex flex-col sm:flex-row justify-center gap-1 sm:gap-4 mt-2">
                                 {radarData.map(r => (
                                     <span key={r.module} className="text-xs text-gray-500">
-                                        {r.module}: {r.practiced}/{r.total} tópicos
+                                        {r.module}: {r.practiced}/{r.total} topicos
                                     </span>
                                 ))}
                             </div>
@@ -279,15 +314,15 @@ export default function StatsClient({
 
                         {/* Bar chart: accuracy per topic */}
                         <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm md:col-span-2">
-                            <h3 className="text-sm font-bold text-gray-900 mb-4">Acerto por Tópico</h3>
-                            <div className="h-64">
+                            <h3 className="text-sm font-bold text-gray-900 mb-4">Acerto por Topico</h3>
+                            <div className="h-48 sm:h-64">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart data={accuracyChartData} layout="vertical" margin={{ left: 0, right: 16 }}>
                                         <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 12 }} tickFormatter={v => `${v}%`} />
                                         <YAxis
                                             type="category"
                                             dataKey="name"
-                                            width={160}
+                                            width={100}
                                             tick={{ fontSize: 12, fill: '#374151' }}
                                         />
                                         <Tooltip
@@ -312,7 +347,7 @@ export default function StatsClient({
                         <div className="px-6 py-4 border-b border-gray-100">
                             <div className="flex items-center gap-2">
                                 <BarChart3 className="w-5 h-5 text-gray-400" />
-                                <h2 className="text-lg font-bold text-gray-900">Desempenho por Tópico</h2>
+                                <h2 className="text-lg font-bold text-gray-900">Desempenho por Topico</h2>
                             </div>
                         </div>
 
@@ -365,8 +400,8 @@ export default function StatsClient({
                                                         </div>
                                                         <span className="text-xs font-bold text-gray-700 w-8 text-right">{accuracy}%</span>
                                                     </div>
-                                                    <div className="text-xs text-gray-500 w-14 text-center">{ratingLabel}</div>
-                                                    <div className="text-xs text-gray-400 w-16 text-right">{formatDate(m.last_practiced)}</div>
+                                                    <div className="text-xs text-gray-500 w-14 text-center hidden sm:block">{ratingLabel}</div>
+                                                    <div className="text-xs text-gray-400 w-16 text-right hidden sm:block">{formatDate(m.last_practiced)}</div>
                                                 </div>
                                             );
                                         })}
@@ -381,8 +416,8 @@ export default function StatsClient({
                 {!hasAnyData && (
                     <div className="bg-white rounded-2xl p-12 border border-gray-200 shadow-sm mb-10 text-center">
                         <BarChart3 className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                        <p className="text-gray-500 font-medium">Nenhum tópico praticado ainda.</p>
-                        <p className="text-sm text-gray-400 mt-1">Resolva exercícios para ver suas estatísticas aqui.</p>
+                        <p className="text-gray-500 font-medium">Nenhum topico praticado ainda.</p>
+                        <p className="text-sm text-gray-400 mt-1">Resolva exercicios para ver suas estatisticas aqui.</p>
                         <Link href="/dashboard" className="inline-block mt-4 text-blue-600 hover:underline font-bold text-sm">
                             Ir para Arena
                         </Link>
@@ -391,12 +426,12 @@ export default function StatsClient({
 
                 {/* Section 4 — Insights */}
                 {(weakestTopic || strongestTopic || (bestStreakTopic && bestStreakTopic.best_streak > 0)) && (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
                         {weakestTopic && (
                             <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                                 <div className="flex items-center gap-2 mb-3">
                                     <TrendingDown className="w-5 h-5 text-red-500" />
-                                    <span className="text-sm font-medium text-gray-500">Tópico mais difícil</span>
+                                    <span className="text-sm font-medium text-gray-500">Topico mais dificil</span>
                                 </div>
                                 <p className="font-bold text-gray-900">{findTopicTitle(weakestTopic.subcategory)}</p>
                                 <p className="text-sm text-gray-500 mt-1">
@@ -409,7 +444,7 @@ export default function StatsClient({
                             <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                                 <div className="flex items-center gap-2 mb-3">
                                     <TrendingUp className="w-5 h-5 text-green-500" />
-                                    <span className="text-sm font-medium text-gray-500">Tópico mais forte</span>
+                                    <span className="text-sm font-medium text-gray-500">Topico mais forte</span>
                                 </div>
                                 <p className="font-bold text-gray-900">{findTopicTitle(strongestTopic.subcategory)}</p>
                                 <p className="text-sm text-gray-500 mt-1">
@@ -422,7 +457,7 @@ export default function StatsClient({
                             <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                                 <div className="flex items-center gap-2 mb-3">
                                     <Award className="w-5 h-5 text-yellow-500" />
-                                    <span className="text-sm font-medium text-gray-500">Melhor sequência</span>
+                                    <span className="text-sm font-medium text-gray-500">Melhor sequencia</span>
                                 </div>
                                 <p className="font-bold text-gray-900">{findTopicTitle(bestStreakTopic.subcategory)}</p>
                                 <p className="text-sm text-gray-500 mt-1">
@@ -432,6 +467,166 @@ export default function StatsClient({
                         )}
                     </div>
                 )}
+
+                {/* Section 5 — Blitz Records */}
+                {Object.keys(blitzBests).length > 0 && (
+                    <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm mb-10">
+                        <div className="flex items-center gap-2 mb-5">
+                            <Zap className="w-5 h-5 text-yellow-500" />
+                            <h2 className="text-lg font-bold text-gray-900">Recordes Blitz</h2>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {curriculum.map((mod) => {
+                                const best = blitzBests[mod.id];
+                                if (best === undefined) return null;
+                                const colors = MODULE_COLORS[mod.id];
+                                return (
+                                    <div key={mod.id} className={cn("rounded-xl p-4 border-l-4", colors.accent, colors.bg)}>
+                                        <p className={cn("text-sm font-bold", colors.text)}>{mod.title}</p>
+                                        <p className="text-3xl font-bold text-gray-900 mt-1">{best}</p>
+                                        <p className="text-xs text-gray-500 mt-0.5">melhor pontuacao</p>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
+
+                {/* Section 6 — Rankings */}
+                <div className="space-y-6 mb-10">
+                    {/* 5a. Global Top 3 */}
+                    <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+                        <div className="flex items-center gap-2 mb-5">
+                            <Crown className="w-5 h-5 text-yellow-500" />
+                            <h2 className="text-lg font-bold text-gray-900">Top 3 Global</h2>
+                        </div>
+
+                        {rankingData.global_top_3.length > 0 ? (
+                            <div className="space-y-3">
+                                {rankingData.global_top_3.map((user) => (
+                                    <div
+                                        key={user.position}
+                                        className={cn(
+                                            "flex items-center gap-4 p-3 rounded-xl",
+                                            user.is_self ? "bg-blue-50 border border-blue-200" : "bg-gray-50"
+                                        )}
+                                    >
+                                        <span className="text-2xl w-8 text-center">{RANK_BADGES[user.position - 1]}</span>
+                                        <div className="flex-1">
+                                            <p className={cn("font-bold text-sm", user.is_self ? "text-blue-700" : "text-gray-900")}>
+                                                {user.display_name} {user.is_self && '(voce)'}
+                                            </p>
+                                        </div>
+                                        <span className="text-sm font-bold text-gray-600">{user.exercises_solved} exercicios</span>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-sm text-gray-400">Ninguem participando do ranking ainda.</p>
+                        )}
+
+                        {/* User's own position or opt-in prompt */}
+                        <div className="mt-4 pt-4 border-t border-gray-100">
+                            {optIn && rankingData.my_global_position !== null ? (
+                                <p className="text-sm text-gray-600">
+                                    <span className="font-bold">Voce:</span> #{rankingData.my_global_position} — {exercisesSolved} exercicios
+                                </p>
+                            ) : !optIn ? (
+                                <button
+                                    onClick={handleToggleOptIn}
+                                    disabled={togglingOptIn}
+                                    className="text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors disabled:opacity-50"
+                                >
+                                    {togglingOptIn ? 'Atualizando...' : 'Participar do ranking'}
+                                </button>
+                            ) : null}
+                        </div>
+                    </div>
+
+                    {/* 5b. Internal Uni Ranking */}
+                    {rankingData.institution && institutionConfig && (
+                        <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+                            <div className="flex items-center gap-2 mb-5">
+                                <Users className="w-5 h-5 text-blue-500" />
+                                <h2 className="text-lg font-bold text-gray-900">Ranking {institutionConfig.name}</h2>
+                            </div>
+
+                            {rankingData.internal_ranking.length > 0 ? (
+                                <div className="space-y-2">
+                                    {rankingData.internal_ranking.map((user) => (
+                                        <div
+                                            key={user.position}
+                                            className={cn(
+                                                "flex items-center gap-4 p-3 rounded-xl",
+                                                user.is_self ? "bg-blue-50 border border-blue-200" : "bg-gray-50"
+                                            )}
+                                        >
+                                            <span className="text-sm font-bold text-gray-400 w-8 text-center">#{user.position}</span>
+                                            <div className="flex-1">
+                                                <p className={cn("font-bold text-sm", user.is_self ? "text-blue-700" : "text-gray-900")}>
+                                                    {user.display_name} {user.is_self && '(voce)'}
+                                                </p>
+                                            </div>
+                                            <span className="text-sm font-bold text-gray-600">{user.exercises_solved}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-sm text-gray-400">Nenhum estudante da {institutionConfig.name} no ranking ainda.</p>
+                            )}
+
+                            {optIn && rankingData.my_internal_position !== null && !rankingData.internal_ranking.some(u => u.is_self) && (
+                                <div className="mt-3 pt-3 border-t border-gray-100">
+                                    <p className="text-sm text-gray-600">
+                                        ... <span className="font-bold">Voce:</span> #{rankingData.my_internal_position} — {exercisesSolved} exercicios
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* 5c. External Uni Ranking */}
+                    {rankingData.institution && institutionConfig && (
+                        <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+                            <div className="flex items-center gap-2 mb-5">
+                                <Building2 className="w-5 h-5 text-purple-500" />
+                                <h2 className="text-lg font-bold text-gray-900">Ranking entre Universidades</h2>
+                            </div>
+
+                            {rankingData.uni_qualified ? (
+                                <div className="space-y-2">
+                                    {rankingData.external_ranking.map((uni, i) => {
+                                        const uniConfig = getInstitutionById(uni.institution);
+                                        return (
+                                            <div key={uni.institution} className={cn(
+                                                "flex items-center gap-4 p-3 rounded-xl",
+                                                uni.institution === rankingData.institution ? "bg-blue-50 border border-blue-200" : "bg-gray-50"
+                                            )}>
+                                                <span className="text-sm font-bold text-gray-400 w-8 text-center">#{i + 1}</span>
+                                                <p className="flex-1 font-bold text-sm text-gray-900">{uniConfig?.name ?? uni.institution}</p>
+                                                <span className="text-sm font-bold text-gray-600">{uni.total_exercises} exercicios</span>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                <div className="text-center py-4">
+                                    <p className="text-sm text-gray-500">
+                                        Faltam <span className="font-bold text-gray-900">{100 - rankingData.uni_total_exercises}</span> exercicios para a{' '}
+                                        <span className="font-bold">{institutionConfig.name}</span> entrar no ranking
+                                    </p>
+                                    <div className="mt-3 w-full bg-gray-100 h-2 rounded-full overflow-hidden max-w-xs mx-auto">
+                                        <div
+                                            className="h-full rounded-full bg-purple-500"
+                                            style={{ width: `${Math.min(100, rankingData.uni_total_exercises)}%` }}
+                                        />
+                                    </div>
+                                    <p className="text-xs text-gray-400 mt-2">{rankingData.uni_total_exercises} / 100</p>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

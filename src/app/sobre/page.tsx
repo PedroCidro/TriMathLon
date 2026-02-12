@@ -15,20 +15,20 @@ export default function SobrePage() {
     return (
         <div className="min-h-screen bg-white flex flex-col">
             {/* Nav */}
-            <nav className="w-full flex justify-between items-center max-w-7xl mx-auto p-6">
+            <nav className="w-full flex justify-between items-center max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
                 <Link href="/" className="flex items-center gap-2">
-                    <img src="/logo-icon.png" alt="Logo" className="h-12 w-auto" />
+                    <img src="/logo-icon.png" alt="Logo" className="h-10 sm:h-12 w-auto" />
                 </Link>
                 <div className="flex items-center gap-6">
                     <Link
                         href="/sign-in"
-                        className="font-bold text-gray-900 hover:text-blue-600 transition-colors"
+                        className="hidden sm:flex font-bold text-gray-900 hover:text-blue-600 transition-colors"
                     >
                         Entrar
                     </Link>
                     <Link
                         href="/sign-up"
-                        className="bg-blue-600 text-white font-bold py-3 px-8 rounded-full shadow-[0_4px_0_0_rgb(29,78,216)] active:shadow-none active:translate-y-[4px] transition-all hover:bg-blue-500 hover:-translate-y-1 hover:shadow-[0_6px_0_0_rgb(29,78,216)]"
+                        className="bg-blue-600 text-white font-bold py-2.5 px-6 sm:py-3 sm:px-8 text-sm sm:text-base rounded-full shadow-[0_4px_0_0_rgb(29,78,216)] active:shadow-none active:translate-y-[4px] transition-all hover:bg-blue-500 hover:-translate-y-1 hover:shadow-[0_6px_0_0_rgb(29,78,216)]"
                     >
                         Começar Agora
                     </Link>
@@ -50,7 +50,7 @@ export default function SobrePage() {
 
                     <motion.h1
                         {...fade(0.1)}
-                        className="text-5xl md:text-7xl font-bold tracking-tight text-gray-900 leading-[1.1] mb-8"
+                        className="text-3xl sm:text-5xl md:text-7xl font-bold tracking-tight text-gray-900 leading-[1.1] mb-8"
                     >
                         Mais do que resolver{' '}
                         <span className="text-blue-600">exercícios</span>.
@@ -80,7 +80,7 @@ export default function SobrePage() {
                                 <MathRenderer latex="\therefore" className="text-3xl text-gray-300" />
                             </div>
                             <div>
-                                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+                                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-4">
                                     Matemática não é mágica. São argumentos lógicos.
                                 </h2>
                                 <p className="text-lg text-gray-500 leading-relaxed">
@@ -103,7 +103,7 @@ export default function SobrePage() {
                                     <MathRenderer latex="\Rightarrow" className="text-3xl text-blue-400" />
                                 </div>
                                 <div>
-                                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+                                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-4">
                                         Entender o porquê muda tudo.
                                     </h2>
                                     <p className="text-lg text-gray-500 leading-relaxed">
@@ -126,7 +126,7 @@ export default function SobrePage() {
                                 <MathRenderer latex="\leftrightarrow" className="text-3xl text-green-400" />
                             </div>
                             <div>
-                                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+                                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-4">
                                     O verdadeiro teste: explicar para alguém.
                                 </h2>
                                 <p className="text-lg text-gray-500 leading-relaxed">
@@ -144,7 +144,7 @@ export default function SobrePage() {
                 <section className="bg-gray-50 border-t border-gray-100">
                     <div className="max-w-3xl mx-auto px-6 py-20 text-center">
                         <motion.div {...fade(0.6)}>
-                            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
                                 Pronto para entender de verdade?
                             </h2>
                             <p className="text-lg text-gray-400 mb-8">
