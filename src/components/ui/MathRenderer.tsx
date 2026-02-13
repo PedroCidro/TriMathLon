@@ -15,5 +15,5 @@ export default function MathRenderer({ latex, className = "" }: { latex: string,
         }
     }, [latex]);
 
-    return <span ref={containerRef} className={cn("inline-block max-w-full overflow-x-auto", className)} />;
+    return <span ref={containerRef} className={cn("inline-block max-w-full overflow-x-auto whitespace-nowrap", className)} />;
 }
