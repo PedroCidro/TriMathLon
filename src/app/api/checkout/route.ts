@@ -3,13 +3,12 @@ import Stripe from 'stripe';
 import { getStripe } from '@/lib/stripe';
 import { auth } from '@clerk/nextjs/server';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
-import { z } from 'zod';
-
-const checkoutSchema = z.object({
-    priceId: z.string().optional(),
-});
+import { rateLimit } from '@/lib/rate-limit';
 
 const UNI_COUPON_ID = 'UNI_STUDENT_50';
+
+const PRICE_UNIVERSAL = process.env.STRIPE_PRICE_ID_UNIVERSAL!;
+const PRICE_STUDENT = process.env.STRIPE_PRICE_ID_STUDENT!;
 
 export async function POST(req: NextRequest) {
     try {
@@ -18,62 +17,51 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const body = await req.json().catch(() => ({}));
-        const result = checkoutSchema.safeParse(body);
-        if (!result.success) {
-            return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
-        }
+        const limited = rateLimit(userId, 'checkout');
+        if (limited) return limited;
 
         const supabase = getSupabaseAdmin();
 
-        // Ensure profile exists before checkout so the Stripe webhook can update it
-        await supabase.from('profiles').upsert({
-            id: userId,
-            is_premium: false,
-            exercises_solved: 0,
-            onboarding_completed: false,
-        }, { onConflict: 'id', ignoreDuplicates: true });
-
-        // Check if user has an institution for the coupon
-        const { data: profile } = await supabase
+        // Ensure profile exists before checkout
+        const { data: existingProfile } = await supabase
             .from('profiles')
-            .select('institution')
+            .select('id, institution')
             .eq('id', userId)
             .single();
 
-        const isInstitutional = !!profile?.institution;
+        if (!existingProfile) {
+            await supabase.from('profiles').insert({
+                id: userId,
+                is_premium: false,
+                exercises_solved: 0,
+                onboarding_completed: false,
+            });
+        }
 
-        const origin = req.headers.get('origin');
+        const isInstitutional = !!existingProfile?.institution;
+
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
         const stripe = getStripe();
+
+        const priceId = isInstitutional ? PRICE_STUDENT : PRICE_UNIVERSAL;
 
         const sessionParams: Stripe.Checkout.SessionCreateParams = {
             payment_method_types: ['card'],
             line_items: [
                 {
-                    price_data: {
-                        currency: 'brl',
-                        product_data: {
-                            name: 'JustMathing Premium',
-                            description: 'Acesso total a todas as arenas de treino.',
-                        },
-                        unit_amount: 2990, // R$ 29,90
-                        recurring: {
-                            interval: 'month',
-                        },
-                    },
+                    price: priceId,
                     quantity: 1,
                 },
             ],
             mode: 'subscription',
             metadata: { clerk_user_id: userId },
-            success_url: `${origin}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${origin}/dashboard`,
+            success_url: `${baseUrl}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${baseUrl}/dashboard`,
         };
 
         // Apply institutional coupon silently
         if (isInstitutional) {
             try {
-                // Verify coupon exists
                 await stripe.coupons.retrieve(UNI_COUPON_ID);
                 sessionParams.discounts = [{ coupon: UNI_COUPON_ID }];
             } catch (couponErr) {

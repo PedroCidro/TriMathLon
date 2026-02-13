@@ -124,7 +124,7 @@ export default function SobrePage() {
                     <motion.div {...fade(0.5)} className="space-y-8">
                         <div className="flex items-start gap-6">
                             <div className="hidden md:flex shrink-0 w-16 h-16 items-center justify-center rounded-2xl bg-gray-50 mt-1">
-                                <MathRenderer latex="\checkmark" className="text-3xl text-green-400" />
+                                <MathRenderer latex="\checkmark" className="text-3xl text-green-400 !overflow-hidden" />
                             </div>
                             <div>
                                 <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-4">

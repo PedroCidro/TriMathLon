@@ -41,12 +41,19 @@ export default async function DashboardPage({
     const user = await currentUser()
     const email = user?.emailAddresses?.[0]?.emailAddress || null
     const fullName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || null
-    await supabase.from('profiles').upsert({
-        id: userId,
-        is_premium: false,
-        exercises_solved: 0,
-        onboarding_completed: false,
-    }, { onConflict: 'id', ignoreDuplicates: true })
+    const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', userId)
+        .single()
+    if (!existingProfile) {
+        await supabase.from('profiles').insert({
+            id: userId,
+            is_premium: false,
+            exercises_solved: 0,
+            onboarding_completed: false,
+        })
+    }
 
     // Always sync email and name from Clerk (may have been missing on initial creation)
     await supabase.from('profiles').update({

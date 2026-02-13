@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
+import { rateLimit } from '@/lib/rate-limit';
+import { curriculum } from '@/data/curriculum';
 
 const VALID_RATINGS = ['wrong', 'hard', 'good', 'easy'] as const;
 const XP_MAP: Record<string, number> = {
@@ -9,6 +11,14 @@ const XP_MAP: Record<string, number> = {
     Hard: 30,
 };
 
+// Build a lookup map from subcategory ID → difficulty at startup
+const TOPIC_DIFFICULTY = new Map<string, string>();
+for (const mod of curriculum) {
+    for (const topic of mod.topics) {
+        TOPIC_DIFFICULTY.set(topic.id, topic.difficulty);
+    }
+}
+
 export async function POST(request: Request) {
     try {
         const { userId } = await auth();
@@ -16,17 +26,28 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
+        const limited = rateLimit(userId, 'exercise');
+        if (limited) return limited;
+
         const body = await request.json();
-        const { subcategory, self_rating, difficulty } = body;
+        const { subcategory, self_rating } = body;
 
         if (!subcategory || typeof subcategory !== 'string') {
             return NextResponse.json({ error: 'subcategory is required' }, { status: 400 });
         }
+
+        // Validate subcategory against known curriculum topics
+        const topicDifficulty = TOPIC_DIFFICULTY.get(subcategory);
+        if (!topicDifficulty) {
+            return NextResponse.json({ error: 'Invalid subcategory' }, { status: 400 });
+        }
+
         if (!VALID_RATINGS.includes(self_rating)) {
             return NextResponse.json({ error: 'Invalid self_rating' }, { status: 400 });
         }
 
-        const xpAmount = XP_MAP[difficulty] || 20;
+        // Use server-side difficulty lookup instead of trusting client
+        const xpAmount = XP_MAP[topicDifficulty] || 20;
 
         const { data, error } = await getSupabaseAdmin().rpc('complete_exercise', {
             p_user_id: userId,

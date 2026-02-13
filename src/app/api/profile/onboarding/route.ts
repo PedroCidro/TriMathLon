@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
+import { rateLimit } from '@/lib/rate-limit';
 import { detectInstitution } from '@/data/institutions';
 import { z } from 'zod';
 
@@ -16,6 +17,9 @@ export async function POST(req: NextRequest) {
         if (!userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
+
+        const limited = rateLimit(userId, 'standard');
+        if (limited) return limited;
 
         const body = await req.json();
         const parsed = bodySchema.safeParse(body);
@@ -60,7 +64,7 @@ export async function POST(req: NextRequest) {
 
         if (error) {
             console.error('Failed to save onboarding:', error.message, error.details, error.hint);
-            return NextResponse.json({ error: `Failed to save profile: ${error.message}` }, { status: 500 });
+            return NextResponse.json({ error: 'Failed to save profile' }, { status: 500 });
         }
 
         return NextResponse.json({ success: true });

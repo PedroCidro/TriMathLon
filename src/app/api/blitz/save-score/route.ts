@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
+import { rateLimit } from '@/lib/rate-limit';
 
 const VALID_MODULES = ['derivadas', 'integrais', 'edos'];
+const MAX_STRIKES = 3;
+const GAME_DURATION = 180; // 3 minutes
+const MAX_SCORE_PER_SECOND = 1; // at most 1 correct answer per second
 
 export async function POST(request: Request) {
     try {
@@ -11,20 +15,29 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
+        const limited = rateLimit(userId, 'blitz');
+        if (limited) return limited;
+
         const body = await request.json();
         const { module_id, score, strikes, duration_seconds } = body;
 
         if (!module_id || !VALID_MODULES.includes(module_id)) {
             return NextResponse.json({ error: 'Invalid module_id' }, { status: 400 });
         }
-        if (typeof score !== 'number' || score < 0) {
+        if (typeof score !== 'number' || !Number.isInteger(score) || score < 0) {
             return NextResponse.json({ error: 'Invalid score' }, { status: 400 });
         }
-        if (typeof strikes !== 'number' || strikes < 0) {
+        if (typeof strikes !== 'number' || !Number.isInteger(strikes) || strikes < 0 || strikes > MAX_STRIKES) {
             return NextResponse.json({ error: 'Invalid strikes' }, { status: 400 });
         }
-        if (typeof duration_seconds !== 'number' || duration_seconds < 0) {
+        if (typeof duration_seconds !== 'number' || !Number.isInteger(duration_seconds) || duration_seconds < 1 || duration_seconds > GAME_DURATION + 5) {
             return NextResponse.json({ error: 'Invalid duration_seconds' }, { status: 400 });
+        }
+
+        // Sanity: score can't exceed what's physically possible in the elapsed time
+        const maxPossibleScore = Math.ceil(duration_seconds * MAX_SCORE_PER_SECOND);
+        if (score > maxPossibleScore) {
+            return NextResponse.json({ error: 'Invalid score' }, { status: 400 });
         }
 
         const { data, error } = await getSupabaseAdmin().rpc('save_blitz_score', {

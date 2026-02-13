@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
+import { rateLimit } from '@/lib/rate-limit';
 
 export async function POST() {
     try {
@@ -9,6 +10,9 @@ export async function POST() {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
+        const limited = rateLimit(userId, 'standard');
+        if (limited) return limited;
+
         const { error } = await getSupabaseAdmin()
             .from('profiles')
             .update({ institution_landing_seen: true })
@@ -16,7 +20,7 @@ export async function POST() {
 
         if (error) {
             console.error('Failed to mark landing seen:', error.message);
-            return NextResponse.json({ error: error.message }, { status: 500 });
+            return NextResponse.json({ error: 'Failed to update profile' }, { status: 500 });
         }
 
         return NextResponse.json({ success: true });

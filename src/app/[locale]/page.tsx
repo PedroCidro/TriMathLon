@@ -43,7 +43,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
             <main className="flex-1 flex flex-col items-center justify-center px-4 pt-10 pb-20">
                 {/* Hero Section — server-rendered, visible on first paint */}
                 <div className="max-w-4xl mx-auto text-center space-y-8">
-                    <h1 className="animate-fade-in-up text-4xl sm:text-6xl md:text-8xl font-bold tracking-tight text-gray-900 leading-[1.1]">
+                    <h1 className="text-4xl sm:text-6xl md:text-8xl font-bold tracking-tight text-gray-900 leading-[1.1]">
                         {t('heroTitle')}<span className="text-blue-600">{t('heroHighlight')}</span>.
                     </h1>
 

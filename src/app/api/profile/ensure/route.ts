@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
+import { rateLimit } from '@/lib/rate-limit';
 
 export async function POST() {
     try {
@@ -8,6 +9,9 @@ export async function POST() {
         if (!userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
+
+        const limited = rateLimit(userId, 'standard');
+        if (limited) return limited;
 
         const supabase = getSupabaseAdmin();
 
