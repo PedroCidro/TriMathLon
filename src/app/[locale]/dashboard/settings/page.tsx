@@ -14,7 +14,7 @@ export default async function SettingsPage() {
 
     const { data: profile } = await supabase
         .from('profiles')
-        .select('academic_level, email, full_name, is_premium, ranking_opt_in, institution, institution_department')
+        .select('academic_level, email, full_name, is_premium, stripe_subscription_id, ranking_opt_in, institution, institution_department')
         .eq('id', userId)
         .single()
 
@@ -25,6 +25,7 @@ export default async function SettingsPage() {
         email={profile?.email ?? null}
         fullName={profile?.full_name ?? null}
         isPremium={profile?.is_premium ?? false}
+        hasSubscription={!!profile?.stripe_subscription_id}
         rankingOptIn={profile?.ranking_opt_in ?? false}
         institutionName={institutionConfig?.name ?? null}
         institutionDepartment={profile?.institution_department ?? null}

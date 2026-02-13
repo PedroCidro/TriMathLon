@@ -202,7 +202,15 @@
         "levelMedio": "High School",
         "levelGraduacao": "Undergraduate (STEM)",
         "levelPos": "Graduate School",
-        "levelEnthusiast": "Enthusiast"
+        "levelEnthusiast": "Enthusiast",
+        "cancelSubscription": "Cancel subscription",
+        "cancelConfirm": "Are you sure? You'll keep access until the end of your current billing period.",
+        "cancelConfirmButton": "Yes, cancel",
+        "cancelKeep": "Keep subscription",
+        "cancelSuccess": "Subscription cancelled. You'll keep access until the end of your billing period.",
+        "cancelError": "Failed to cancel subscription. Please try again.",
+        "cancelledBadge": "Cancellation scheduled",
+        "cancelledHint": "Your premium access continues until the end of the current billing period."
     },
     "Onboarding": {
         "stepTitle": "What stage are you at?",

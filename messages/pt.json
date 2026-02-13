@@ -202,7 +202,15 @@
         "levelMedio": "Ensino Medio",
         "levelGraduacao": "Graduacao (STEM)",
         "levelPos": "Pos-Graduacao",
-        "levelEnthusiast": "Entusiasta"
+        "levelEnthusiast": "Entusiasta",
+        "cancelSubscription": "Cancelar assinatura",
+        "cancelConfirm": "Tem certeza? Voce mantera o acesso ate o final do periodo de cobranca atual.",
+        "cancelConfirmButton": "Sim, cancelar",
+        "cancelKeep": "Manter assinatura",
+        "cancelSuccess": "Assinatura cancelada. Voce mantera o acesso ate o final do periodo de cobranca.",
+        "cancelError": "Falha ao cancelar assinatura. Tente novamente.",
+        "cancelledBadge": "Cancelamento agendado",
+        "cancelledHint": "Seu acesso premium continua ate o final do periodo de cobranca atual."
     },
     "Onboarding": {
         "stepTitle": "Em qual etapa voce esta?",

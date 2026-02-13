@@ -27,6 +27,7 @@ interface SettingsClientProps {
     email: string | null;
     fullName: string | null;
     isPremium: boolean;
+    hasSubscription: boolean;
     rankingOptIn: boolean;
     institutionName: string | null;
     institutionDepartment: string | null;
@@ -38,6 +39,7 @@ export default function SettingsClient({
     email,
     fullName,
     isPremium,
+    hasSubscription,
     rankingOptIn: initialOptIn,
     institutionName,
     institutionDepartmentName,
@@ -57,6 +59,9 @@ export default function SettingsClient({
     const [saving, setSaving] = useState(false);
     const [optIn, setOptIn] = useState(initialOptIn);
     const [togglingOptIn, setTogglingOptIn] = useState(false);
+    const [cancellingSubscription, setCancellingSubscription] = useState(false);
+    const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+    const [cancelled, setCancelled] = useState(false);
     const hasChanged = selectedLevel !== academicLevel;
 
     const handleSave = async () => {
@@ -99,6 +104,24 @@ export default function SettingsClient({
             toast.error(t('updateError'));
         } finally {
             setTogglingOptIn(false);
+        }
+    };
+
+    const handleCancelSubscription = async () => {
+        setCancellingSubscription(true);
+        try {
+            const res = await fetch('/api/subscription/cancel', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            });
+            if (!res.ok) throw new Error();
+            setCancelled(true);
+            setShowCancelConfirm(false);
+            toast.success(t('cancelSuccess'));
+        } catch {
+            toast.error(t('cancelError'));
+        } finally {
+            setCancellingSubscription(false);
         }
     };
 
@@ -186,8 +209,42 @@ export default function SettingsClient({
                         <div>
                             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-700 text-sm font-bold border border-green-200">
                                 <Check className="w-4 h-4" />
-                                {t('premiumActive')}
+                                {cancelled ? t('cancelledBadge') : t('premiumActive')}
                             </span>
+                            {cancelled && (
+                                <p className="text-sm text-gray-500 mt-3">{t('cancelledHint')}</p>
+                            )}
+                            {hasSubscription && !cancelled && (
+                                <div className="mt-4">
+                                    {!showCancelConfirm ? (
+                                        <button
+                                            onClick={() => setShowCancelConfirm(true)}
+                                            className="text-sm text-gray-400 hover:text-red-500 font-medium transition-colors"
+                                        >
+                                            {t('cancelSubscription')}
+                                        </button>
+                                    ) : (
+                                        <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                                            <p className="text-sm font-medium text-red-800 mb-3">{t('cancelConfirm')}</p>
+                                            <div className="flex gap-2">
+                                                <button
+                                                    onClick={handleCancelSubscription}
+                                                    disabled={cancellingSubscription}
+                                                    className="px-4 py-2 bg-red-600 text-white text-sm font-bold rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                                                >
+                                                    {cancellingSubscription ? tCommon('loading') : t('cancelConfirmButton')}
+                                                </button>
+                                                <button
+                                                    onClick={() => setShowCancelConfirm(false)}
+                                                    className="px-4 py-2 bg-white text-gray-600 text-sm font-bold rounded-lg border border-gray-200 hover:border-gray-400 transition-colors"
+                                                >
+                                                    {t('cancelKeep')}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     ) : (
                         <div>
