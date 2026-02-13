@@ -6,6 +6,7 @@ import MathRenderer from '@/components/ui/MathRenderer';
 import { cn } from '@/lib/utils';
 import { Link } from '@/i18n/routing';
 import { UserButton } from '@clerk/nextjs';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 
 import UpgradeButton from '@/components/UpgradeButton';
@@ -47,7 +48,7 @@ export default function DashboardClient({
             {/* Top Navigation */}
             <nav className="bg-white border-b border-gray-200 px-3 sm:px-6 py-3 sm:py-4 flex justify-between items-center sticky top-0 z-10">
                 <div className="flex items-center gap-2 font-bold text-xl tracking-tight text-gray-900">
-                    <img src="/logo-icon.png" alt="JustMathing Logo" className="h-8 sm:h-10 w-auto" />
+                    <Image src="/logo-icon.png" alt="JustMathing Logo" width={261} height={271} priority className="h-8 sm:h-10 w-auto" />
                 </div>
 
                 <div className="flex items-center gap-3 sm:gap-5">

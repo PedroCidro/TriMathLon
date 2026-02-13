@@ -5,6 +5,7 @@ import { Link } from '@/i18n/routing';
 import { motion } from 'framer-motion';
 import MathRenderer from '@/components/ui/MathRenderer';
 import LocaleToggle from '@/components/ui/LocaleToggle';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 
 const fade = (delay: number) => ({
@@ -22,7 +23,7 @@ export default function SobrePage() {
             {/* Nav */}
             <nav className="w-full flex justify-between items-center max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
                 <Link href="/" className="flex items-center gap-2">
-                    <img src="/logo-icon.png" alt="Logo" className="h-10 sm:h-12 w-auto" />
+                    <Image src="/logo-icon.png" alt="Logo" width={261} height={271} className="h-10 sm:h-12 w-auto" />
                 </Link>
                 <div className="flex items-center gap-6">
                     <LocaleToggle />
@@ -83,14 +84,14 @@ export default function SobrePage() {
                     <motion.div {...fade(0.3)} className="space-y-8">
                         <div className="flex items-start gap-6">
                             <div className="hidden md:flex shrink-0 w-16 h-16 items-center justify-center rounded-2xl bg-gray-50 mt-1">
-                                <MathRenderer latex="\therefore" className="text-3xl text-gray-300" />
+                                <MathRenderer latex="\neq" className="text-3xl text-gray-300" />
                             </div>
                             <div>
                                 <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-4">
                                     {t('whyTitle')}
                                 </h2>
                                 <p className="text-lg text-gray-500 leading-relaxed">
-                                    {t('whyDesc', { emHow: t('whyEmHow'), emWhy: t('whyEmWhy') })}
+                                    {t('whyDesc')}
                                 </p>
                             </div>
                         </div>
@@ -110,7 +111,7 @@ export default function SobrePage() {
                                         {t('methodTitle')}
                                     </h2>
                                     <p className="text-lg text-gray-500 leading-relaxed">
-                                        {t('methodDesc', { emWhy: t('methodEmWhy') })}
+                                        {t('methodDesc')}
                                     </p>
                                 </div>
                             </div>
@@ -123,14 +124,14 @@ export default function SobrePage() {
                     <motion.div {...fade(0.5)} className="space-y-8">
                         <div className="flex items-start gap-6">
                             <div className="hidden md:flex shrink-0 w-16 h-16 items-center justify-center rounded-2xl bg-gray-50 mt-1">
-                                <MathRenderer latex="\leftrightarrow" className="text-3xl text-green-400" />
+                                <MathRenderer latex="\checkmark" className="text-3xl text-green-400" />
                             </div>
                             <div>
                                 <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-4">
                                     {t('goalTitle')}
                                 </h2>
                                 <p className="text-lg text-gray-500 leading-relaxed">
-                                    {t('goalDesc', { emWhy: t('goalEmWhy') })}
+                                    {t('goalDesc')}
                                 </p>
                             </div>
                         </div>

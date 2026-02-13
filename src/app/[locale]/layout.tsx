@@ -4,6 +4,7 @@ import { ptBR } from "@clerk/localizations";
 import { Toaster } from "sonner";
 import { NextIntlClientProvider } from "next-intl";
 import { setRequestLocale, getTranslations } from "next-intl/server";
+import { Analytics } from "@vercel/analytics/next";
 import { routing } from "@/i18n/routing";
 import { notFound } from "next/navigation";
 
@@ -56,23 +57,13 @@ export default async function LocaleLayout({ children, params }: Props) {
     setRequestLocale(locale);
 
     const messages = (await import(`../../../messages/${locale}.json`)).default;
-    let explanations = {};
-    try {
-        explanations = (await import(`../../../messages/explanations/${locale}.json`)).default;
-    } catch {
-        // Explanations file may not exist yet
-    }
-
-    const allMessages = {
-        ...messages,
-        Explanations: explanations,
-    };
 
     return (
         <ClerkProvider localization={locale === "pt" ? ptBR : undefined}>
-            <NextIntlClientProvider locale={locale} messages={allMessages}>
+            <NextIntlClientProvider locale={locale} messages={messages}>
                 {children}
                 <Toaster richColors position="top-right" />
+                <Analytics />
             </NextIntlClientProvider>
         </ClerkProvider>
     );

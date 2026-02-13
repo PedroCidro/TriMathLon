@@ -6,6 +6,7 @@ import { ArrowRight, Check, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { curriculum } from '@/data/curriculum';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 
 const MODULE_COLORS: Record<string, { accent: string; bg: string; border: string }> = {
@@ -73,7 +74,7 @@ export default function PremiumClient({
             {/* Navigation */}
             <nav className="w-full flex justify-between items-center max-w-7xl mx-auto p-6">
                 <Link href="/dashboard" className="flex items-center gap-2">
-                    <img src="/logo-icon.png" alt="JustMathing Logo" className="h-10 sm:h-16 w-auto" />
+                    <Image src="/logo-icon.png" alt="JustMathing Logo" width={261} height={271} className="h-10 sm:h-16 w-auto" />
                 </Link>
             </nav>
 
