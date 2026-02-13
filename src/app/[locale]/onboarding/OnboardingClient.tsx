@@ -4,9 +4,10 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Check, GraduationCap, School, BookOpen, Brain, Users, ChevronRight, Building2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/routing';
 import { toast } from 'sonner';
 import type { Department } from '@/data/institutions';
+import { useTranslations } from 'next-intl';
 
 type Level = {
     id: string;
@@ -15,15 +16,7 @@ type Level = {
     icon: React.ReactNode;
 };
 
-const levels: Level[] = [
-    { id: 'fundamental', title: 'Ensino Fundamental', description: 'Foco em aritmetica e pre-algebra. Construindo a base.', icon: <School className="w-6 h-6" /> },
-    { id: 'medio', title: 'Ensino Medio', description: 'Funcoes, trigonometria e introducao ao calculo.', icon: <BookOpen className="w-6 h-6" /> },
-    { id: 'graduacao', title: 'Graduacao (STEM)', description: 'Calculo I, II, III e EDOs completo.', icon: <GraduationCap className="w-6 h-6" /> },
-    { id: 'pos', title: 'Pos-Graduacao', description: 'Metodos avancados e pesquisa matematica.', icon: <Brain className="w-6 h-6" /> },
-    { id: 'enthusiast', title: 'Entusiasta', description: 'Aprendendo por conta propria ou reforco mental.', icon: <Users className="w-6 h-6" /> },
-];
-
-const VALID_LEVELS = levels.map(l => l.id);
+const VALID_LEVELS = ['fundamental', 'medio', 'graduacao', 'pos', 'enthusiast'];
 
 interface OnboardingClientProps {
     institutionId: string | null;
@@ -36,6 +29,17 @@ export default function OnboardingClient({
     institutionName,
     departments,
 }: OnboardingClientProps) {
+    const t = useTranslations('Onboarding');
+    const tCommon = useTranslations('Common');
+
+    const levels: Level[] = [
+        { id: 'fundamental', title: t('levelFundamental'), description: t('levelFundamentalDesc'), icon: <School className="w-6 h-6" /> },
+        { id: 'medio', title: t('levelMedio'), description: t('levelMedioDesc'), icon: <BookOpen className="w-6 h-6" /> },
+        { id: 'graduacao', title: t('levelGraduacao'), description: t('levelGraduacaoDesc'), icon: <GraduationCap className="w-6 h-6" /> },
+        { id: 'pos', title: t('levelPos'), description: t('levelPosDesc'), icon: <Brain className="w-6 h-6" /> },
+        { id: 'enthusiast', title: t('levelEnthusiast'), description: t('levelEnthusiastDesc'), icon: <Users className="w-6 h-6" /> },
+    ];
+
     const [step, setStep] = useState(1);
     const [selectedLevel, setSelectedLevel] = useState<string | null>(null);
     const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
@@ -67,14 +71,14 @@ export default function OnboardingClient({
             }
 
             if (hasInstitution) {
-                router.push(`/institutional/${institutionId}`);
+                router.push({ pathname: '/institutional/[institution]', params: { institution: institutionId } });
             } else {
                 router.push('/dashboard');
             }
         } catch (error) {
             console.error('Error saving profile:', error);
             const msg = error instanceof Error ? error.message : 'Unknown error';
-            toast.error(`Erro ao salvar perfil: ${msg}`);
+            toast.error(t('saveError', { msg }));
         } finally {
             setLoading(false);
         }
@@ -99,7 +103,7 @@ export default function OnboardingClient({
                 {step === 1 && (
                     <>
                         <div className="text-center mb-10">
-                            <h1 className="text-2xl sm:text-3xl font-bold mb-4 text-gray-900 tracking-tight">Em qual etapa voce esta?</h1>
+                            <h1 className="text-2xl sm:text-3xl font-bold mb-4 text-gray-900 tracking-tight">{t('stepTitle')}</h1>
                         </div>
 
                         <div className="space-y-3">
@@ -155,7 +159,7 @@ export default function OnboardingClient({
                                         : "bg-black text-white shadow-[0_4px_0_0_black] hover:-translate-y-1 hover:shadow-[0_6px_0_0_black] active:translate-y-[2px] active:shadow-none"
                                 )}
                             >
-                                {loading && !hasInstitution ? 'Salvando...' : 'Continuar'}
+                                {loading && !hasInstitution ? tCommon('saving') : tCommon('continue')}
                                 {!loading && hasInstitution && <ChevronRight className="w-5 h-5" />}
                             </button>
                         </div>
@@ -174,12 +178,12 @@ export default function OnboardingClient({
                                 {institutionName}
                             </div>
                             <h1 className="text-2xl sm:text-3xl font-bold mb-3 text-gray-900 tracking-tight">
-                                Detectamos que voce e estudante da {institutionName}!
+                                {t('institutionDetected', { name: institutionName ?? '' })}
                             </h1>
                             <p className="text-gray-500">
                                 {hasDepartments
-                                    ? 'Selecione seu instituto ou faculdade.'
-                                    : 'Vamos personalizar sua experiencia.'}
+                                    ? t('selectDepartment')
+                                    : t('personalizeExperience')}
                             </p>
                         </div>
 
@@ -223,7 +227,7 @@ export default function OnboardingClient({
                                         : "bg-black text-white shadow-[0_4px_0_0_black] hover:-translate-y-1 hover:shadow-[0_6px_0_0_black] active:translate-y-[2px] active:shadow-none"
                                 )}
                             >
-                                {loading ? 'Salvando...' : 'Continuar'}
+                                {loading ? tCommon('saving') : tCommon('continue')}
                             </button>
                         </div>
                     </motion.div>

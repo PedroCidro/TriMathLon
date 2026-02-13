@@ -2,13 +2,17 @@
 
 import { useParams } from 'next/navigation';
 import { ArrowLeft, Play, BookOpen, Lock, Zap } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
 import MathRenderer from '@/components/ui/MathRenderer';
 import { curriculum } from '@/data/curriculum';
+import { useTranslations } from 'next-intl';
 
 export default function ModuleClient({ isPremium }: { isPremium: boolean }) {
     const params = useParams();
+    const t = useTranslations('Module');
+    const tc = useTranslations('Curriculum');
+    const tCommon = useTranslations('Common');
 
     const moduleId = typeof params.module === 'string' ? params.module : '';
     const moduleData = curriculum.find(m => m.id === moduleId);
@@ -16,8 +20,8 @@ export default function ModuleClient({ isPremium }: { isPremium: boolean }) {
     if (!moduleData) {
         return (
             <div className="min-h-screen bg-gray-50 p-12 flex flex-col items-center justify-center">
-                <h1 className="text-2xl font-bold text-gray-900 mb-4">Módulo não encontrado</h1>
-                <Link href="/dashboard" className="text-blue-600 hover:underline">Voltar para o Dashboard</Link>
+                <h1 className="text-2xl font-bold text-gray-900 mb-4">{t('notFound')}</h1>
+                <Link href="/dashboard" className="text-blue-600 hover:underline">{tCommon('backToDashboard')}</Link>
             </div>
         );
     }
@@ -27,17 +31,17 @@ export default function ModuleClient({ isPremium }: { isPremium: boolean }) {
             <div className="max-w-4xl mx-auto">
                 <Link href="/dashboard" className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 font-bold mb-8 transition-colors">
                     <ArrowLeft className="w-5 h-5" />
-                    Voltar para Arena
+                    {tCommon('backToArena')}
                 </Link>
 
                 <header className="mb-12">
-                    <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">{moduleData.title}</h1>
-                    <p className="text-gray-500 text-lg">{moduleData.description}</p>
+                    <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">{tc(`${moduleData.id}.title`)}</h1>
+                    <p className="text-gray-500 text-lg">{tc(`${moduleData.id}.description`)}</p>
                 </header>
 
                 {/* Blitz Mode Card */}
                 <Link
-                    href={`/dashboard/${moduleId}/blitz`}
+                    href={{ pathname: '/dashboard/[module]/blitz', params: { module: moduleId } }}
                     className="block mb-8"
                 >
                     <div className="group relative p-6 bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-200 rounded-2xl transition-all hover:border-yellow-400 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
@@ -47,13 +51,13 @@ export default function ModuleClient({ isPremium }: { isPremium: boolean }) {
                                     <Zap className="w-6 h-6 text-yellow-600 fill-yellow-600" />
                                 </div>
                                 <div>
-                                    <h3 className="text-xl font-bold text-gray-900">Modo Blitz</h3>
-                                    <p className="text-gray-500 font-medium hidden sm:block">3 minutos. Máximo de problemas. 3 erros e acabou.</p>
+                                    <h3 className="text-xl font-bold text-gray-900">{t('blitzMode')}</h3>
+                                    <p className="text-gray-500 font-medium hidden sm:block">{t('blitzDesc')}</p>
                                 </div>
                             </div>
                             <div className="inline-flex items-center gap-2 text-xs font-bold text-yellow-600 bg-yellow-100 px-3 py-1 rounded-full uppercase tracking-wider group-hover:bg-yellow-600 group-hover:text-white transition-colors">
                                 <Play className="w-3 h-3 fill-current" />
-                                Jogar
+                                {tCommon('play')}
                             </div>
                         </div>
                     </div>
@@ -65,7 +69,7 @@ export default function ModuleClient({ isPremium }: { isPremium: boolean }) {
 
                         return (
                             <Link
-                                href={isLocked ? '/premium' : `/dashboard/${moduleId}/${topic.id}`}
+                                href={isLocked ? '/premium' : { pathname: '/dashboard/[module]/[method]', params: { module: moduleId, method: topic.id } }}
                                 key={topic.id}
                                 className={cn(
                                     "group relative p-6 bg-white border-2 rounded-2xl transition-all",
@@ -76,18 +80,18 @@ export default function ModuleClient({ isPremium }: { isPremium: boolean }) {
                             >
                                 <div className="flex justify-between items-start">
                                     <div>
-                                        <h3 className="text-xl font-bold text-gray-900 mb-1">{topic.title}</h3>
-                                        <p className="text-gray-500 font-medium mb-4">{topic.description}</p>
+                                        <h3 className="text-xl font-bold text-gray-900 mb-1">{tc(`${topic.id}.title`)}</h3>
+                                        <p className="text-gray-500 font-medium mb-4">{tc(`${topic.id}.description`)}</p>
 
                                         {isLocked ? (
                                             <div className="inline-flex items-center gap-2 text-xs font-bold text-gray-400 bg-gray-100 px-3 py-1 rounded-full uppercase tracking-wider">
                                                 <Lock className="w-3 h-3" />
-                                                Premium
+                                                {tCommon('premium')}
                                             </div>
                                         ) : (
                                             <div className="inline-flex items-center gap-2 text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full uppercase tracking-wider group-hover:bg-blue-600 group-hover:text-white transition-colors">
                                                 <Play className="w-3 h-3 fill-current" />
-                                                Começar
+                                                {tCommon('start')}
                                             </div>
                                         )}
                                     </div>

@@ -1,9 +1,11 @@
 'use client';
 
 import { ArrowLeft, ArrowRight } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { motion } from 'framer-motion';
 import MathRenderer from '@/components/ui/MathRenderer';
+import LocaleToggle from '@/components/ui/LocaleToggle';
+import { useTranslations } from 'next-intl';
 
 const fade = (delay: number) => ({
     initial: { opacity: 0, y: 24 },
@@ -12,6 +14,9 @@ const fade = (delay: number) => ({
 });
 
 export default function SobrePage() {
+    const t = useTranslations('About');
+    const tLanding = useTranslations('Landing');
+
     return (
         <div className="min-h-screen bg-white flex flex-col">
             {/* Nav */}
@@ -20,17 +25,18 @@ export default function SobrePage() {
                     <img src="/logo-icon.png" alt="Logo" className="h-10 sm:h-12 w-auto" />
                 </Link>
                 <div className="flex items-center gap-6">
+                    <LocaleToggle />
                     <Link
-                        href="/sign-in"
+                        href="/sign-in/[[...sign-in]]"
                         className="hidden sm:flex font-bold text-gray-900 hover:text-blue-600 transition-colors"
                     >
-                        Entrar
+                        {tLanding('signIn')}
                     </Link>
                     <Link
-                        href="/sign-up"
+                        href="/sign-up/[[...sign-up]]"
                         className="bg-blue-600 text-white font-bold py-2.5 px-6 sm:py-3 sm:px-8 text-sm sm:text-base rounded-full shadow-[0_4px_0_0_rgb(29,78,216)] active:shadow-none active:translate-y-[4px] transition-all hover:bg-blue-500 hover:-translate-y-1 hover:shadow-[0_6px_0_0_rgb(29,78,216)]"
                     >
-                        Começar Agora
+                        {t('ctaButton')}
                     </Link>
                 </div>
             </nav>
@@ -44,7 +50,7 @@ export default function SobrePage() {
                             className="inline-flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-gray-900 transition-colors mb-12"
                         >
                             <ArrowLeft className="w-4 h-4" />
-                            Voltar
+                            {t('heroBack')}
                         </Link>
                     </motion.div>
 
@@ -52,19 +58,19 @@ export default function SobrePage() {
                         {...fade(0.1)}
                         className="text-3xl sm:text-5xl md:text-7xl font-bold tracking-tight text-gray-900 leading-[1.1] mb-8"
                     >
-                        Mais do que resolver{' '}
-                        <span className="text-blue-600">exercícios</span>.
+                        {t('heroTitle')}
+                        <span className="text-blue-600">{t('heroHighlight')}</span>.
                     </motion.h1>
 
                     <motion.p
                         {...fade(0.2)}
                         className="text-xl md:text-2xl text-gray-400 leading-relaxed max-w-2xl mx-auto"
                     >
-                        Queremos que você entenda matemática do jeito que ela realmente é.
+                        {t('heroSubtitle')}
                     </motion.p>
                 </section>
 
-                {/* Divider — axiom line */}
+                {/* Divider -- axiom line */}
                 <motion.div
                     {...fade(0.3)}
                     className="max-w-3xl mx-auto px-6"
@@ -81,13 +87,10 @@ export default function SobrePage() {
                             </div>
                             <div>
                                 <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-                                    Matemática não é mágica. São argumentos lógicos.
+                                    {t('whyTitle')}
                                 </h2>
                                 <p className="text-lg text-gray-500 leading-relaxed">
-                                    A maioria dos cursos ensina <em>como</em> usar uma fórmula.
-                                    Nós explicamos <em>por que</em> ela funciona. Quando o caminho
-                                    da matemática é respeitado, tudo faz sentido — porque no fundo
-                                    são apenas argumentos lógicos aplicados sobre axiomas.
+                                    {t('whyDesc', { emHow: t('whyEmHow'), emWhy: t('whyEmWhy') })}
                                 </p>
                             </div>
                         </div>
@@ -104,13 +107,10 @@ export default function SobrePage() {
                                 </div>
                                 <div>
                                     <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-                                        Entender o porquê muda tudo.
+                                        {t('methodTitle')}
                                     </h2>
                                     <p className="text-lg text-gray-500 leading-relaxed">
-                                        Quando você entende <em>por que</em> um método funciona, você
-                                        não precisa decorar — você consegue reconstruir a ferramenta
-                                        sozinho. No meio de uma prova, quando a memória falha, o
-                                        entendimento não falha.
+                                        {t('methodDesc', { emWhy: t('methodEmWhy') })}
                                     </p>
                                 </div>
                             </div>
@@ -127,13 +127,10 @@ export default function SobrePage() {
                             </div>
                             <div>
                                 <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-                                    O verdadeiro teste: explicar para alguém.
+                                    {t('goalTitle')}
                                 </h2>
                                 <p className="text-lg text-gray-500 leading-relaxed">
-                                    Para nós, o objetivo final não é passar na prova. É quando
-                                    você consegue explicar para um amigo, um colega, um filho
-                                    ou um parente <em>por que</em> algo funciona de uma maneira e
-                                    não de outra. Esse é o momento em que você realmente aprendeu.
+                                    {t('goalDesc', { emWhy: t('goalEmWhy') })}
                                 </p>
                             </div>
                         </div>
@@ -145,16 +142,16 @@ export default function SobrePage() {
                     <div className="max-w-3xl mx-auto px-6 py-20 text-center">
                         <motion.div {...fade(0.6)}>
                             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                                Pronto para entender de verdade?
+                                {t('ctaTitle')}
                             </h2>
                             <p className="text-lg text-gray-400 mb-8">
-                                Comece gratuitamente. Sem compromisso.
+                                {t('ctaSubtitle')}
                             </p>
                             <Link
-                                href="/sign-up"
+                                href="/sign-up/[[...sign-up]]"
                                 className="inline-flex items-center gap-2 text-lg px-10 py-4 bg-blue-600 text-white font-bold rounded-full shadow-[0_4px_0_0_rgb(29,78,216)] active:shadow-none active:translate-y-[4px] transition-all hover:bg-blue-500 hover:-translate-y-1 hover:shadow-[0_6px_0_0_rgb(29,78,216)]"
                             >
-                                Começar Agora
+                                {t('ctaButton')}
                                 <ArrowRight className="w-5 h-5" />
                             </Link>
                         </motion.div>

@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 
 const INSTITUTION_STYLES: Record<string, { accent: string; bg: string; border: string; button: string; shadow: string }> = {
     usp: {
@@ -39,6 +40,8 @@ export default function InstitutionalLandingClient({
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const styles = INSTITUTION_STYLES[institutionId] ?? INSTITUTION_STYLES.usp;
+    const t = useTranslations('Institutional');
+    const tCommon = useTranslations('Common');
 
     const handleContinue = async () => {
         setLoading(true);
@@ -84,7 +87,7 @@ export default function InstitutionalLandingClient({
                         styles.button, styles.shadow
                     )}
                 >
-                    {loading ? 'Carregando...' : 'Continuar para a Arena'}
+                    {loading ? tCommon('loading') : t('continueToArena')}
                     {!loading && <ArrowRight className="w-5 h-5" />}
                 </button>
             </motion.div>

@@ -4,10 +4,12 @@ import { motion } from 'framer-motion';
 import { Flame, Trophy, Zap, Settings, Building2, ArrowRight } from 'lucide-react';
 import MathRenderer from '@/components/ui/MathRenderer';
 import { cn } from '@/lib/utils';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { UserButton } from '@clerk/nextjs';
+import { useTranslations } from 'next-intl';
 
 import UpgradeButton from '@/components/UpgradeButton';
+import LocaleToggle from '@/components/ui/LocaleToggle';
 import { curriculum } from '@/data/curriculum';
 
 const modules = curriculum;
@@ -33,6 +35,10 @@ export default function DashboardClient({
     moduleProgress,
     uniRankingBalloon,
 }: DashboardClientProps) {
+    const t = useTranslations('Dashboard');
+    const tc = useTranslations('Curriculum');
+    const tCommon = useTranslations('Common');
+
     const xpPercent = Math.min(100, Math.round((xpToday / DAILY_XP_GOAL) * 100));
 
     return (
@@ -61,7 +67,7 @@ export default function DashboardClient({
                         <span className="hidden sm:inline">{xpTotal}</span>
                     </div>
 
-                    {/* Exercise count — links to stats */}
+                    {/* Exercise count -- links to stats */}
                     <Link href="/dashboard/stats" className="flex items-center gap-1.5 text-gray-500 font-medium text-sm hover:text-green-600 transition-colors">
                         <Trophy className="w-4 h-4 text-green-500" />
                         <span className="hidden sm:inline">{exercisesSolved}</span>
@@ -72,6 +78,8 @@ export default function DashboardClient({
                         <Settings className="w-4.5 h-4.5" />
                     </Link>
 
+                    <LocaleToggle />
+
                     <UserButton afterSignOutUrl="/" />
                 </div>
             </nav>
@@ -80,8 +88,8 @@ export default function DashboardClient({
             <main className="flex-1 max-w-5xl mx-auto w-full p-4 sm:p-6 md:p-12">
 
                 <header className="mb-10">
-                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Sua Arena de Treino</h1>
-                    <p className="text-gray-500 mt-2">Escolha uma modalidade para começar.</p>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('yourArena')}</h1>
+                    <p className="text-gray-500 mt-2">{t('chooseModule')}</p>
                 </header>
 
                 {/* Daily XP goal bar */}
@@ -89,7 +97,7 @@ export default function DashboardClient({
                     <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
                             <Zap className="w-5 h-5 fill-yellow-500 text-yellow-500" />
-                            <span className="font-bold text-gray-900 text-sm">Meta Diária</span>
+                            <span className="font-bold text-gray-900 text-sm">{t('dailyGoal')}</span>
                         </div>
                         <span className="text-sm font-bold">
                             <span className={xpToday >= DAILY_XP_GOAL ? "text-green-600" : "text-gray-700"}>
@@ -110,7 +118,7 @@ export default function DashboardClient({
                         />
                     </div>
                     {xpToday >= DAILY_XP_GOAL && (
-                        <p className="text-sm text-green-600 font-bold mt-2">Meta concluída! Continue treinando para subir no ranking.</p>
+                        <p className="text-sm text-green-600 font-bold mt-2">{t('dailyGoalDone')}</p>
                     )}
                 </div>
 
@@ -124,12 +132,12 @@ export default function DashboardClient({
                             <div className="flex-1">
                                 {uniRankingBalloon.qualified ? (
                                     <p className="text-sm font-bold text-gray-900">
-                                        {uniRankingBalloon.institutionName} tem {uniRankingBalloon.totalExercises} exercicios resolvidos!{' '}
-                                        <span className="text-purple-600">Ver ranking completo</span>
+                                        {t('uniQualified', { name: uniRankingBalloon.institutionName, count: uniRankingBalloon.totalExercises })}{' '}
+                                        <span className="text-purple-600">{t('uniQualifiedCta')}</span>
                                     </p>
                                 ) : (
                                     <p className="text-sm font-bold text-gray-900">
-                                        Faltam {100 - uniRankingBalloon.totalExercises} exercicios para a {uniRankingBalloon.institutionName} entrar no ranking!
+                                        {t('uniNotQualified', { remaining: 100 - uniRankingBalloon.totalExercises, name: uniRankingBalloon.institutionName })}
                                     </p>
                                 )}
                             </div>
@@ -147,7 +155,7 @@ export default function DashboardClient({
                             : 0;
 
                         return (
-                            <Link href={`/dashboard/${module.id}`} key={module.id} className="block">
+                            <Link href={{ pathname: '/dashboard/[module]', params: { module: module.id } }} key={module.id} className="block">
                                 <motion.div
                                     whileHover={{ y: -4 }}
                                     className={cn(
@@ -160,11 +168,11 @@ export default function DashboardClient({
                                             <MathRenderer latex={module.iconLatex} className={cn("text-3xl", module.id === 'derivadas' ? 'text-blue-600' : module.id === 'integrais' ? 'text-purple-600' : 'text-yellow-600')} />
                                         </div>
                                         <div className="text-sm font-bold text-gray-400 bg-white/50 px-2 py-1 rounded-md">
-                                            {module.topics.length} Tópicos
+                                            {module.topics.length} {tCommon('topics')}
                                         </div>
                                     </div>
 
-                                    <h2 className="text-2xl font-bold text-gray-900 mb-2">{module.title}</h2>
+                                    <h2 className="text-2xl font-bold text-gray-900 mb-2">{tc(`${module.id}.title`)}</h2>
                                     <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
                                         <motion.div
                                             initial={{ width: 0 }}
@@ -174,13 +182,13 @@ export default function DashboardClient({
                                         />
                                     </div>
                                     <div className="mt-2 text-sm text-gray-500 font-medium text-right">
-                                        {progressPercent}% Completo
+                                        {progressPercent}% {tCommon('complete')}
                                     </div>
                                     <div className="mt-4 space-y-1 hidden sm:block">
                                         {module.topics.map((topic) => (
                                             <div key={topic.id} className="text-xs text-gray-500 flex items-center gap-1">
                                                 <div className={cn("w-1 h-1 rounded-full", module.barColor)} />
-                                                {topic.title}
+                                                {tc(`${topic.id}.title`)}
                                             </div>
                                         ))}
                                     </div>

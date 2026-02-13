@@ -2,12 +2,14 @@
 
 import { useState } from 'react';
 import { ArrowLeft, Trophy, Flame, Zap, Target, BarChart3, TrendingUp, TrendingDown, Award, Crown, Users, Building2 } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
 import { curriculum } from '@/data/curriculum';
 import { getInstitutionById } from '@/data/institutions';
 import { toast } from 'sonner';
 import type { RankingData } from '@/lib/rankings';
+import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 import {
     BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
     RadarChart, PolarGrid, PolarAngleAxis, Radar,
@@ -35,38 +37,17 @@ interface StatsClientProps {
     blitzBests: Record<string, number>;
 }
 
-const RATING_LABELS: Record<number, string> = {
-    1: 'Errei',
-    2: 'Dificil',
-    3: 'Bom',
-    4: 'Facil',
-};
-
 const MODULE_COLORS: Record<string, { accent: string; bg: string; text: string; fill: string }> = {
     derivadas: { accent: 'border-blue-500', bg: 'bg-blue-50', text: 'text-blue-700', fill: '#3b82f6' },
     integrais: { accent: 'border-purple-500', bg: 'bg-purple-50', text: 'text-purple-700', fill: '#8b5cf6' },
     edos: { accent: 'border-yellow-500', bg: 'bg-yellow-50', text: 'text-yellow-700', fill: '#eab308' },
 };
 
-const RANK_BADGES = ['🥇', '🥈', '🥉'];
-
-function formatDate(dateStr: string | null): string {
-    if (!dateStr) return '—';
-    const d = new Date(dateStr);
-    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit' });
-}
+const RANK_BADGES = ['\u{1F947}', '\u{1F948}', '\u{1F949}'];
 
 function getAccuracy(correct: number, attempts: number): number {
     if (attempts === 0) return 0;
     return Math.round((correct / attempts) * 100);
-}
-
-function findTopicTitle(subcategory: string): string {
-    for (const mod of curriculum) {
-        const topic = mod.topics.find(t => t.id === subcategory);
-        if (topic) return topic.title;
-    }
-    return subcategory;
 }
 
 function findModuleForTopic(subcategory: string): string {
@@ -90,6 +71,27 @@ export default function StatsClient({
 }: StatsClientProps) {
     const [optIn, setOptIn] = useState(initialOptIn);
     const [togglingOptIn, setTogglingOptIn] = useState(false);
+    const t = useTranslations('Stats');
+    const tc = useTranslations('Curriculum');
+    const tCommon = useTranslations('Common');
+    const locale = useLocale();
+
+    const RATING_LABELS: Record<number, string> = {
+        1: t('ratingWrong'),
+        2: t('ratingHard'),
+        3: t('ratingGood'),
+        4: t('ratingEasy'),
+    };
+
+    function formatDate(dateStr: string | null): string {
+        if (!dateStr) return '\u2014';
+        const d = new Date(dateStr);
+        return d.toLocaleDateString(locale === 'pt' ? 'pt-BR' : 'en-US', { day: '2-digit', month: '2-digit', year: '2-digit' });
+    }
+
+    function findTopicTitle(subcategory: string): string {
+        return tc.has(`${subcategory}.title`) ? tc(`${subcategory}.title`) : subcategory;
+    }
 
     const masteryMap = new Map(mastery.map(m => [m.subcategory, m]));
     const practicedMastery = mastery.filter(m => m.attempts > 0);
@@ -137,7 +139,7 @@ export default function StatsClient({
         const totalCorrect = modTopics.reduce((s, m) => s + m.correct, 0);
         const totalAttempts = modTopics.reduce((s, m) => s + m.attempts, 0);
         return {
-            module: mod.title,
+            module: tc(`${mod.id}.title`),
             accuracy: totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0,
             practiced: modTopics.length,
             total: mod.topics.length,
@@ -148,8 +150,8 @@ export default function StatsClient({
     const totalCorrect = practicedMastery.reduce((s, m) => s + m.correct, 0);
     const totalWrong = practicedMastery.reduce((s, m) => s + m.wrong_count, 0);
     const donutData = [
-        { name: 'Corretas', value: totalCorrect, fill: '#22c55e' },
-        { name: 'Erradas', value: totalWrong, fill: '#ef4444' },
+        { name: tCommon('correct'), value: totalCorrect, fill: '#22c55e' },
+        { name: tCommon('wrong'), value: totalWrong, fill: '#ef4444' },
     ];
     const overallAccuracy = totalCorrect + totalWrong > 0
         ? Math.round((totalCorrect / (totalCorrect + totalWrong)) * 100)
@@ -169,9 +171,9 @@ export default function StatsClient({
             if (!res.ok) throw new Error();
             const data = await res.json();
             setOptIn(data.ranking_opt_in);
-            toast.success(data.ranking_opt_in ? 'Voce entrou no ranking!' : 'Voce saiu do ranking.');
+            toast.success(data.ranking_opt_in ? t('joinedRanking') : t('leftRanking'));
         } catch {
-            toast.error('Erro ao atualizar preferencia.');
+            toast.error(t('updateError'));
         } finally {
             setTogglingOptIn(false);
         }
@@ -182,20 +184,20 @@ export default function StatsClient({
             <div className="max-w-4xl mx-auto">
                 <Link href="/dashboard" className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 font-bold mb-8 transition-colors">
                     <ArrowLeft className="w-5 h-5" />
-                    Voltar para Arena
+                    {tCommon('backToArena')}
                 </Link>
 
                 <header className="mb-10">
-                    <h1 className="text-3xl font-bold text-gray-900">Suas Estatisticas</h1>
-                    <p className="text-gray-500 mt-2">Acompanhe seu progresso e identifique pontos de melhoria.</p>
+                    <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
+                    <p className="text-gray-500 mt-2">{t('subtitle')}</p>
                 </header>
 
-                {/* Section 1 — Overview Cards */}
+                {/* Section 1 -- Overview Cards */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-10">
                     <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                         <div className="flex items-center gap-2 mb-2">
                             <Trophy className="w-5 h-5 text-green-500" />
-                            <span className="text-sm font-medium text-gray-500">Exercicios</span>
+                            <span className="text-sm font-medium text-gray-500">{t('exercisesLabel')}</span>
                         </div>
                         <p className="text-xl sm:text-2xl font-bold text-gray-900">{exercisesSolved}</p>
                     </div>
@@ -203,18 +205,18 @@ export default function StatsClient({
                     <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                         <div className="flex items-center gap-2 mb-2">
                             <Flame className="w-5 h-5 text-orange-500" />
-                            <span className="text-sm font-medium text-gray-500">Sequencia</span>
+                            <span className="text-sm font-medium text-gray-500">{t('streakLabel')}</span>
                         </div>
                         <p className="text-xl sm:text-2xl font-bold text-gray-900">
                             {currentStreak}
-                            <span className="text-sm font-medium text-gray-400 ml-1">/ {longestStreak} max</span>
+                            <span className="text-sm font-medium text-gray-400 ml-1">/ {longestStreak} {t('maxSuffix')}</span>
                         </p>
                     </div>
 
                     <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                         <div className="flex items-center gap-2 mb-2">
                             <Zap className="w-5 h-5 text-yellow-500" />
-                            <span className="text-sm font-medium text-gray-500">XP Total</span>
+                            <span className="text-sm font-medium text-gray-500">{t('xpTotalLabel')}</span>
                         </div>
                         <p className="text-xl sm:text-2xl font-bold text-gray-900">{xpTotal}</p>
                     </div>
@@ -222,7 +224,7 @@ export default function StatsClient({
                     <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                         <div className="flex items-center gap-2 mb-2">
                             <Target className="w-5 h-5 text-blue-500" />
-                            <span className="text-sm font-medium text-gray-500">Topicos</span>
+                            <span className="text-sm font-medium text-gray-500">{t('topicsLabel')}</span>
                         </div>
                         <p className="text-xl sm:text-2xl font-bold text-gray-900">
                             {topicsPracticed}
@@ -231,12 +233,12 @@ export default function StatsClient({
                     </div>
                 </div>
 
-                {/* Section 2 — Charts */}
+                {/* Section 2 -- Charts */}
                 {hasAnyData && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
                         {/* Overall accuracy donut */}
                         <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-                            <h3 className="text-sm font-bold text-gray-900 mb-4">Acerto Geral</h3>
+                            <h3 className="text-sm font-bold text-gray-900 mb-4">{t('overallAccuracy')}</h3>
                             <div className="relative h-52">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <PieChart>
@@ -262,25 +264,25 @@ export default function StatsClient({
                                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                                     <div className="text-center">
                                         <p className="text-3xl font-bold text-gray-900">{overallAccuracy}%</p>
-                                        <p className="text-xs text-gray-500">acerto</p>
+                                        <p className="text-xs text-gray-500">{tCommon('accuracy')}</p>
                                     </div>
                                 </div>
                             </div>
                             <div className="flex justify-center gap-6 mt-2">
                                 <div className="flex items-center gap-1.5 text-sm">
                                     <div className="w-3 h-3 rounded-full bg-green-500" />
-                                    <span className="text-gray-600">{totalCorrect} corretas</span>
+                                    <span className="text-gray-600">{totalCorrect} {tCommon('correct')}</span>
                                 </div>
                                 <div className="flex items-center gap-1.5 text-sm">
                                     <div className="w-3 h-3 rounded-full bg-red-500" />
-                                    <span className="text-gray-600">{totalWrong} erradas</span>
+                                    <span className="text-gray-600">{totalWrong} {tCommon('wrong')}</span>
                                 </div>
                             </div>
                         </div>
 
                         {/* Radar: per-module accuracy */}
                         <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-                            <h3 className="text-sm font-bold text-gray-900 mb-4">Acerto por Modulo</h3>
+                            <h3 className="text-sm font-bold text-gray-900 mb-4">{t('accuracyByModule')}</h3>
                             <div className="h-52">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="75%">
@@ -297,7 +299,7 @@ export default function StatsClient({
                                             strokeWidth={2}
                                         />
                                         <Tooltip
-                                            formatter={(value) => [`${value}%`, 'Acerto']}
+                                            formatter={(value) => [`${value}%`, tCommon('accuracy')]}
                                             contentStyle={{ borderRadius: '12px', border: '1px solid #e5e7eb', fontSize: '13px' }}
                                         />
                                     </RadarChart>
@@ -306,7 +308,7 @@ export default function StatsClient({
                             <div className="flex flex-col sm:flex-row justify-center gap-1 sm:gap-4 mt-2">
                                 {radarData.map(r => (
                                     <span key={r.module} className="text-xs text-gray-500">
-                                        {r.module}: {r.practiced}/{r.total} topicos
+                                        {r.module}: {r.practiced}/{r.total} {t('topicsSuffix')}
                                     </span>
                                 ))}
                             </div>
@@ -314,7 +316,7 @@ export default function StatsClient({
 
                         {/* Bar chart: accuracy per topic */}
                         <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm md:col-span-2">
-                            <h3 className="text-sm font-bold text-gray-900 mb-4">Acerto por Topico</h3>
+                            <h3 className="text-sm font-bold text-gray-900 mb-4">{t('accuracyByTopic')}</h3>
                             <div className="h-48 sm:h-64">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart data={accuracyChartData} layout="vertical" margin={{ left: 0, right: 16 }}>
@@ -326,7 +328,7 @@ export default function StatsClient({
                                             tick={{ fontSize: 12, fill: '#374151' }}
                                         />
                                         <Tooltip
-                                            formatter={(value) => [`${value}%`, 'Acerto']}
+                                            formatter={(value) => [`${value}%`, tCommon('accuracy')]}
                                             contentStyle={{ borderRadius: '12px', border: '1px solid #e5e7eb', fontSize: '13px' }}
                                         />
                                         <Bar dataKey="accuracy" radius={[0, 6, 6, 0]} barSize={18}>
@@ -341,13 +343,13 @@ export default function StatsClient({
                     </div>
                 )}
 
-                {/* Section 3 — Per-topic Breakdown (practiced only) */}
+                {/* Section 3 -- Per-topic Breakdown (practiced only) */}
                 {hasAnyData && (
                     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm mb-10 overflow-hidden">
                         <div className="px-6 py-4 border-b border-gray-100">
                             <div className="flex items-center gap-2">
                                 <BarChart3 className="w-5 h-5 text-gray-400" />
-                                <h2 className="text-lg font-bold text-gray-900">Desempenho por Topico</h2>
+                                <h2 className="text-lg font-bold text-gray-900">{t('performanceByTopic')}</h2>
                             </div>
                         </div>
 
@@ -370,23 +372,23 @@ export default function StatsClient({
                             return (
                                 <div key={mod.id}>
                                     <div className={cn("px-6 py-3 border-l-4", colors.accent, colors.bg)}>
-                                        <span className={cn("font-bold text-sm", colors.text)}>{mod.title}</span>
+                                        <span className={cn("font-bold text-sm", colors.text)}>{tc(`${mod.id}.title`)}</span>
                                     </div>
                                     <div className="divide-y divide-gray-50">
                                         {practicedTopics.map((topic) => {
                                             const m = masteryMap.get(topic.id)!;
                                             const accuracy = getAccuracy(m.correct, m.attempts);
                                             const ratingLabel = m.avg_self_rating
-                                                ? RATING_LABELS[Math.round(m.avg_self_rating)] ?? '—'
-                                                : '—';
+                                                ? RATING_LABELS[Math.round(m.avg_self_rating)] ?? '\u2014'
+                                                : '\u2014';
 
                                             return (
                                                 <div key={topic.id} className="px-6 py-3 flex items-center gap-4">
                                                     <div className="flex-1 min-w-0">
-                                                        <p className="text-sm font-medium text-gray-900 truncate">{topic.title}</p>
+                                                        <p className="text-sm font-medium text-gray-900 truncate">{tc(`${topic.id}.title`)}</p>
                                                     </div>
                                                     <div className="text-xs text-gray-500 w-20 text-right">
-                                                        {m.attempts} tentativas
+                                                        {m.attempts} {tCommon('attempts')}
                                                     </div>
                                                     <div className="w-24 flex items-center gap-2">
                                                         <div className="flex-1 bg-gray-100 h-2 rounded-full overflow-hidden">
@@ -416,26 +418,26 @@ export default function StatsClient({
                 {!hasAnyData && (
                     <div className="bg-white rounded-2xl p-12 border border-gray-200 shadow-sm mb-10 text-center">
                         <BarChart3 className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                        <p className="text-gray-500 font-medium">Nenhum topico praticado ainda.</p>
-                        <p className="text-sm text-gray-400 mt-1">Resolva exercicios para ver suas estatisticas aqui.</p>
+                        <p className="text-gray-500 font-medium">{t('noTopicsPracticed')}</p>
+                        <p className="text-sm text-gray-400 mt-1">{t('noTopicsHint')}</p>
                         <Link href="/dashboard" className="inline-block mt-4 text-blue-600 hover:underline font-bold text-sm">
-                            Ir para Arena
+                            {t('goToArena')}
                         </Link>
                     </div>
                 )}
 
-                {/* Section 4 — Insights */}
+                {/* Section 4 -- Insights */}
                 {(weakestTopic || strongestTopic || (bestStreakTopic && bestStreakTopic.best_streak > 0)) && (
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
                         {weakestTopic && (
                             <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                                 <div className="flex items-center gap-2 mb-3">
                                     <TrendingDown className="w-5 h-5 text-red-500" />
-                                    <span className="text-sm font-medium text-gray-500">Topico mais dificil</span>
+                                    <span className="text-sm font-medium text-gray-500">{t('hardestTopic')}</span>
                                 </div>
                                 <p className="font-bold text-gray-900">{findTopicTitle(weakestTopic.subcategory)}</p>
                                 <p className="text-sm text-gray-500 mt-1">
-                                    {getAccuracy(weakestTopic.correct, weakestTopic.attempts)}% de acerto em {weakestTopic.attempts} tentativas
+                                    {t('accuracyIn', { accuracy: getAccuracy(weakestTopic.correct, weakestTopic.attempts), attempts: weakestTopic.attempts })}
                                 </p>
                             </div>
                         )}
@@ -444,11 +446,11 @@ export default function StatsClient({
                             <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                                 <div className="flex items-center gap-2 mb-3">
                                     <TrendingUp className="w-5 h-5 text-green-500" />
-                                    <span className="text-sm font-medium text-gray-500">Topico mais forte</span>
+                                    <span className="text-sm font-medium text-gray-500">{t('strongestTopic')}</span>
                                 </div>
                                 <p className="font-bold text-gray-900">{findTopicTitle(strongestTopic.subcategory)}</p>
                                 <p className="text-sm text-gray-500 mt-1">
-                                    {getAccuracy(strongestTopic.correct, strongestTopic.attempts)}% de acerto em {strongestTopic.attempts} tentativas
+                                    {t('accuracyIn', { accuracy: getAccuracy(strongestTopic.correct, strongestTopic.attempts), attempts: strongestTopic.attempts })}
                                 </p>
                             </div>
                         )}
@@ -457,23 +459,23 @@ export default function StatsClient({
                             <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                                 <div className="flex items-center gap-2 mb-3">
                                     <Award className="w-5 h-5 text-yellow-500" />
-                                    <span className="text-sm font-medium text-gray-500">Melhor sequencia</span>
+                                    <span className="text-sm font-medium text-gray-500">{t('bestStreak')}</span>
                                 </div>
                                 <p className="font-bold text-gray-900">{findTopicTitle(bestStreakTopic.subcategory)}</p>
                                 <p className="text-sm text-gray-500 mt-1">
-                                    {bestStreakTopic.best_streak} acertos consecutivos
+                                    {t('consecutiveCorrect', { count: bestStreakTopic.best_streak })}
                                 </p>
                             </div>
                         )}
                     </div>
                 )}
 
-                {/* Section 5 — Blitz Records */}
+                {/* Section 5 -- Blitz Records */}
                 {Object.keys(blitzBests).length > 0 && (
                     <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm mb-10">
                         <div className="flex items-center gap-2 mb-5">
                             <Zap className="w-5 h-5 text-yellow-500" />
-                            <h2 className="text-lg font-bold text-gray-900">Recordes Blitz</h2>
+                            <h2 className="text-lg font-bold text-gray-900">{t('blitzRecords')}</h2>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             {curriculum.map((mod) => {
@@ -482,9 +484,9 @@ export default function StatsClient({
                                 const colors = MODULE_COLORS[mod.id];
                                 return (
                                     <div key={mod.id} className={cn("rounded-xl p-4 border-l-4", colors.accent, colors.bg)}>
-                                        <p className={cn("text-sm font-bold", colors.text)}>{mod.title}</p>
+                                        <p className={cn("text-sm font-bold", colors.text)}>{tc(`${mod.id}.title`)}</p>
                                         <p className="text-3xl font-bold text-gray-900 mt-1">{best}</p>
-                                        <p className="text-xs text-gray-500 mt-0.5">melhor pontuacao</p>
+                                        <p className="text-xs text-gray-500 mt-0.5">{t('bestScoreLabel')}</p>
                                     </div>
                                 );
                             })}
@@ -492,13 +494,13 @@ export default function StatsClient({
                     </div>
                 )}
 
-                {/* Section 6 — Rankings */}
+                {/* Section 6 -- Rankings */}
                 <div className="space-y-6 mb-10">
                     {/* 5a. Global Top 3 */}
                     <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
                         <div className="flex items-center gap-2 mb-5">
                             <Crown className="w-5 h-5 text-yellow-500" />
-                            <h2 className="text-lg font-bold text-gray-900">Top 3 Global</h2>
+                            <h2 className="text-lg font-bold text-gray-900">{t('globalTop3')}</h2>
                         </div>
 
                         {rankingData.global_top_3.length > 0 ? (
@@ -514,22 +516,22 @@ export default function StatsClient({
                                         <span className="text-2xl w-8 text-center">{RANK_BADGES[user.position - 1]}</span>
                                         <div className="flex-1">
                                             <p className={cn("font-bold text-sm", user.is_self ? "text-blue-700" : "text-gray-900")}>
-                                                {user.display_name} {user.is_self && '(voce)'}
+                                                {user.display_name} {user.is_self && `(${t('you')})`}
                                             </p>
                                         </div>
-                                        <span className="text-sm font-bold text-gray-600">{user.exercises_solved} exercicios</span>
+                                        <span className="text-sm font-bold text-gray-600">{user.exercises_solved} {tCommon('exercises')}</span>
                                     </div>
                                 ))}
                             </div>
                         ) : (
-                            <p className="text-sm text-gray-400">Ninguem participando do ranking ainda.</p>
+                            <p className="text-sm text-gray-400">{t('noRankingYet')}</p>
                         )}
 
                         {/* User's own position or opt-in prompt */}
                         <div className="mt-4 pt-4 border-t border-gray-100">
                             {optIn && rankingData.my_global_position !== null ? (
                                 <p className="text-sm text-gray-600">
-                                    <span className="font-bold">Voce:</span> #{rankingData.my_global_position} — {exercisesSolved} exercicios
+                                    <span className="font-bold">{t('yourPosition')}</span> #{rankingData.my_global_position} — {exercisesSolved} {tCommon('exercises')}
                                 </p>
                             ) : !optIn ? (
                                 <button
@@ -537,7 +539,7 @@ export default function StatsClient({
                                     disabled={togglingOptIn}
                                     className="text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors disabled:opacity-50"
                                 >
-                                    {togglingOptIn ? 'Atualizando...' : 'Participar do ranking'}
+                                    {togglingOptIn ? t('updating') : t('joinRanking')}
                                 </button>
                             ) : null}
                         </div>
@@ -548,7 +550,7 @@ export default function StatsClient({
                         <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
                             <div className="flex items-center gap-2 mb-5">
                                 <Users className="w-5 h-5 text-blue-500" />
-                                <h2 className="text-lg font-bold text-gray-900">Ranking {institutionConfig.name}</h2>
+                                <h2 className="text-lg font-bold text-gray-900">{t('uniRanking', { name: institutionConfig.name })}</h2>
                             </div>
 
                             {rankingData.internal_ranking.length > 0 ? (
@@ -564,7 +566,7 @@ export default function StatsClient({
                                             <span className="text-sm font-bold text-gray-400 w-8 text-center">#{user.position}</span>
                                             <div className="flex-1">
                                                 <p className={cn("font-bold text-sm", user.is_self ? "text-blue-700" : "text-gray-900")}>
-                                                    {user.display_name} {user.is_self && '(voce)'}
+                                                    {user.display_name} {user.is_self && `(${t('you')})`}
                                                 </p>
                                             </div>
                                             <span className="text-sm font-bold text-gray-600">{user.exercises_solved}</span>
@@ -572,13 +574,13 @@ export default function StatsClient({
                                     ))}
                                 </div>
                             ) : (
-                                <p className="text-sm text-gray-400">Nenhum estudante da {institutionConfig.name} no ranking ainda.</p>
+                                <p className="text-sm text-gray-400">{t('noStudentsYet', { name: institutionConfig.name })}</p>
                             )}
 
                             {optIn && rankingData.my_internal_position !== null && !rankingData.internal_ranking.some(u => u.is_self) && (
                                 <div className="mt-3 pt-3 border-t border-gray-100">
                                     <p className="text-sm text-gray-600">
-                                        ... <span className="font-bold">Voce:</span> #{rankingData.my_internal_position} — {exercisesSolved} exercicios
+                                        ... <span className="font-bold">{t('yourPosition')}</span> #{rankingData.my_internal_position} — {exercisesSolved} {tCommon('exercises')}
                                     </p>
                                 </div>
                             )}
@@ -590,7 +592,7 @@ export default function StatsClient({
                         <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
                             <div className="flex items-center gap-2 mb-5">
                                 <Building2 className="w-5 h-5 text-purple-500" />
-                                <h2 className="text-lg font-bold text-gray-900">Ranking entre Universidades</h2>
+                                <h2 className="text-lg font-bold text-gray-900">{t('interUniRanking')}</h2>
                             </div>
 
                             {rankingData.uni_qualified ? (
@@ -604,7 +606,7 @@ export default function StatsClient({
                                             )}>
                                                 <span className="text-sm font-bold text-gray-400 w-8 text-center">#{i + 1}</span>
                                                 <p className="flex-1 font-bold text-sm text-gray-900">{uniConfig?.name ?? uni.institution}</p>
-                                                <span className="text-sm font-bold text-gray-600">{uni.total_exercises} exercicios</span>
+                                                <span className="text-sm font-bold text-gray-600">{uni.total_exercises} {tCommon('exercises')}</span>
                                             </div>
                                         );
                                     })}
@@ -612,8 +614,7 @@ export default function StatsClient({
                             ) : (
                                 <div className="text-center py-4">
                                     <p className="text-sm text-gray-500">
-                                        Faltam <span className="font-bold text-gray-900">{100 - rankingData.uni_total_exercises}</span> exercicios para a{' '}
-                                        <span className="font-bold">{institutionConfig.name}</span> entrar no ranking
+                                        {t('uniNotQualified', { remaining: 100 - rankingData.uni_total_exercises, name: institutionConfig.name })}
                                     </p>
                                     <div className="mt-3 w-full bg-gray-100 h-2 rounded-full overflow-hidden max-w-xs mx-auto">
                                         <div

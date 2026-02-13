@@ -3,14 +3,14 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { ArrowLeft, BookOpen, Dumbbell, Eye, Check, X, RotateCcw, Lock, Zap } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
 import MathRenderer from '@/components/ui/MathRenderer';
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
 import { curriculum } from '@/data/curriculum';
-import { explanations } from '@/data/explanations';
+import { useTranslations } from 'next-intl';
 
 type Tab = 'learn' | 'practice' | 'recognize';
 
@@ -30,6 +30,10 @@ type RecognizeQuestion = {
 export default function MethodClient({ isPremium }: { isPremium: boolean }) {
     const [activeTab, setActiveTab] = useState<Tab>('learn');
     const params = useParams();
+    const t = useTranslations('Method');
+    const tc = useTranslations('Curriculum');
+    const tCommon = useTranslations('Common');
+    const te = useTranslations('Explanations');
 
     // Find Topic Data
     const moduleId = typeof params.module === 'string' ? params.module : '';
@@ -198,7 +202,7 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
 
     // Helper to get topic title from id
     const getTopicTitle = (topicId: string) => {
-        return moduleData?.topics.find(t => t.id === topicId)?.title || topicId;
+        return tc.has(`${topicId}.title`) ? tc(`${topicId}.title`) : topicId;
     };
 
     // Helper to render mixed text and LaTeX (e.g. "Derive $f(x)$")
@@ -222,21 +226,21 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
             {/* Top Bar */}
             <header className="bg-white border-b border-gray-200 px-3 sm:px-6 py-3 sm:py-4 flex items-center justify-between sticky top-0 z-20">
                 <div className="flex items-center gap-4">
-                    <Link href={`/dashboard/${params.module}`} className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500">
+                    <Link href={{ pathname: '/dashboard/[module]', params: { module: params.module as string } }} className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500">
                         <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6" />
                     </Link>
                     <div className="flex flex-col">
-                        <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{moduleData?.title || params.module}</span>
-                        <h1 className="text-base sm:text-lg font-bold text-gray-900">{topicData?.title || 'Tópico'}</h1>
+                        <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{tc.has(`${moduleId}.title`) ? tc(`${moduleId}.title`) : (moduleData?.title || params.module)}</span>
+                        <h1 className="text-base sm:text-lg font-bold text-gray-900">{tc.has(`${methodId}.title`) ? tc(`${methodId}.title`) : t('topic')}</h1>
                     </div>
                 </div>
 
                 {/* Tabs */}
                 <div className="flex bg-gray-100 p-1 rounded-xl">
                     {[
-                        { id: 'learn', label: 'Aprender', icon: BookOpen, premium: false },
-                        { id: 'practice', label: 'Treinar', icon: Dumbbell, premium: false },
-                        { id: 'recognize', label: 'Reconhecer', icon: Eye, premium: true }
+                        { id: 'learn', label: t('tabLearn'), icon: BookOpen, premium: false },
+                        { id: 'practice', label: t('tabPractice'), icon: Dumbbell, premium: false },
+                        { id: 'recognize', label: t('tabRecognize'), icon: Eye, premium: true }
                     ].map((tab) => {
                         const locked = tab.premium && !isPremium;
                         return (
@@ -271,47 +275,50 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
                         transition={{ duration: 0.2 }}
                     >
                         {activeTab === 'learn' && (() => {
-                            const explanation = explanations[methodId];
+                            const hasExplanation = te.has(`${methodId}.intuitionTitle`);
+                            // Use te.raw() for all explanation fields — they contain LaTeX
+                            // with braces that next-intl would misinterpret as ICU placeholders
+                            const raw = (key: string) => String(te.raw(`${methodId}.${key}`));
                             return (
                                 <div className="space-y-6">
-                                    {explanation ? (
+                                    {hasExplanation ? (
                                         <>
                                             {/* Intuition section */}
                                             <div className="bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-gray-200">
-                                                <h2 className="text-xl sm:text-2xl font-bold mb-4">{explanation.intuitionTitle}</h2>
+                                                <h2 className="text-xl sm:text-2xl font-bold mb-4">{raw('intuitionTitle')}</h2>
                                                 <div className="text-gray-600 leading-relaxed text-lg mb-6">
-                                                    {renderFormattedText(explanation.intuition, "")}
+                                                    {renderFormattedText(raw('intuition'), "")}
                                                 </div>
                                                 <div className="bg-blue-50 p-6 rounded-xl border border-blue-100 text-center">
-                                                    <span className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-3 block">Fórmula Principal</span>
-                                                    <MathRenderer latex={explanation.formulaLatex} className="text-xl sm:text-3xl text-blue-700" />
+                                                    <span className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-3 block">{t('mainFormula')}</span>
+                                                    <MathRenderer latex={raw('formulaLatex')} display className="text-xl sm:text-3xl text-blue-700" />
                                                 </div>
                                             </div>
 
                                             {/* Proof / formal explanation */}
                                             <div className="bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-gray-200">
-                                                <h2 className="text-xl sm:text-2xl font-bold mb-4">{explanation.proofTitle}</h2>
+                                                <h2 className="text-xl sm:text-2xl font-bold mb-4">{raw('proofTitle')}</h2>
                                                 <div className="text-gray-600 leading-loose text-base sm:text-[1.175rem]">
-                                                    {renderFormattedText(explanation.proof, "")}
+                                                    {renderFormattedText(raw('proof'), "")}
                                                 </div>
                                             </div>
 
                                             {/* Worked examples */}
                                             <div className="bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-gray-200">
-                                                <h2 className="text-2xl font-bold mb-6">Exemplos Resolvidos</h2>
+                                                <h2 className="text-2xl font-bold mb-6">{t('workedExamples')}</h2>
                                                 <div className="space-y-6">
-                                                    {explanation.examples.map((example, i) => (
+                                                    {[0, 1].map((i) => (
                                                         <div key={i} className="border border-gray-100 rounded-xl p-6">
                                                             <div className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-3">
-                                                                Exemplo {i + 1}
+                                                                {t('exampleLabel', { n: i + 1 })}
                                                             </div>
                                                             <div className="text-lg font-bold text-gray-900 mb-4">
-                                                                {renderFormattedText(example.problem, "")}
+                                                                {renderFormattedText(String(te.raw(`${methodId}.examples.${i}.problem`)), "")}
                                                             </div>
                                                             <div className="bg-green-50 border border-green-100 rounded-lg p-4">
-                                                                <span className="text-xs font-bold text-green-600 uppercase mb-2 block">Solução</span>
+                                                                <span className="text-xs font-bold text-green-600 uppercase mb-2 block">{t('solution')}</span>
                                                                 <div className="text-gray-700 leading-relaxed">
-                                                                    {renderFormattedText(example.solution, "")}
+                                                                    {renderFormattedText(String(te.raw(`${methodId}.examples.${i}.solution`)), "")}
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -321,8 +328,8 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
                                         </>
                                     ) : (
                                         <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-200">
-                                            <h2 className="text-2xl font-bold mb-4">A Intuição</h2>
-                                            <p className="text-gray-500">Conteúdo em desenvolvimento para este tópico.</p>
+                                            <h2 className="text-2xl font-bold mb-4">{t('intuitionFallback')}</h2>
+                                            <p className="text-gray-500">{t('contentInDevelopment')}</p>
                                         </div>
                                     )}
                                 </div>
@@ -332,7 +339,7 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
                         {activeTab === 'practice' && (
                             <div className="bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-gray-200 text-center min-h-[400px] flex flex-col items-center justify-center relative">
                                 {loading ? (
-                                    <div className="text-gray-400 animate-pulse">Carregando questões...</div>
+                                    <div className="text-gray-400 animate-pulse">{t('loadingQuestions')}</div>
                                 ) : questions.length > 0 ? (
                                     <div className="w-full max-w-2xl">
                                         <div className="absolute top-6 right-6 text-sm font-bold text-gray-300">
@@ -340,7 +347,7 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
                                         </div>
 
                                         <span className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6 block">
-                                            Calcule a derivada
+                                            {t('calculateDerivative')}
                                         </span>
 
                                         <div className="mb-12 min-h-[120px] flex items-center justify-center">
@@ -356,7 +363,7 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
                                                     className="mb-8"
                                                 >
                                                     <div className="bg-green-50 border border-green-100 rounded-xl p-6">
-                                                        <span className="text-xs font-bold text-green-600 uppercase mb-2 block">Resposta</span>
+                                                        <span className="text-xs font-bold text-green-600 uppercase mb-2 block">{t('answer')}</span>
                                                         {renderFormattedText(questions[currentIndex].solution_latex, "text-xl sm:text-2xl text-green-700 font-bold")}
                                                     </div>
                                                 </motion.div>
@@ -369,7 +376,7 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
                                                     onClick={() => setShowAnswer(true)}
                                                     className="px-6 sm:px-8 py-2.5 sm:py-3 bg-white border-2 border-gray-200 hover:border-blue-500 hover:text-blue-600 text-gray-600 rounded-xl font-bold transition-all"
                                                 >
-                                                    Mostrar Resposta
+                                                    {t('showAnswer')}
                                                 </button>
                                             </div>
                                         ) : (
@@ -390,14 +397,14 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
 
                                                 {/* Self-rating buttons */}
                                                 <span className="text-sm font-bold text-gray-400 uppercase tracking-widest block">
-                                                    Como foi?
+                                                    {t('howWasIt')}
                                                 </span>
                                                 <div className="flex flex-wrap gap-2 sm:gap-3 justify-center">
                                                     {[
-                                                        { id: 'wrong' as const, label: 'Errei', color: 'border-red-200 hover:border-red-500 hover:bg-red-50 text-red-600' },
-                                                        { id: 'hard' as const, label: 'Difícil', color: 'border-orange-200 hover:border-orange-500 hover:bg-orange-50 text-orange-600' },
-                                                        { id: 'good' as const, label: 'Bom', color: 'border-green-200 hover:border-green-500 hover:bg-green-50 text-green-600' },
-                                                        { id: 'easy' as const, label: 'Fácil', color: 'border-blue-200 hover:border-blue-500 hover:bg-blue-50 text-blue-600' },
+                                                        { id: 'wrong' as const, label: t('ratingWrong'), color: 'border-red-200 hover:border-red-500 hover:bg-red-50 text-red-600' },
+                                                        { id: 'hard' as const, label: t('ratingHard'), color: 'border-orange-200 hover:border-orange-500 hover:bg-orange-50 text-orange-600' },
+                                                        { id: 'good' as const, label: t('ratingGood'), color: 'border-green-200 hover:border-green-500 hover:bg-green-50 text-green-600' },
+                                                        { id: 'easy' as const, label: t('ratingEasy'), color: 'border-blue-200 hover:border-blue-500 hover:bg-blue-50 text-blue-600' },
                                                     ].map((btn) => (
                                                         <button
                                                             key={btn.id}
@@ -419,7 +426,7 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
                                     </div>
                                 ) : (
                                     <div className="text-gray-400">
-                                        <p>Nenhuma questão encontrada para este tópico.</p>
+                                        <p>{t('noQuestions')}</p>
                                     </div>
                                 )}
                             </div>
@@ -428,7 +435,7 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
                         {activeTab === 'recognize' && (
                             <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-200 text-center min-h-[400px] flex flex-col items-center justify-center relative">
                                 {recognizeLoading ? (
-                                    <div className="text-gray-400 animate-pulse">Carregando questões...</div>
+                                    <div className="text-gray-400 animate-pulse">{t('loadingQuestions')}</div>
                                 ) : recognizeQuestions.length > 0 ? (
                                     recognizeIndex < recognizeQuestions.length ? (
                                         <div className="w-full max-w-2xl">
@@ -442,7 +449,7 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
                                             </div>
 
                                             <span className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6 block">
-                                                Qual método usar?
+                                                {t('whichMethod')}
                                             </span>
 
                                             <div className="mb-12 min-h-[120px] flex items-center justify-center">
@@ -490,11 +497,11 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
                                                 <span className="text-gray-300"> / </span>
                                                 <span className="text-gray-400">{recognizeScore.total}</span>
                                             </div>
-                                            <h2 className="text-2xl font-bold text-gray-900 mb-2">Rodada Completa!</h2>
+                                            <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('roundComplete')}</h2>
                                             <p className="text-gray-500 mb-8">
                                                 {recognizeScore.correct === recognizeScore.total
-                                                    ? 'Perfeito! Você acertou todas.'
-                                                    : `Você acertou ${recognizeScore.correct} de ${recognizeScore.total} questões.`
+                                                    ? t('perfectScore')
+                                                    : t('scoreResult', { correct: recognizeScore.correct, total: recognizeScore.total })
                                                 }
                                             </p>
                                             <button
@@ -502,13 +509,13 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
                                                 className="px-8 py-3 bg-blue-600 text-white hover:bg-blue-700 rounded-xl font-bold transition-all inline-flex items-center gap-2"
                                             >
                                                 <RotateCcw className="w-5 h-5" />
-                                                Jogar Novamente
+                                                {tCommon('playAgain')}
                                             </button>
                                         </div>
                                     )
                                 ) : (
                                     <div className="text-gray-400">
-                                        <p>Nenhuma questão de reconhecimento encontrada para este tópico.</p>
+                                        <p>{t('noRecognizeQuestions')}</p>
                                     </div>
                                 )}
                             </div>

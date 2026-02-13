@@ -1,0 +1,376 @@
+{
+  "power_rule": {
+    "intuitionTitle": "A Intuição",
+    "intuition": "A regra da potência nos diz como a função $x^n$ muda quando $x$ muda um pouquinho. Pense assim: se você tem $x^3$, isso é $x \\cdot x \\cdot x$. Ao derivar, cada um dos três fatores \"tem sua vez\" de ser derivado enquanto os outros ficam parados — por isso aparece o fator $3$ na frente. O expoente desce e diminui em um: simples e poderoso.",
+    "formulaLatex": "\\frac{d}{dx}\\left[x^n\\right] = n \\cdot x^{n-1}",
+    "proofTitle": "Por que funciona?",
+    "proof": "Vamos direto à definição de derivada: $\\lim_{h \\to 0} \\frac{(x+h)^n - x^n}{h}$. Pense em $(x+h)^n$ como o produto $(x+h)(x+h)\\cdots(x+h)$, com $n$ fatores. Ao expandir, cada termo vem de escolher $x$ ou $h$ em cada fator. O termo principal é $x^n$ (escolher $x$ em todos). O próximo grupo é quando escolhemos $h$ em exatamente um fator e $x$ nos outros $n-1$: são $n$ formas de fazer isso, cada uma dando $x^{n-1} \\cdot h$. Somados: $n \\cdot x^{n-1} \\cdot h$. Todos os outros termos têm $h^2$ ou potências maiores. Subtraindo $x^n$, dividindo por $h$ e fazendo $h \\to 0$, os termos com $h$ desaparecem e sobra $n \\cdot x^{n-1}$. O expoente \"desce\" por causa de combinatória pura — o $n$ conta de quantas maneiras podemos escolher qual dos $n$ fatores contribui com o $h$.",
+    "examples": [
+      {
+        "problem": "Encontre a derivada de $f(x) = x^5$.",
+        "solution": "Aplicando a regra da potência: $f'(x) = 5x^{5-1} = 5x^4$."
+      },
+      {
+        "problem": "Derive $g(x) = 3x^4 - 2x^3 + 7x$.",
+        "solution": "Derivando termo a termo: $g'(x) = 3 \\cdot 4x^3 - 2 \\cdot 3x^2 + 7 = 12x^3 - 6x^2 + 7$."
+      }
+    ]
+  },
+  "product_rule": {
+    "intuitionTitle": "A Intuição",
+    "intuition": "Quando duas quantidades que variam são multiplicadas, a variação total vem de duas contribuições: a primeira função muda enquanto a segunda fica parada, e depois a segunda muda enquanto a primeira fica parada. Imagine a área de um retângulo cujos lados $u$ e $v$ estão crescendo — o acréscimo de área vem tanto do aumento na largura quanto do aumento na altura.",
+    "formulaLatex": "\\frac{d}{dx}\\left[u \\cdot v\\right] = u' \\cdot v + u \\cdot v'",
+    "proofTitle": "Por que funciona?",
+    "proof": "Pela definição, queremos $\\lim_{h \\to 0} \\frac{u(x+h)v(x+h) - u(x)v(x)}{h}$. O problema é que dois fatores estão mudando ao mesmo tempo. Para isolar cada variação, somamos e subtraímos $u(x+h)v(x)$ no numerador — isso não muda o valor, mas separa em duas partes: $u(x+h)\\frac{v(x+h)-v(x)}{h} + v(x)\\frac{u(x+h)-u(x)}{h}$. A primeira parte captura a variação de $v$ enquanto $u$ está \"quase parado\" em $x+h$; a segunda captura a variação de $u$ enquanto $v$ está parado em $x$. Quando $h \\to 0$, $u(x+h) \\to u(x)$ por continuidade, e os quocientes viram $v'(x)$ e $u'(x)$. Resultado: $u \\cdot v' + u' \\cdot v$. É a versão rigorosa da intuição do retângulo: cada dimensão varia por vez, e a variação total é a soma dessas contribuições.",
+    "examples": [
+      {
+        "problem": "Derive $f(x) = x^2 \\cdot \\sin(x)$.",
+        "solution": "Sejam $u = x^2$ e $v = \\sin(x)$. Então $u' = 2x$ e $v' = \\cos(x)$. Pela regra do produto: $f'(x) = 2x \\cdot \\sin(x) + x^2 \\cdot \\cos(x)$."
+      },
+      {
+        "problem": "Derive $g(x) = e^x \\cdot \\ln(x)$.",
+        "solution": "Com $u = e^x$ e $v = \\ln(x)$: $u' = e^x$, $v' = \\frac{1}{x}$. Logo $g'(x) = e^x \\cdot \\ln(x) + e^x \\cdot \\frac{1}{x} = e^x\\!\\left(\\ln(x) + \\frac{1}{x}\\right)$."
+      }
+    ]
+  },
+  "quotient_rule": {
+    "intuitionTitle": "A Intuição",
+    "intuition": "A regra do quociente trata de como a razão entre duas funções muda. Quando o numerador cresce, a fração tende a crescer; quando o denominador cresce, a fração tende a diminuir. A fórmula captura essa \"competição\" entre numerador e denominador, sempre dividindo pelo quadrado do denominador para manter as unidades corretas.",
+    "formulaLatex": "\\frac{d}{dx}\\!\\left[\\frac{u}{v}\\right] = \\frac{u' \\cdot v - u \\cdot v'}{v^2}",
+    "proofTitle": "Por que funciona?",
+    "proof": "Em vez de partir da definição, vamos derivar a regra do quociente da regra do produto — mostrando que não é uma fórmula separada para decorar, mas uma consequência lógica. Se $u = \\frac{u}{v} \\cdot v$, aplicamos a regra do produto: $u' = \\left(\\frac{u}{v}\\right)' \\cdot v + \\frac{u}{v} \\cdot v'$. Isolamos $\\left(\\frac{u}{v}\\right)'$: $\\left(\\frac{u}{v}\\right)' = \\frac{u' - \\frac{u}{v} \\cdot v'}{v} = \\frac{u'v - uv'}{v^2}$. O sinal de menos aparece naturalmente: quando o denominador $v$ cresce, a fração diminui — esse efeito negativo é o $-uv'$. O $v^2$ no denominador mantém as unidades consistentes. Se você esquecer a fórmula numa prova, basta lembrar da regra do produto e isolar.",
+    "examples": [
+      {
+        "problem": "Derive $f(x) = \\frac{x^2 + 1}{x - 3}$.",
+        "solution": "Com $u = x^2 + 1$, $v = x - 3$: $u' = 2x$, $v' = 1$. Então $f'(x) = \\frac{2x(x-3) - (x^2+1)(1)}{(x-3)^2} = \\frac{x^2 - 6x - 1}{(x-3)^2}$."
+      },
+      {
+        "problem": "Derive $g(x) = \\frac{\\sin(x)}{x}$.",
+        "solution": "Com $u = \\sin(x)$ e $v = x$: $u' = \\cos(x)$, $v' = 1$. Logo $g'(x) = \\frac{\\cos(x) \\cdot x - \\sin(x) \\cdot 1}{x^2} = \\frac{x\\cos(x) - \\sin(x)}{x^2}$."
+      }
+    ]
+  },
+  "chain_rule": {
+    "intuitionTitle": "A Intuição",
+    "intuition": "A regra da cadeia lida com funções compostas — funções dentro de funções. Pense em duas engrenagens conectadas: se a engrenagem interna gira a uma certa taxa e a externa amplifica esse giro, a taxa total é o produto das duas. A derivada da função \"de fora\" avaliada na função \"de dentro\", vezes a derivada da função de dentro.",
+    "formulaLatex": "\\frac{d}{dx}\\left[f(g(x))\\right] = f'(g(x)) \\cdot g'(x)",
+    "proofTitle": "Por que funciona?",
+    "proof": "A lógica é surpreendentemente simples. Se $y = f(u)$ e $u = g(x)$, uma pequena variação $\\Delta x$ primeiro causa $\\Delta u \\approx g'(x) \\cdot \\Delta x$ (pela definição de derivada de $g$). Essa variação $\\Delta u$, por sua vez, causa $\\Delta y \\approx f'(u) \\cdot \\Delta u$ (pela definição de derivada de $f$). Substituindo: $\\Delta y \\approx f'(g(x)) \\cdot g'(x) \\cdot \\Delta x$. Dividindo por $\\Delta x$: $\\frac{\\Delta y}{\\Delta x} \\approx f'(g(x)) \\cdot g'(x)$. No limite, a aproximação vira igualdade. É como engrenagens conectadas: a taxa total é o produto das taxas de cada elo. Se a função de dentro triplica a variação e a de fora dobra, a variação total é $\\times 6$. A prova rigorosa exige cuidado quando $\\Delta u = 0$ (não podemos dividir por zero), mas a ideia central é essa: taxas de variação se multiplicam ao longo da composição.",
+    "examples": [
+      {
+        "problem": "Derive $f(x) = (3x^2 + 1)^5$.",
+        "solution": "A função externa é $u^5$ e a interna é $u = 3x^2 + 1$. Pela regra da cadeia: $f'(x) = 5(3x^2+1)^4 \\cdot 6x = 30x(3x^2+1)^4$."
+      },
+      {
+        "problem": "Derive $g(x) = \\sin(x^3)$.",
+        "solution": "Externa: $\\sin(u)$, interna: $u = x^3$. Logo $g'(x) = \\cos(x^3) \\cdot 3x^2 = 3x^2\\cos(x^3)$."
+      }
+    ]
+  },
+  "trig_basic": {
+    "intuitionTitle": "A Intuição",
+    "intuition": "As funções trigonométricas descrevem movimentos circulares e oscilações. A derivada de $\\sin(x)$ é $\\cos(x)$ porque, no círculo unitário, a taxa de variação da coordenada vertical (seno) em um dado ponto é exatamente a coordenada horizontal (cosseno) naquele ponto. Cada função trigonométrica tem uma derivada que pode ser expressa em termos das outras.",
+    "formulaLatex": "\\frac{d}{dx}[\\sin x] = \\cos x \\qquad \\frac{d}{dx}[\\cos x] = -\\sin x",
+    "proofTitle": "Por que funciona?",
+    "proof": "Vamos provar que a derivada de $\\sin x$ é $\\cos x$ direto da definição. Calculamos $\\lim_{h \\to 0}\\frac{\\sin(x+h)-\\sin(x)}{h}$. Pela fórmula de soma: $\\sin(x+h) = \\sin x \\cos h + \\cos x \\sin h$. Substituindo no limite: $\\sin x \\cdot \\frac{\\cos h - 1}{h} + \\cos x \\cdot \\frac{\\sin h}{h}$. Tudo depende de dois limites fundamentais. Primeiro: $\\lim_{h \\to 0}\\frac{\\sin h}{h} = 1$ — para ângulos muito pequenos, o arco e a corda do círculo unitário são praticamente iguais. Segundo: $\\lim_{h \\to 0}\\frac{\\cos h - 1}{h} = 0$ — o cosseno se afasta de $1$ muito mais devagar que $h$ se afasta de $0$. Com esses limites, o primeiro termo zera e o segundo dá $\\cos x$. Para $\\cos x$, o argumento é análogo, mas $\\cos(x+h) = \\cos x \\cos h - \\sin x \\sin h$ — o sinal de menos na fórmula de soma é o responsável pelo $-\\sin x$ na derivada.",
+    "examples": [
+      {
+        "problem": "Derive $f(x) = 3\\sin(x) + 2\\cos(x)$.",
+        "solution": "$f'(x) = 3\\cos(x) + 2(-\\sin(x)) = 3\\cos(x) - 2\\sin(x)$."
+      },
+      {
+        "problem": "Derive $g(x) = \\tan(x)$.",
+        "solution": "Escrevendo $\\tan(x) = \\frac{\\sin(x)}{\\cos(x)}$ e aplicando a regra do quociente: $g'(x) = \\frac{\\cos^2(x) + \\sin^2(x)}{\\cos^2(x)} = \\frac{1}{\\cos^2(x)} = \\sec^2(x)$."
+      }
+    ]
+  },
+  "exp_log": {
+    "intuitionTitle": "A Intuição",
+    "intuition": "A função $e^x$ é a única função que é igual à sua própria derivada — ela cresce a uma taxa proporcional ao seu valor atual. Já $\\ln(x)$, sendo a inversa de $e^x$, tem derivada $\\frac{1}{x}$: quanto maior o valor de $x$, mais devagar o logaritmo cresce. Essas duas funções formam a base de modelos de crescimento e decaimento na natureza.",
+    "formulaLatex": "\\frac{d}{dx}[e^x] = e^x \\qquad \\frac{d}{dx}[\\ln x] = \\frac{1}{x}",
+    "proofTitle": "Por que funciona?",
+    "proof": "O que torna $e^x$ especial? Calculamos pela definição: $\\lim_{h \\to 0}\\frac{e^{x+h}-e^x}{h} = e^x \\cdot \\lim_{h \\to 0}\\frac{e^h - 1}{h}$. O número $e \\approx 2{,}718$ é o único valor de base para o qual $\\lim_{h \\to 0}\\frac{b^h - 1}{h} = 1$. Para qualquer outra base, esse limite seria uma constante diferente de $1$, e a derivada teria um fator extra. Com base $e$, o fator é $1$ e a derivada é simplesmente $e^x$ — a função é igual à sua própria taxa de variação. Para $\\ln(x)$, usamos que ela é a inversa de $e^x$: se $y = \\ln x$, então $x = e^y$. Derivando implicitamente: $1 = e^y \\cdot \\frac{dy}{dx}$, logo $\\frac{dy}{dx} = \\frac{1}{e^y} = \\frac{1}{x}$. Quanto maior o $x$, mais devagar $\\ln x$ cresce — e a fórmula $\\frac{1}{x}$ captura isso com precisão.",
+    "examples": [
+      {
+        "problem": "Derive $f(x) = 5e^x - 3\\ln(x)$.",
+        "solution": "$f'(x) = 5e^x - \\frac{3}{x}$."
+      },
+      {
+        "problem": "Derive $g(x) = x^2 e^x$ (use a regra do produto).",
+        "solution": "$g'(x) = 2x \\cdot e^x + x^2 \\cdot e^x = e^x(2x + x^2) = xe^x(2 + x)$."
+      }
+    ]
+  },
+  "implicit": {
+    "intuitionTitle": "A Intuição",
+    "intuition": "Às vezes não conseguimos (ou não queremos) isolar $y$ em função de $x$. Na derivação implícita, derivamos os dois lados da equação em relação a $x$, lembrando que $y$ depende de $x$ — então cada vez que derivamos um termo com $y$, aparece um $\\frac{dy}{dx}$ pela regra da cadeia. Depois, basta isolar $\\frac{dy}{dx}$.",
+    "formulaLatex": "\\frac{d}{dx}[F(x,y)] = 0 \\implies \\frac{dy}{dx} = -\\frac{F_x}{F_y}",
+    "proofTitle": "Por que funciona?",
+    "proof": "A derivação implícita não é uma técnica nova — é a regra da cadeia aplicada com um detalhe crucial: $y$ depende de $x$, mesmo que não saibamos explicitar como. Quando temos $F(x,y) = 0$, derivamos ambos os lados em relação a $x$. Termos com $x$ puro são derivados normalmente. Mas cada termo com $y$ recebe um fator $\\frac{dy}{dx}$ pela regra da cadeia — porque $y$ é uma função de $x$, mesmo escondida. Isso dá: $F_x + F_y \\cdot \\frac{dy}{dx} = 0$. Isolando: $\\frac{dy}{dx} = -\\frac{F_x}{F_y}$ (desde que $F_y \\neq 0$). O Teorema da Função Implícita garante que, nessas condições, $y$ de fato é uma função diferenciável de $x$ na vizinhança do ponto. Ou seja: não precisamos isolar $y$ para encontrar sua taxa de variação — basta derivar a equação inteira respeitando a dependência e resolver para $\\frac{dy}{dx}$.",
+    "examples": [
+      {
+        "problem": "Encontre $\\frac{dy}{dx}$ para $x^2 + y^2 = 25$.",
+        "solution": "Derivando ambos os lados: $2x + 2y\\frac{dy}{dx} = 0$. Isolando: $\\frac{dy}{dx} = -\\frac{x}{y}$."
+      },
+      {
+        "problem": "Encontre $\\frac{dy}{dx}$ para $x^3 + y^3 = 6xy$.",
+        "solution": "Derivando: $3x^2 + 3y^2\\frac{dy}{dx} = 6y + 6x\\frac{dy}{dx}$. Reagrupando: $(3y^2 - 6x)\\frac{dy}{dx} = 6y - 3x^2$. Logo $\\frac{dy}{dx} = \\frac{6y - 3x^2}{3y^2 - 6x} = \\frac{2y - x^2}{y^2 - 2x}$."
+      }
+    ]
+  },
+  "related_rates": {
+    "intuitionTitle": "A Intuição",
+    "intuition": "Problemas de taxas relacionadas conectam as taxas de variação de grandezas que dependem uma da outra através de alguma equação geométrica ou física. Por exemplo, se um balão esférico está sendo inflado, a taxa de crescimento do raio e a taxa de crescimento do volume estão ligadas pela fórmula do volume da esfera. O segredo é: derive a equação que relaciona as grandezas em relação ao tempo $t$.",
+    "formulaLatex": "\\frac{dV}{dt} = \\frac{dV}{dr} \\cdot \\frac{dr}{dt}",
+    "proofTitle": "Por que funciona?",
+    "proof": "Se duas grandezas estão conectadas por uma equação, suas taxas de variação no tempo também estão. É a regra da cadeia aplicada ao tempo $t$. Se temos $F(x, y) = 0$ onde $x = x(t)$ e $y = y(t)$, derivando em relação a $t$: $F_x \\frac{dx}{dt} + F_y \\frac{dy}{dt} = 0$. Essa equação conecta as duas taxas — conhecendo uma, encontramos a outra. No caso do balão: $V = \\frac{4}{3}\\pi r^3$ vale em todos os instantes. Derivando em $t$: $\\frac{dV}{dt} = 4\\pi r^2 \\frac{dr}{dt}$. Conhecendo $\\frac{dV}{dt}$ e $r$ num instante, encontramos $\\frac{dr}{dt}$. O método funciona porque a equação geométrica ou física é verdadeira em todo instante — e portanto sua derivada temporal também é. Essa derivada é exatamente o que conecta as taxas de variação entre si.",
+    "examples": [
+      {
+        "problem": "Uma escada de $5$m encosta na parede. A base desliza a $1$ m/s. A que taxa o topo desce quando a base está a $3$m da parede?",
+        "solution": "Pela relação $x^2 + y^2 = 25$, derivando em $t$: $2x\\frac{dx}{dt} + 2y\\frac{dy}{dt} = 0$. Com $x=3$, $y=4$ e $\\frac{dx}{dt}=1$: $6(1) + 8\\frac{dy}{dt} = 0$, logo $\\frac{dy}{dt} = -\\frac{3}{4}$ m/s (o topo desce)."
+      },
+      {
+        "problem": "Um balão esférico é inflado a $\\frac{dV}{dt} = 100$ cm$^3$/s. Qual é $\\frac{dr}{dt}$ quando $r = 5$ cm?",
+        "solution": "$V = \\frac{4}{3}\\pi r^3 \\implies \\frac{dV}{dt} = 4\\pi r^2 \\frac{dr}{dt}$. Com $r=5$: $100 = 4\\pi(25)\\frac{dr}{dt} = 100\\pi\\frac{dr}{dt}$. Logo $\\frac{dr}{dt} = \\frac{1}{\\pi} \\approx 0{,}318$ cm/s."
+      }
+    ]
+  },
+  "basic_integrals": {
+    "intuitionTitle": "A Intuição",
+    "intuition": "Integrar é o processo inverso de derivar. Se a derivada responde \"qual é a taxa de variação?\", a integral responde \"qual função tem essa taxa de variação?\". As integrais imediatas são as \"tabuadas\" da integração — fórmulas que reconhecemos de cara porque são simplesmente as derivadas conhecidas lidas de trás para frente.",
+    "formulaLatex": "\\int x^n\\,dx = \\frac{x^{n+1}}{n+1} + C \\quad (n \\neq -1)",
+    "proofTitle": "Por que funciona?",
+    "proof": "A verificação revela a essência da integração. Se derivamos $\\frac{x^{n+1}}{n+1} + C$, pela regra da potência obtemos $(n+1) \\cdot \\frac{x^n}{n+1} = x^n$ — exatamente o integrando. Integrar é literalmente desfazer a derivada. Mas por que aparece o $C$? Porque a derivada de qualquer constante é zero: as funções $x^3 + 5$ e $x^3 - 100$ têm a mesma derivada $3x^2$, então ambas são antiderivadas válidas de $3x^2$. A integral indefinida representa uma família infinita de funções paralelas, diferindo apenas por um deslocamento vertical. Essa é a conexão fundamental do Cálculo: derivar e integrar são operações inversas, e a constante $C$ absorve a informação que a derivada \"apaga\".",
+    "examples": [
+      {
+        "problem": "Calcule $\\int (3x^2 + 4x - 1)\\,dx$.",
+        "solution": "$\\int 3x^2\\,dx + \\int 4x\\,dx - \\int 1\\,dx = x^3 + 2x^2 - x + C$."
+      },
+      {
+        "problem": "Calcule $\\int \\frac{1}{x}\\,dx$.",
+        "solution": "Como $n = -1$ é o caso especial: $\\int \\frac{1}{x}\\,dx = \\ln|x| + C$."
+      }
+    ]
+  },
+  "substitution": {
+    "intuitionTitle": "A Intuição",
+    "intuition": "A substituição é a regra da cadeia ao contrário. Se a integral contém uma função e sua derivada aparece como fator, podemos trocar essa função por uma variável $u$, simplificando tudo. É como trocar a roupa de uma integral complicada por uma mais simples. A chave é encontrar o $u$ certo: geralmente é a função \"de dentro\".",
+    "formulaLatex": "\\int f(g(x))\\,g'(x)\\,dx = \\int f(u)\\,du \\quad \\text{com } u = g(x)",
+    "proofTitle": "Por que funciona?",
+    "proof": "A substituição é a regra da cadeia lida ao contrário — e entender isso é a chave de tudo. Se $F$ é a antiderivada de $f$ (ou seja, $F' = f$), então pela regra da cadeia: $\\frac{d}{dx}[F(g(x))] = f(g(x)) \\cdot g'(x)$. Lendo essa igualdade de trás para frente: $\\int f(g(x)) \\cdot g'(x)\\,dx = F(g(x)) + C$. A notação $u = g(x)$, $du = g'(x)\\,dx$ é apenas uma forma organizada de enxergar esse fato: o $g'(x)\\,dx$ se transforma em $du$, e a integral complicada em $x$ vira uma simples em $u$. É por isso que procuramos uma função \"de dentro\" cuja derivada aparece como fator \"do lado de fora\": quando isso acontece, a regra da cadeia garante que a substituição vai funcionar.",
+    "examples": [
+      {
+        "problem": "Calcule $\\int 2x \\cdot e^{x^2}\\,dx$.",
+        "solution": "Fazendo $u = x^2$, temos $du = 2x\\,dx$. A integral vira $\\int e^u\\,du = e^u + C = e^{x^2} + C$."
+      },
+      {
+        "problem": "Calcule $\\int \\cos(3x)\\,dx$.",
+        "solution": "Com $u = 3x$, $du = 3\\,dx$, logo $dx = \\frac{du}{3}$. $\\int \\cos(u)\\frac{du}{3} = \\frac{1}{3}\\sin(u) + C = \\frac{1}{3}\\sin(3x) + C$."
+      }
+    ]
+  },
+  "by_parts": {
+    "intuitionTitle": "A Intuição",
+    "intuition": "A integração por partes é a regra do produto ao contrário. Quando temos o produto de duas funções e não conseguimos integrar diretamente, \"transferimos\" a derivada de uma para a outra. Escolhemos uma parte para derivar ($u$) e outra para integrar ($dv$). A regra LIATE (Logarítmica, Inversa trig, Algébrica, Trigonométrica, Exponencial) ajuda a escolher $u$.",
+    "formulaLatex": "\\int u\\,dv = uv - \\int v\\,du",
+    "proofTitle": "Por que funciona?",
+    "proof": "Pela regra do produto: $\\frac{d}{dx}[u \\cdot v] = u'v + uv'$. Integrando ambos os lados: $uv = \\int u'v\\,dx + \\int uv'\\,dx$. Rearranjando: $\\int uv'\\,dx = uv - \\int u'v\\,dx$, ou na notação diferencial: $\\int u\\,dv = uv - \\int v\\,du$. Mas por que isso é útil? Porque transfere a derivada de uma função para a outra. Se $u$ é algo que simplifica ao derivar (como $x^2 \\to 2x \\to 2 \\to 0$) e $dv$ é algo fácil de integrar (como $e^x$ ou $\\sin x$), então a nova integral $\\int v\\,du$ é mais simples que a original. A regra LIATE (Logarítmica, Inversa trig, Algébrica, Trigonométrica, Exponencial) ordena de \"mais quer ser $u$\" para \"mais quer ser $dv$\": logaritmos simplificam muito ao derivar, enquanto exponenciais nem mudam ao integrar. Não é um truque — é a regra do produto ao contrário.",
+    "examples": [
+      {
+        "problem": "Calcule $\\int x e^x\\,dx$.",
+        "solution": "Escolhemos $u = x$ ($du = dx$) e $dv = e^x dx$ ($v = e^x$). $\\int xe^x\\,dx = xe^x - \\int e^x\\,dx = xe^x - e^x + C = e^x(x-1) + C$."
+      },
+      {
+        "problem": "Calcule $\\int x^2 \\sin(x)\\,dx$.",
+        "solution": "Com $u = x^2$, $dv = \\sin(x)dx$: $\\int x^2\\sin x\\,dx = -x^2\\cos x + 2\\int x\\cos x\\,dx$. Aplicando por partes novamente com $u=x$, $dv=\\cos x\\,dx$: $= -x^2\\cos x + 2(x\\sin x - \\int \\sin x\\,dx) = -x^2\\cos x + 2x\\sin x + 2\\cos x + C$."
+      }
+    ]
+  },
+  "trig_integrals": {
+    "intuitionTitle": "A Intuição",
+    "intuition": "Integrais trigonométricas envolvem potências e produtos de seno e cosseno. A estratégia principal é usar identidades trigonométricas para reduzir a complexidade. Se um dos expoentes é ímpar, separamos um fator e usamos $\\sin^2 + \\cos^2 = 1$ para converter o resto em uma só função — abrindo caminho para uma substituição simples.",
+    "formulaLatex": "\\sin^2(x) = \\frac{1 - \\cos(2x)}{2} \\qquad \\cos^2(x) = \\frac{1 + \\cos(2x)}{2}",
+    "proofTitle": "Por que funciona?",
+    "proof": "A estratégia depende de uma observação sobre paridade. Quando um dos expoentes é ímpar, separamos um fator de $\\sin x$ ou $\\cos x$ e usamos $\\sin^2 x + \\cos^2 x = 1$ para converter o resto. Exemplo: $\\sin^3 x = (1 - \\cos^2 x) \\cdot \\sin x$. Com $u = \\cos x$, $du = -\\sin x\\,dx$, tudo vira polinômio em $u$. Funciona porque a identidade pitagórica converte entre $\\sin^2$ e $\\cos^2$, e o fator separado fornece exatamente o $du$ da substituição. Quando ambos os expoentes são pares, não sobra fator para separar. Aí usamos as fórmulas de ângulo duplo: de $\\cos(2x) = 1 - 2\\sin^2 x = 2\\cos^2 x - 1$ isolamos $\\sin^2 x = \\frac{1-\\cos(2x)}{2}$ e $\\cos^2 x = \\frac{1+\\cos(2x)}{2}$. Cada aplicação reduz a potência pela metade, até chegarmos a integrais de $\\cos$ e $\\sin$ simples.",
+    "examples": [
+      {
+        "problem": "Calcule $\\int \\sin^3(x)\\,dx$.",
+        "solution": "Separamos: $\\int \\sin^2(x)\\sin(x)\\,dx = \\int (1-\\cos^2(x))\\sin(x)\\,dx$. Com $u = \\cos(x)$, $du = -\\sin(x)dx$: $-\\int (1-u^2)du = -u + \\frac{u^3}{3} + C = -\\cos(x) + \\frac{\\cos^3(x)}{3} + C$."
+      },
+      {
+        "problem": "Calcule $\\int \\cos^2(x)\\,dx$.",
+        "solution": "Pela identidade: $\\int \\frac{1+\\cos(2x)}{2}\\,dx = \\frac{x}{2} + \\frac{\\sin(2x)}{4} + C$."
+      }
+    ]
+  },
+  "trig_sub": {
+    "intuitionTitle": "A Intuição",
+    "intuition": "Quando aparecem expressões como $\\sqrt{a^2 - x^2}$, $\\sqrt{a^2 + x^2}$ ou $\\sqrt{x^2 - a^2}$, uma substituição trigonométrica transforma a raiz em algo simples. A ideia é usar o triângulo retângulo: os lados e a hipotenusa criam relações que eliminam a raiz. É como vestir a integral com uma \"roupa trigonométrica\" que simplifica a expressão.",
+    "formulaLatex": "\\sqrt{a^2 - x^2} \\Rightarrow x = a\\sin\\theta \\qquad \\sqrt{a^2 + x^2} \\Rightarrow x = a\\tan\\theta",
+    "proofTitle": "Por que funciona?",
+    "proof": "A ideia parte de um triângulo retângulo. Quando vemos $\\sqrt{a^2 - x^2}$, pensamos: isso parece o cateto de um triângulo com hipotenusa $a$. Se $x = a\\sin\\theta$, então $a^2 - x^2 = a^2(1 - \\sin^2\\theta) = a^2\\cos^2\\theta$ pela identidade pitagórica, logo $\\sqrt{a^2 - x^2} = a\\cos\\theta$ — a raiz desaparece e vira um monômio simples. Para $\\sqrt{a^2 + x^2}$, o triângulo tem catetos $a$ e $x$ e hipotenusa $\\sqrt{a^2+x^2}$. Com $x = a\\tan\\theta$: $a^2 + a^2\\tan^2\\theta = a^2\\sec^2\\theta$, logo $\\sqrt{a^2+x^2} = a\\sec\\theta$. Para $\\sqrt{x^2 - a^2}$, usamos $x = a\\sec\\theta$ e $\\sec^2\\theta - 1 = \\tan^2\\theta$. Em todos os casos, a mesma lógica: a identidade pitagórica \"absorve\" a raiz quadrada, transformando-a num monômio trigonométrico. A substituição não é arbitrária — cada forma de raiz corresponde a um lado do triângulo retângulo.",
+    "examples": [
+      {
+        "problem": "Calcule $\\int \\frac{dx}{\\sqrt{4-x^2}}$.",
+        "solution": "Com $x = 2\\sin\\theta$, $dx = 2\\cos\\theta\\,d\\theta$ e $\\sqrt{4-x^2} = 2\\cos\\theta$. A integral vira $\\int \\frac{2\\cos\\theta}{2\\cos\\theta}d\\theta = \\int d\\theta = \\theta + C = \\arcsin\\!\\left(\\frac{x}{2}\\right) + C$."
+      },
+      {
+        "problem": "Calcule $\\int \\frac{x^2}{\\sqrt{x^2+9}}\\,dx$.",
+        "solution": "Com $x = 3\\tan\\theta$, $dx = 3\\sec^2\\theta\\,d\\theta$, $\\sqrt{x^2+9} = 3\\sec\\theta$. A integral vira $\\int \\frac{9\\tan^2\\theta}{3\\sec\\theta} \\cdot 3\\sec^2\\theta\\,d\\theta = 9\\int \\tan^2\\theta\\sec\\theta\\,d\\theta$. Usando $\\tan^2\\theta = \\sec^2\\theta - 1$: $9\\int(\\sec^3\\theta - \\sec\\theta)d\\theta$. Resolvendo e voltando para $x$: $\\frac{x\\sqrt{x^2+9}}{2} - \\frac{9}{2}\\ln\\!\\left|\\frac{x+\\sqrt{x^2+9}}{3}\\right| + C$."
+      }
+    ]
+  },
+  "partial_fractions": {
+    "intuitionTitle": "A Intuição",
+    "intuition": "Quando temos uma fração de polinômios, podemos quebrá-la em frações mais simples — é como decompor uma fração numérica: $\\frac{5}{6} = \\frac{1}{2} + \\frac{1}{3}$. Cada fator do denominador contribui com uma fração parcial, e cada uma dessas é fácil de integrar. O passo crucial é fatorar o denominador e encontrar os coeficientes.",
+    "formulaLatex": "\\frac{P(x)}{(x-a)(x-b)} = \\frac{A}{x-a} + \\frac{B}{x-b}",
+    "proofTitle": "Por que funciona?",
+    "proof": "A ideia é que frações de polinômios podem ser desmontadas em peças mais simples — assim como $\\frac{5}{6} = \\frac{1}{2} + \\frac{1}{3}$. O Teorema da Decomposição garante: se o grau do numerador é menor que o do denominador e o denominador está fatorado, existe uma decomposição única em frações parciais. Para encontrar os coeficientes, multiplicamos ambos os lados pelo denominador original, obtendo uma igualdade entre polinômios. Substituindo valores estratégicos de $x$ (as raízes do denominador), cada equação revela um coeficiente diretamente. Depois, cada fração $\\frac{A}{x-a}$ integra como $A\\ln|x-a|$ — algo muito mais simples que a fração original. Não estamos simplificando a função — estamos reescrevendo-a numa forma onde cada pedaço é integrável imediatamente.",
+    "examples": [
+      {
+        "problem": "Calcule $\\int \\frac{5x+1}{x^2-x-2}\\,dx$.",
+        "solution": "Fatorando: $x^2-x-2 = (x-2)(x+1)$. Decompomos: $\\frac{5x+1}{(x-2)(x+1)} = \\frac{A}{x-2} + \\frac{B}{x+1}$. Multiplicando: $5x+1 = A(x+1) + B(x-2)$. Com $x=2$: $11 = 3A \\Rightarrow A = \\frac{11}{3}$. Com $x=-1$: $-4 = -3B \\Rightarrow B = \\frac{4}{3}$. Logo $\\int\\frac{11/3}{x-2}+\\frac{4/3}{x+1}\\,dx = \\frac{11}{3}\\ln|x-2| + \\frac{4}{3}\\ln|x+1| + C$."
+      },
+      {
+        "problem": "Calcule $\\int \\frac{3}{x^2-9}\\,dx$.",
+        "solution": "$x^2-9 = (x-3)(x+3)$. Decomposição: $\\frac{3}{(x-3)(x+3)} = \\frac{A}{x-3}+\\frac{B}{x+3}$. $3 = A(x+3)+B(x-3)$. Com $x=3$: $A = \\frac{1}{2}$. Com $x=-3$: $B = -\\frac{1}{2}$. Integral: $\\frac{1}{2}\\ln|x-3| - \\frac{1}{2}\\ln|x+3| + C = \\frac{1}{2}\\ln\\!\\left|\\frac{x-3}{x+3}\\right| + C$."
+      }
+    ]
+  },
+  "improper": {
+    "intuitionTitle": "A Intuição",
+    "intuition": "Uma integral imprópria tem algum \"problema\": o intervalo vai até o infinito, ou o integrando tem uma assíntota vertical. Parece impossível calcular a área de uma região infinita, mas às vezes essa área é finita! A ideia é usar limites: substituímos o infinito (ou o ponto problemático) por uma variável e vemos se o resultado converge.",
+    "formulaLatex": "\\int_a^{\\infty} f(x)\\,dx = \\lim_{b \\to \\infty} \\int_a^b f(x)\\,dx",
+    "proofTitle": "Por que funciona?",
+    "proof": "Como pode uma região infinita ter área finita? A resposta está em quão rápido a função vai a zero. Definimos $\\int_a^{\\infty} f(x)\\,dx = \\lim_{b \\to \\infty} \\int_a^b f(x)\\,dx$: calculamos a integral até $b$ e vemos se o resultado se estabiliza quando $b$ cresce. O exemplo revelador: $\\int_1^{\\infty} \\frac{1}{x^p}\\,dx$ converge se $p > 1$ e diverge se $p \\leq 1$. Por quê? A antiderivada é $\\frac{x^{1-p}}{1-p}$, e quando $1-p < 0$ (ou seja, $p > 1$), $x^{1-p} \\to 0$ quando $x \\to \\infty$ — a função cai rápido o suficiente para que a soma de todas as fatias de área convirja. Com $p = 1$ temos $\\ln x$, que cresce sem limite. Para integrais com assíntota vertical (como $\\int_0^1 \\frac{1}{\\sqrt{x}}\\,dx$), a lógica é a mesma: substituímos o ponto problemático por um limite e verificamos se a área se estabiliza. Infinito não significa automaticamente divergente — depende de quão rápido a função se comporta.",
+    "examples": [
+      {
+        "problem": "Calcule $\\int_1^{\\infty} \\frac{1}{x^2}\\,dx$.",
+        "solution": "$\\lim_{b \\to \\infty}\\int_1^b x^{-2}dx = \\lim_{b \\to \\infty}\\left[-\\frac{1}{x}\\right]_1^b = \\lim_{b \\to \\infty}\\left(-\\frac{1}{b}+1\\right) = 1$. A integral converge para $1$."
+      },
+      {
+        "problem": "Determine se $\\int_0^1 \\frac{1}{\\sqrt{x}}\\,dx$ converge.",
+        "solution": "Há descontinuidade em $x=0$. $\\lim_{a \\to 0^+}\\int_a^1 x^{-1/2}dx = \\lim_{a \\to 0^+}[2\\sqrt{x}]_a^1 = \\lim_{a \\to 0^+}(2-2\\sqrt{a}) = 2$. Converge para $2$."
+      }
+    ]
+  },
+  "separable": {
+    "intuitionTitle": "A Intuição",
+    "intuition": "Uma EDO separável é aquela em que conseguimos colocar tudo que depende de $y$ de um lado e tudo que depende de $x$ do outro. É como separar ingredientes em dois recipientes: os \"$y$-ingredientes\" num lado, os \"$x$-ingredientes\" no outro. Depois, integramos cada lado separadamente.",
+    "formulaLatex": "\\frac{dy}{dx} = f(x)g(y) \\implies \\int \\frac{dy}{g(y)} = \\int f(x)\\,dx",
+    "proofTitle": "Por que funciona?",
+    "proof": "A separação de variáveis parece informal — \"passamos $dx$ para o outro lado\" — mas tem fundamento rigoroso. Se $\\frac{dy}{dx} = f(x)g(y)$ e $g(y) \\neq 0$, dividimos: $\\frac{1}{g(y)}\\frac{dy}{dx} = f(x)$. Integrando ambos os lados em $x$: $\\int \\frac{1}{g(y)}\\frac{dy}{dx}\\,dx = \\int f(x)\\,dx$. Pelo teorema da substituição (com $y = y(x)$), o lado esquerdo é $\\int \\frac{1}{g(y)}\\,dy$. Pronto: $\\int \\frac{dy}{g(y)} = \\int f(x)\\,dx$, de forma completamente rigorosa. A \"separação\" não é manipulação mágica com diferenciais — é integração dos dois lados seguida de uma substituição. O resultado é o mesmo da notação informal, mas agora sabemos exatamente por que é válido: a regra da cadeia e o teorema da substituição trabalhando juntos.",
+    "examples": [
+      {
+        "problem": "Resolva $\\frac{dy}{dx} = xy$ com $y(0) = 2$.",
+        "solution": "Separando: $\\frac{dy}{y} = x\\,dx$. Integrando: $\\ln|y| = \\frac{x^2}{2} + C$, logo $y = Ae^{x^2/2}$. Com $y(0) = 2$: $A = 2$. Solução: $y = 2e^{x^2/2}$."
+      },
+      {
+        "problem": "Resolva $\\frac{dy}{dx} = \\frac{x^2}{y}$.",
+        "solution": "Separando: $y\\,dy = x^2\\,dx$. Integrando: $\\frac{y^2}{2} = \\frac{x^3}{3} + C$, logo $y^2 = \\frac{2x^3}{3} + C_1$, ou seja, $y = \\pm\\sqrt{\\frac{2x^3}{3} + C_1}$."
+      }
+    ]
+  },
+  "first_order_linear": {
+    "intuitionTitle": "A Intuição",
+    "intuition": "Uma EDO linear de 1a ordem tem a forma $y' + P(x)y = Q(x)$. O truque genial é multiplicar a equação por um \"fator integrante\" $\\mu(x) = e^{\\int P(x)dx}$ que transforma o lado esquerdo na derivada exata de $\\mu \\cdot y$. É como encontrar o multiplicador mágico que faz tudo se encaixar numa derivada de produto.",
+    "formulaLatex": "y' + P(x)y = Q(x) \\implies y = \\frac{1}{\\mu}\\int \\mu\\,Q\\,dx, \\quad \\mu = e^{\\int P\\,dx}",
+    "proofTitle": "Por que funciona?",
+    "proof": "De onde vem o fator integrante $\\mu = e^{\\int P\\,dx}$? Não é mágica — é engenharia reversa. Queremos multiplicar $y' + Py = Q$ por alguma função $\\mu(x)$ tal que o lado esquerdo vire $(\\mu y)'$. Expandindo pela regra do produto: $(\\mu y)' = \\mu' y + \\mu y'$. Comparando com $\\mu(y' + Py) = \\mu y' + \\mu P y$, precisamos de $\\mu' = \\mu P$, ou seja, $\\frac{\\mu'}{\\mu} = P$. Integrando: $\\ln|\\mu| = \\int P\\,dx$, logo $\\mu = e^{\\int P\\,dx}$. Com esse $\\mu$, a equação vira $(\\mu y)' = \\mu Q$. Integrando: $\\mu y = \\int \\mu Q\\,dx + C$. O fator integrante é a única função que transforma a equação numa derivada de produto — e a beleza é que $\\frac{\\mu'}{\\mu} = P$ é, ela mesma, uma EDO separável que já sabemos resolver.",
+    "examples": [
+      {
+        "problem": "Resolva $y' + 2y = e^{-x}$.",
+        "solution": "$P(x) = 2$, $\\mu = e^{2x}$. Multiplicando: $(e^{2x}y)' = e^{2x} \\cdot e^{-x} = e^x$. Integrando: $e^{2x}y = e^x + C$, logo $y = e^{-x} + Ce^{-2x}$."
+      },
+      {
+        "problem": "Resolva $y' - \\frac{y}{x} = x^2$ para $x > 0$.",
+        "solution": "$P(x) = -\\frac{1}{x}$, $\\mu = e^{-\\ln x} = \\frac{1}{x}$. Multiplicando: $\\left(\\frac{y}{x}\\right)' = x$. Integrando: $\\frac{y}{x} = \\frac{x^2}{2} + C$, logo $y = \\frac{x^3}{2} + Cx$."
+      }
+    ]
+  },
+  "exact": {
+    "intuitionTitle": "A Intuição",
+    "intuition": "Uma equação exata $M\\,dx + N\\,dy = 0$ é aquela em que já existe uma função $F(x,y)$ cuja diferencial total é exatamente $M\\,dx + N\\,dy$. Ou seja, $dF = 0$, logo $F(x,y) = C$ é a solução. O teste é simples: se $\\frac{\\partial M}{\\partial y} = \\frac{\\partial N}{\\partial x}$, a equação é exata. É como descobrir que uma combinação de peças forma um quebra-cabeça perfeito.",
+    "formulaLatex": "M\\,dx + N\\,dy = 0 \\text{ é exata se } \\frac{\\partial M}{\\partial y} = \\frac{\\partial N}{\\partial x}",
+    "proofTitle": "Por que funciona?",
+    "proof": "Imagine uma superfície $F(x,y)$ no espaço. As curvas de nível $F(x,y) = C$ são como linhas de altitude num mapa topográfico. Se nos movemos ao longo de uma curva de nível, $F$ não muda: $dF = F_x\\,dx + F_y\\,dy = 0$. Essa é exatamente a forma $M\\,dx + N\\,dy = 0$ com $M = F_x$ e $N = F_y$. A condição $M_y = N_x$ verifica se tal superfície $F$ existe: pelo teorema de Schwarz, se $F$ existe, então $F_{xy} = F_{yx}$, logo $M_y = N_x$. Para encontrar $F$, integramos $M$ em $x$: $F = \\int M\\,dx + g(y)$, onde $g(y)$ é uma \"constante\" que pode depender de $y$. Determinamos $g(y)$ exigindo $F_y = N$: isso dá uma equação para $g'(y)$ que envolve apenas $y$. A solução da EDO é $F(x,y) = C$ — estamos encontrando as curvas de nível da superfície.",
+    "examples": [
+      {
+        "problem": "Resolva $(2xy + 3)dx + (x^2 + 4y)dy = 0$.",
+        "solution": "Verificação: $M_y = 2x$ e $N_x = 2x$ — exata! $F = \\int (2xy+3)dx = x^2y + 3x + g(y)$. $F_y = x^2 + g'(y) = x^2 + 4y \\implies g'(y) = 4y \\implies g(y) = 2y^2$. Solução: $x^2y + 3x + 2y^2 = C$."
+      },
+      {
+        "problem": "Resolva $(ye^{xy} + 2x)dx + (xe^{xy} + 1)dy = 0$.",
+        "solution": "$M_y = e^{xy} + xye^{xy}$ e $N_x = e^{xy} + xye^{xy}$ — exata! $F = \\int (xe^{xy}+1)dy = e^{xy} + y + h(x)$. $F_x = ye^{xy} + h'(x) = ye^{xy} + 2x \\implies h'(x) = 2x \\implies h(x) = x^2$. Solução: $e^{xy} + y + x^2 = C$."
+      }
+    ]
+  },
+  "homogeneous": {
+    "intuitionTitle": "A Intuição",
+    "intuition": "Uma EDO homogênea é aquela onde $\\frac{dy}{dx}$ depende apenas da razão $\\frac{y}{x}$. A substituição $v = \\frac{y}{x}$ (ou seja, $y = vx$) transforma a equação numa EDO separável em $v$ e $x$. A intuição é que, se a equação \"não distingue escala\" (multiplicar $x$ e $y$ pelo mesmo fator não muda nada), então a razão $v = y/x$ é a variável natural.",
+    "formulaLatex": "\\frac{dy}{dx} = \\phi\\!\\left(\\frac{y}{x}\\right) \\implies v + x\\frac{dv}{dx} = \\phi(v), \\quad v = \\frac{y}{x}",
+    "proofTitle": "Por que funciona?",
+    "proof": "Uma EDO homogênea de grau 0 tem a propriedade $f(tx,ty) = f(x,y)$ para todo $t > 0$: multiplicar $x$ e $y$ pelo mesmo fator não muda nada. Fazendo $t = 1/x$: $f(x,y) = f(1, y/x) = \\phi(y/x)$. Isso prova que $\\frac{dy}{dx}$ depende apenas da razão $v = y/x$, não de $x$ e $y$ separadamente. A substituição $y = vx$ é natural: se a razão é o que importa, fazemos dela a nova variável. Derivando $y = vx$ pela regra do produto: $\\frac{dy}{dx} = v + x\\frac{dv}{dx}$. Substituindo na EDO: $v + x\\frac{dv}{dx} = \\phi(v)$, logo $x\\frac{dv}{dx} = \\phi(v) - v$. Essa equação é separável: $\\frac{dv}{\\phi(v) - v} = \\frac{dx}{x}$. A invariância de escala é o que garantiu que $v = y/x$ reduziria a equação a algo mais simples — não foi uma substituição aleatória, foi a substituição natural do problema.",
+    "examples": [
+      {
+        "problem": "Resolva $\\frac{dy}{dx} = \\frac{x + y}{x}$.",
+        "solution": "Reescrevendo: $\\frac{dy}{dx} = 1 + \\frac{y}{x}$. Com $v = y/x$: $v + xv' = 1 + v$, logo $xv' = 1$, ou seja, $\\frac{dv}{1} = \\frac{dx}{x}$. Integrando: $v = \\ln|x| + C$, portanto $y = x(\\ln|x| + C)$."
+      },
+      {
+        "problem": "Resolva $(x^2 + y^2)dx - 2xy\\,dy = 0$.",
+        "solution": "$\\frac{dy}{dx} = \\frac{x^2+y^2}{2xy}$. Com $y = vx$: $v + xv' = \\frac{1+v^2}{2v}$. Então $xv' = \\frac{1+v^2}{2v} - v = \\frac{1-v^2}{2v}$. Separando: $\\frac{2v}{1-v^2}dv = \\frac{dx}{x}$. Integrando: $-\\ln|1-v^2| = \\ln|x| + C_1$, logo $\\frac{1}{1-v^2} = Ax$. Voltando: $\\frac{x^2}{x^2-y^2} = Ax$, ou seja, $x = A(x^2-y^2)$."
+      }
+    ]
+  },
+  "second_order_linear": {
+    "intuitionTitle": "A Intuição",
+    "intuition": "EDOs lineares de 2a ordem com coeficientes constantes ($ay'' + by' + cy = 0$) modelam oscilações — molas, circuitos, pêndulos. A ideia genial é supor $y = e^{rx}$ e ver que valor de $r$ funciona. Isso transforma a EDO numa equação do 2o grau (a equação característica), e as raízes $r$ determinam o comportamento da solução: oscila, decai, ou cresce.",
+    "formulaLatex": "ay'' + by' + cy = 0 \\implies ar^2 + br + c = 0",
+    "proofTitle": "Por que funciona?",
+    "proof": "Por que tentamos $y = e^{rx}$? Porque derivar uma exponencial devolve uma exponencial: $y' = re^{rx}$, $y'' = r^2 e^{rx}$. Substituindo em $ay'' + by' + cy = 0$: $e^{rx}(ar^2 + br + c) = 0$. Como $e^{rx}$ nunca é zero, devemos ter $ar^2 + br + c = 0$ — a equação característica, uma simples equação do 2o grau. Se há duas raízes reais distintas $r_1, r_2$: a solução geral é $y = C_1 e^{r_1 x} + C_2 e^{r_2 x}$. Se a raiz é dupla $r$: uma solução é $e^{rx}$, mas precisamos de duas independentes; a segunda é $xe^{rx}$, onde o fator $x$ garante independência. Se as raízes são complexas $\\alpha \\pm \\beta i$: pela fórmula de Euler, $e^{(\\alpha + \\beta i)x} = e^{\\alpha x}(\\cos \\beta x + i\\sin \\beta x)$. Tomando partes real e imaginária: $e^{\\alpha x}\\cos \\beta x$ e $e^{\\alpha x}\\sin \\beta x$. O $\\alpha$ controla crescimento ou decaimento e o $\\beta$ controla a oscilação — exatamente o que observamos em molas, pêndulos e circuitos elétricos.",
+    "examples": [
+      {
+        "problem": "Resolva $y'' - 5y' + 6y = 0$.",
+        "solution": "Equação característica: $r^2 - 5r + 6 = 0 \\implies (r-2)(r-3) = 0$, logo $r_1 = 2$, $r_2 = 3$. Solução geral: $y = C_1 e^{2x} + C_2 e^{3x}$."
+      },
+      {
+        "problem": "Resolva $y'' + 4y = 0$.",
+        "solution": "Equação característica: $r^2 + 4 = 0 \\implies r = \\pm 2i$. Raízes complexas com $\\alpha = 0$, $\\beta = 2$. Solução geral: $y = C_1 \\cos(2x) + C_2 \\sin(2x)$."
+      }
+    ]
+  },
+  "undetermined_coeffs": {
+    "intuitionTitle": "A Intuição",
+    "intuition": "O método dos coeficientes a determinar resolve EDOs não-homogêneas ($ay'' + by' + cy = g(x)$) quando $g(x)$ é um polinômio, exponencial, seno/cosseno, ou combinação desses. \"Chutamos\" que a solução particular tem a mesma forma de $g(x)$, substituímos na EDO, e determinamos os coeficientes comparando os dois lados. A solução geral é: homogênea + particular.",
+    "formulaLatex": "y = y_h + y_p \\quad \\text{onde } y_p \\text{ tem a forma de } g(x)",
+    "proofTitle": "Por que funciona?",
+    "proof": "O \"chute\" tem uma lógica precisa por trás. Derivar um polinômio dá outro polinômio; derivar $e^{kx}$ dá um múltiplo de $e^{kx}$; derivar $\\sin$ e $\\cos$ dá $\\cos$ e $-\\sin$. Essas famílias são fechadas sob derivação — não escapam de si mesmas. Se $g(x) = e^{5x}$, então $y_p$, $y_p'$, $y_p''$ são todos múltiplos de $e^{5x}$, e a equação $ay_p'' + by_p' + cy_p = g(x)$ vira uma equação algébrica para o coeficiente. O princípio da superposição garante que $y = y_h + y_p$ é a solução geral: $y_h$ captura todas as soluções da homogênea, e $y_p$ ajusta para o termo forçante. Caso especial: se $g(x)$ já é solução da homogênea (por exemplo $g(x) = e^{r_1 x}$), o chute $Ae^{r_1 x}$ dá zero ao substituir na homogênea. Multiplicamos por $x$: $y_p = Axe^{r_1 x}$. Se a raiz for dupla, por $x^2$. Cada fator de $x$ garante independência linear, fornecendo uma solução particular genuína.",
+    "examples": [
+      {
+        "problem": "Resolva $y'' - 3y' + 2y = 4e^{5x}$.",
+        "solution": "Homogênea: $r^2-3r+2=0 \\implies r=1,2$, logo $y_h = C_1e^x + C_2e^{2x}$. Particular: chutamos $y_p = Ae^{5x}$. $y_p'' - 3y_p' + 2y_p = 25Ae^{5x} - 15Ae^{5x} + 2Ae^{5x} = 12Ae^{5x} = 4e^{5x}$. Logo $A = \\frac{1}{3}$. Solução: $y = C_1e^x + C_2e^{2x} + \\frac{1}{3}e^{5x}$."
+      },
+      {
+        "problem": "Resolva $y'' + y = 3\\sin(2x)$.",
+        "solution": "Homogênea: $r^2+1=0 \\implies r = \\pm i$, $y_h = C_1\\cos x + C_2\\sin x$. Chutamos $y_p = A\\cos(2x) + B\\sin(2x)$. Substituindo: $-4A\\cos(2x) - 4B\\sin(2x) + A\\cos(2x) + B\\sin(2x) = 3\\sin(2x)$. Logo $-3A = 0$ e $-3B = 3$, ou seja, $A = 0$, $B = -1$. Solução: $y = C_1\\cos x + C_2\\sin x - \\sin(2x)$."
+      }
+    ]
+  },
+  "laplace": {
+    "intuitionTitle": "A Intuição",
+    "intuition": "A Transformada de Laplace converte uma EDO (difícil) numa equação algébrica (fácil). A ideia é transformar a função do \"domínio do tempo\" $t$ para o \"domínio da frequência\" $s$, onde derivadas viram multiplicações por $s$. Resolvemos a álgebra, e depois aplicamos a transformada inversa para voltar ao domínio de $t$.",
+    "formulaLatex": "\\mathcal{L}\\{f(t)\\} = F(s) = \\int_0^{\\infty} e^{-st} f(t)\\,dt",
+    "proofTitle": "Por que funciona?",
+    "proof": "A ideia genial é converter derivadas em multiplicações — transformando equações diferenciais em álgebra. A propriedade central: $\\mathcal{L}\\{f'(t)\\} = sF(s) - f(0)$, obtida por integração por partes: $\\int_0^\\infty e^{-st}f'(t)\\,dt = [e^{-st}f(t)]_0^\\infty + s\\int_0^\\infty e^{-st}f(t)\\,dt = -f(0) + sF(s)$ (supondo $f(t)e^{-st} \\to 0$ quando $t \\to \\infty$). Cada derivada vira multiplicação por $s$, e as condições iniciais entram automaticamente. Assim, $y'' + ay' + by = g(t)$ vira $(s^2Y - sy(0) - y'(0)) + a(sY - y(0)) + bY = G(s)$ — uma equação algébrica em $Y(s)$ que resolvemos com álgebra básica. Depois, consultando uma tabela de pares conhecidos, aplicamos a transformada inversa para voltar ao domínio do tempo. É como traduzir um problema difícil para um idioma onde ele fica fácil, resolver lá, e traduzir a resposta de volta.",
+    "examples": [
+      {
+        "problem": "Resolva $y' + 2y = 0$, $y(0) = 3$, usando Laplace.",
+        "solution": "Aplicando $\\mathcal{L}$: $sY(s) - y(0) + 2Y(s) = 0$, logo $(s+2)Y(s) = 3$. $Y(s) = \\frac{3}{s+2}$. Invertendo: $y(t) = 3e^{-2t}$."
+      },
+      {
+        "problem": "Resolva $y'' + y = 0$, $y(0) = 1$, $y'(0) = 0$.",
+        "solution": "Aplicando $\\mathcal{L}$: $s^2Y - sy(0) - y'(0) + Y = 0$, logo $(s^2+1)Y = s$. $Y(s) = \\frac{s}{s^2+1}$. Pela tabela: $\\mathcal{L}^{-1}\\left\\{\\frac{s}{s^2+1}\\right\\} = \\cos(t)$. Solução: $y(t) = \\cos(t)$."
+      }
+    ]
+  }
+}

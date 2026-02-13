@@ -1,0 +1,376 @@
+{
+  "power_rule": {
+    "intuitionTitle": "The Intuition",
+    "intuition": "The power rule tells us how the function $x^n$ changes when $x$ changes by a tiny amount. Think of it this way: if you have $x^3$, that's $x \\cdot x \\cdot x$. When differentiating, each of the three factors \"takes its turn\" being differentiated while the others stay put — that's why the factor $3$ appears in front. The exponent comes down and decreases by one: simple and powerful.",
+    "formulaLatex": "\\frac{d}{dx}\\left[x^n\\right] = n \\cdot x^{n-1}",
+    "proofTitle": "Why does it work?",
+    "proof": "Let's go straight to the definition of the derivative: $\\lim_{h \\to 0} \\frac{(x+h)^n - x^n}{h}$. Think of $(x+h)^n$ as the product $(x+h)(x+h)\\cdots(x+h)$, with $n$ factors. When expanding, each term comes from choosing $x$ or $h$ in each factor. The leading term is $x^n$ (choosing $x$ in all of them). The next group is when we choose $h$ in exactly one factor and $x$ in the other $n-1$: there are $n$ ways to do this, each giving $x^{n-1} \\cdot h$. Summed up: $n \\cdot x^{n-1} \\cdot h$. All other terms have $h^2$ or higher powers. Subtracting $x^n$, dividing by $h$, and taking $h \\to 0$, the terms with $h$ vanish and we are left with $n \\cdot x^{n-1}$. The exponent \"comes down\" because of pure combinatorics — the $n$ counts how many ways we can choose which of the $n$ factors contributes the $h$.",
+    "examples": [
+      {
+        "problem": "Find the derivative of $f(x) = x^5$.",
+        "solution": "Applying the power rule: $f'(x) = 5x^{5-1} = 5x^4$."
+      },
+      {
+        "problem": "Differentiate $g(x) = 3x^4 - 2x^3 + 7x$.",
+        "solution": "Differentiating term by term: $g'(x) = 3 \\cdot 4x^3 - 2 \\cdot 3x^2 + 7 = 12x^3 - 6x^2 + 7$."
+      }
+    ]
+  },
+  "product_rule": {
+    "intuitionTitle": "The Intuition",
+    "intuition": "When two varying quantities are multiplied, the total change comes from two contributions: the first function changes while the second stays still, and then the second changes while the first stays still. Imagine the area of a rectangle whose sides $u$ and $v$ are growing — the increase in area comes from both the increase in width and the increase in height.",
+    "formulaLatex": "\\frac{d}{dx}\\left[u \\cdot v\\right] = u' \\cdot v + u \\cdot v'",
+    "proofTitle": "Why does it work?",
+    "proof": "By definition, we want $\\lim_{h \\to 0} \\frac{u(x+h)v(x+h) - u(x)v(x)}{h}$. The problem is that two factors are changing at the same time. To isolate each variation, we add and subtract $u(x+h)v(x)$ in the numerator — this doesn't change the value, but separates it into two parts: $u(x+h)\\frac{v(x+h)-v(x)}{h} + v(x)\\frac{u(x+h)-u(x)}{h}$. The first part captures the change in $v$ while $u$ is \"nearly fixed\" at $x+h$; the second captures the change in $u$ while $v$ is fixed at $x$. When $h \\to 0$, $u(x+h) \\to u(x)$ by continuity, and the quotients become $v'(x)$ and $u'(x)$. Result: $u \\cdot v' + u' \\cdot v$. This is the rigorous version of the rectangle intuition: each dimension varies in turn, and the total change is the sum of those contributions.",
+    "examples": [
+      {
+        "problem": "Differentiate $f(x) = x^2 \\cdot \\sin(x)$.",
+        "solution": "Let $u = x^2$ and $v = \\sin(x)$. Then $u' = 2x$ and $v' = \\cos(x)$. By the product rule: $f'(x) = 2x \\cdot \\sin(x) + x^2 \\cdot \\cos(x)$."
+      },
+      {
+        "problem": "Differentiate $g(x) = e^x \\cdot \\ln(x)$.",
+        "solution": "With $u = e^x$ and $v = \\ln(x)$: $u' = e^x$, $v' = \\frac{1}{x}$. Therefore $g'(x) = e^x \\cdot \\ln(x) + e^x \\cdot \\frac{1}{x} = e^x\\!\\left(\\ln(x) + \\frac{1}{x}\\right)$."
+      }
+    ]
+  },
+  "quotient_rule": {
+    "intuitionTitle": "The Intuition",
+    "intuition": "The quotient rule deals with how the ratio between two functions changes. When the numerator grows, the fraction tends to grow; when the denominator grows, the fraction tends to shrink. The formula captures this \"competition\" between numerator and denominator, always dividing by the square of the denominator to keep the units correct.",
+    "formulaLatex": "\\frac{d}{dx}\\!\\left[\\frac{u}{v}\\right] = \\frac{u' \\cdot v - u \\cdot v'}{v^2}",
+    "proofTitle": "Why does it work?",
+    "proof": "Instead of starting from the definition, let's derive the quotient rule from the product rule — showing that it's not a separate formula to memorize, but a logical consequence. If $u = \\frac{u}{v} \\cdot v$, we apply the product rule: $u' = \\left(\\frac{u}{v}\\right)' \\cdot v + \\frac{u}{v} \\cdot v'$. We isolate $\\left(\\frac{u}{v}\\right)'$: $\\left(\\frac{u}{v}\\right)' = \\frac{u' - \\frac{u}{v} \\cdot v'}{v} = \\frac{u'v - uv'}{v^2}$. The minus sign appears naturally: when the denominator $v$ grows, the fraction decreases — this negative effect is the $-uv'$. The $v^2$ in the denominator keeps the units consistent. If you forget the formula on a test, just remember the product rule and isolate.",
+    "examples": [
+      {
+        "problem": "Differentiate $f(x) = \\frac{x^2 + 1}{x - 3}$.",
+        "solution": "With $u = x^2 + 1$, $v = x - 3$: $u' = 2x$, $v' = 1$. Then $f'(x) = \\frac{2x(x-3) - (x^2+1)(1)}{(x-3)^2} = \\frac{x^2 - 6x - 1}{(x-3)^2}$."
+      },
+      {
+        "problem": "Differentiate $g(x) = \\frac{\\sin(x)}{x}$.",
+        "solution": "With $u = \\sin(x)$ and $v = x$: $u' = \\cos(x)$, $v' = 1$. Therefore $g'(x) = \\frac{\\cos(x) \\cdot x - \\sin(x) \\cdot 1}{x^2} = \\frac{x\\cos(x) - \\sin(x)}{x^2}$."
+      }
+    ]
+  },
+  "chain_rule": {
+    "intuitionTitle": "The Intuition",
+    "intuition": "The chain rule deals with composite functions — functions inside functions. Think of two connected gears: if the inner gear turns at a certain rate and the outer one amplifies that turn, the total rate is the product of the two. The derivative of the \"outer\" function evaluated at the \"inner\" function, times the derivative of the inner function.",
+    "formulaLatex": "\\frac{d}{dx}\\left[f(g(x))\\right] = f'(g(x)) \\cdot g'(x)",
+    "proofTitle": "Why does it work?",
+    "proof": "The logic is surprisingly simple. If $y = f(u)$ and $u = g(x)$, a small change $\\Delta x$ first causes $\\Delta u \\approx g'(x) \\cdot \\Delta x$ (by the definition of the derivative of $g$). This change $\\Delta u$, in turn, causes $\\Delta y \\approx f'(u) \\cdot \\Delta u$ (by the definition of the derivative of $f$). Substituting: $\\Delta y \\approx f'(g(x)) \\cdot g'(x) \\cdot \\Delta x$. Dividing by $\\Delta x$: $\\frac{\\Delta y}{\\Delta x} \\approx f'(g(x)) \\cdot g'(x)$. In the limit, the approximation becomes an equality. It's like connected gears: the total rate is the product of each link's rate. If the inner function triples the change and the outer one doubles it, the total change is $\\times 6$. The rigorous proof requires care when $\\Delta u = 0$ (we can't divide by zero), but the core idea is this: rates of change multiply along the composition.",
+    "examples": [
+      {
+        "problem": "Differentiate $f(x) = (3x^2 + 1)^5$.",
+        "solution": "The outer function is $u^5$ and the inner is $u = 3x^2 + 1$. By the chain rule: $f'(x) = 5(3x^2+1)^4 \\cdot 6x = 30x(3x^2+1)^4$."
+      },
+      {
+        "problem": "Differentiate $g(x) = \\sin(x^3)$.",
+        "solution": "Outer: $\\sin(u)$, inner: $u = x^3$. Therefore $g'(x) = \\cos(x^3) \\cdot 3x^2 = 3x^2\\cos(x^3)$."
+      }
+    ]
+  },
+  "trig_basic": {
+    "intuitionTitle": "The Intuition",
+    "intuition": "Trigonometric functions describe circular motion and oscillations. The derivative of $\\sin(x)$ is $\\cos(x)$ because, on the unit circle, the rate of change of the vertical coordinate (sine) at a given point is exactly the horizontal coordinate (cosine) at that point. Each trigonometric function has a derivative that can be expressed in terms of the others.",
+    "formulaLatex": "\\frac{d}{dx}[\\sin x] = \\cos x \\qquad \\frac{d}{dx}[\\cos x] = -\\sin x",
+    "proofTitle": "Why does it work?",
+    "proof": "Let's prove that the derivative of $\\sin x$ is $\\cos x$ directly from the definition. We compute $\\lim_{h \\to 0}\\frac{\\sin(x+h)-\\sin(x)}{h}$. By the angle addition formula: $\\sin(x+h) = \\sin x \\cos h + \\cos x \\sin h$. Substituting into the limit: $\\sin x \\cdot \\frac{\\cos h - 1}{h} + \\cos x \\cdot \\frac{\\sin h}{h}$. Everything depends on two fundamental limits. First: $\\lim_{h \\to 0}\\frac{\\sin h}{h} = 1$ — for very small angles, the arc and the chord of the unit circle are practically equal. Second: $\\lim_{h \\to 0}\\frac{\\cos h - 1}{h} = 0$ — the cosine departs from $1$ much more slowly than $h$ departs from $0$. With these limits, the first term vanishes and the second gives $\\cos x$. For $\\cos x$, the argument is analogous, but $\\cos(x+h) = \\cos x \\cos h - \\sin x \\sin h$ — the minus sign in the addition formula is what's responsible for the $-\\sin x$ in the derivative.",
+    "examples": [
+      {
+        "problem": "Differentiate $f(x) = 3\\sin(x) + 2\\cos(x)$.",
+        "solution": "$f'(x) = 3\\cos(x) + 2(-\\sin(x)) = 3\\cos(x) - 2\\sin(x)$."
+      },
+      {
+        "problem": "Differentiate $g(x) = \\tan(x)$.",
+        "solution": "Writing $\\tan(x) = \\frac{\\sin(x)}{\\cos(x)}$ and applying the quotient rule: $g'(x) = \\frac{\\cos^2(x) + \\sin^2(x)}{\\cos^2(x)} = \\frac{1}{\\cos^2(x)} = \\sec^2(x)$."
+      }
+    ]
+  },
+  "exp_log": {
+    "intuitionTitle": "The Intuition",
+    "intuition": "The function $e^x$ is the only function that equals its own derivative — it grows at a rate proportional to its current value. Meanwhile, $\\ln(x)$, being the inverse of $e^x$, has derivative $\\frac{1}{x}$: the larger the value of $x$, the more slowly the logarithm grows. These two functions form the foundation of growth and decay models in nature.",
+    "formulaLatex": "\\frac{d}{dx}[e^x] = e^x \\qquad \\frac{d}{dx}[\\ln x] = \\frac{1}{x}",
+    "proofTitle": "Why does it work?",
+    "proof": "What makes $e^x$ special? We compute from the definition: $\\lim_{h \\to 0}\\frac{e^{x+h}-e^x}{h} = e^x \\cdot \\lim_{h \\to 0}\\frac{e^h - 1}{h}$. The number $e \\approx 2.718$ is the only base value for which $\\lim_{h \\to 0}\\frac{b^h - 1}{h} = 1$. For any other base, this limit would be a constant different from $1$, and the derivative would have an extra factor. With base $e$, the factor is $1$ and the derivative is simply $e^x$ — the function equals its own rate of change. For $\\ln(x)$, we use the fact that it is the inverse of $e^x$: if $y = \\ln x$, then $x = e^y$. Differentiating implicitly: $1 = e^y \\cdot \\frac{dy}{dx}$, so $\\frac{dy}{dx} = \\frac{1}{e^y} = \\frac{1}{x}$. The larger $x$ is, the more slowly $\\ln x$ grows — and the formula $\\frac{1}{x}$ captures this precisely.",
+    "examples": [
+      {
+        "problem": "Differentiate $f(x) = 5e^x - 3\\ln(x)$.",
+        "solution": "$f'(x) = 5e^x - \\frac{3}{x}$."
+      },
+      {
+        "problem": "Differentiate $g(x) = x^2 e^x$ (use the product rule).",
+        "solution": "$g'(x) = 2x \\cdot e^x + x^2 \\cdot e^x = e^x(2x + x^2) = xe^x(2 + x)$."
+      }
+    ]
+  },
+  "implicit": {
+    "intuitionTitle": "The Intuition",
+    "intuition": "Sometimes we cannot (or don't want to) isolate $y$ as a function of $x$. In implicit differentiation, we differentiate both sides of the equation with respect to $x$, remembering that $y$ depends on $x$ — so every time we differentiate a term involving $y$, a $\\frac{dy}{dx}$ appears by the chain rule. Then we simply solve for $\\frac{dy}{dx}$.",
+    "formulaLatex": "\\frac{d}{dx}[F(x,y)] = 0 \\implies \\frac{dy}{dx} = -\\frac{F_x}{F_y}",
+    "proofTitle": "Why does it work?",
+    "proof": "Implicit differentiation is not a new technique — it is the chain rule applied with one crucial detail: $y$ depends on $x$, even if we don't know how to express it explicitly. When we have $F(x,y) = 0$, we differentiate both sides with respect to $x$. Terms with $x$ alone are differentiated normally. But each term with $y$ receives a factor of $\\frac{dy}{dx}$ by the chain rule — because $y$ is a function of $x$, even if hidden. This gives: $F_x + F_y \\cdot \\frac{dy}{dx} = 0$. Solving: $\\frac{dy}{dx} = -\\frac{F_x}{F_y}$ (provided that $F_y \\neq 0$). The Implicit Function Theorem guarantees that, under these conditions, $y$ is indeed a differentiable function of $x$ in a neighborhood of the point. In other words: we don't need to isolate $y$ to find its rate of change — we just differentiate the entire equation respecting the dependence and solve for $\\frac{dy}{dx}$.",
+    "examples": [
+      {
+        "problem": "Find $\\frac{dy}{dx}$ for $x^2 + y^2 = 25$.",
+        "solution": "Differentiating both sides: $2x + 2y\\frac{dy}{dx} = 0$. Solving: $\\frac{dy}{dx} = -\\frac{x}{y}$."
+      },
+      {
+        "problem": "Find $\\frac{dy}{dx}$ for $x^3 + y^3 = 6xy$.",
+        "solution": "Differentiating: $3x^2 + 3y^2\\frac{dy}{dx} = 6y + 6x\\frac{dy}{dx}$. Rearranging: $(3y^2 - 6x)\\frac{dy}{dx} = 6y - 3x^2$. Therefore $\\frac{dy}{dx} = \\frac{6y - 3x^2}{3y^2 - 6x} = \\frac{2y - x^2}{y^2 - 2x}$."
+      }
+    ]
+  },
+  "related_rates": {
+    "intuitionTitle": "The Intuition",
+    "intuition": "Related rates problems connect the rates of change of quantities that depend on each other through some geometric or physical equation. For example, if a spherical balloon is being inflated, the rate of growth of the radius and the rate of growth of the volume are linked by the formula for the volume of a sphere. The key is: differentiate the equation relating the quantities with respect to time $t$.",
+    "formulaLatex": "\\frac{dV}{dt} = \\frac{dV}{dr} \\cdot \\frac{dr}{dt}",
+    "proofTitle": "Why does it work?",
+    "proof": "If two quantities are connected by an equation, their rates of change over time are connected as well. It is the chain rule applied to time $t$. If we have $F(x, y) = 0$ where $x = x(t)$ and $y = y(t)$, differentiating with respect to $t$: $F_x \\frac{dx}{dt} + F_y \\frac{dy}{dt} = 0$. This equation connects the two rates — knowing one, we find the other. In the balloon case: $V = \\frac{4}{3}\\pi r^3$ holds at every instant. Differentiating with respect to $t$: $\\frac{dV}{dt} = 4\\pi r^2 \\frac{dr}{dt}$. Knowing $\\frac{dV}{dt}$ and $r$ at an instant, we find $\\frac{dr}{dt}$. The method works because the geometric or physical equation is true at every instant — and therefore its time derivative is true as well. That derivative is exactly what connects the rates of change to each other.",
+    "examples": [
+      {
+        "problem": "A $5$m ladder leans against a wall. The base slides at $1$ m/s. At what rate is the top descending when the base is $3$m from the wall?",
+        "solution": "From the relation $x^2 + y^2 = 25$, differentiating with respect to $t$: $2x\\frac{dx}{dt} + 2y\\frac{dy}{dt} = 0$. With $x=3$, $y=4$, and $\\frac{dx}{dt}=1$: $6(1) + 8\\frac{dy}{dt} = 0$, so $\\frac{dy}{dt} = -\\frac{3}{4}$ m/s (the top descends)."
+      },
+      {
+        "problem": "A spherical balloon is inflated at $\\frac{dV}{dt} = 100$ cm$^3$/s. What is $\\frac{dr}{dt}$ when $r = 5$ cm?",
+        "solution": "$V = \\frac{4}{3}\\pi r^3 \\implies \\frac{dV}{dt} = 4\\pi r^2 \\frac{dr}{dt}$. With $r=5$: $100 = 4\\pi(25)\\frac{dr}{dt} = 100\\pi\\frac{dr}{dt}$. Therefore $\\frac{dr}{dt} = \\frac{1}{\\pi} \\approx 0.318$ cm/s."
+      }
+    ]
+  },
+  "basic_integrals": {
+    "intuitionTitle": "The Intuition",
+    "intuition": "Integration is the reverse process of differentiation. If the derivative answers \"what is the rate of change?\", the integral answers \"what function has this rate of change?\". The basic integrals are the \"multiplication tables\" of integration — formulas we recognize on sight because they are simply the known derivatives read backwards.",
+    "formulaLatex": "\\int x^n\\,dx = \\frac{x^{n+1}}{n+1} + C \\quad (n \\neq -1)",
+    "proofTitle": "Why does it work?",
+    "proof": "Verification reveals the essence of integration. If we differentiate $\\frac{x^{n+1}}{n+1} + C$, by the power rule we get $(n+1) \\cdot \\frac{x^n}{n+1} = x^n$ — exactly the integrand. Integration is literally undoing the derivative. But why does the $C$ appear? Because the derivative of any constant is zero: the functions $x^3 + 5$ and $x^3 - 100$ have the same derivative $3x^2$, so both are valid antiderivatives of $3x^2$. The indefinite integral represents an infinite family of parallel functions, differing only by a vertical shift. This is the fundamental connection of Calculus: differentiating and integrating are inverse operations, and the constant $C$ absorbs the information that the derivative \"erases\".",
+    "examples": [
+      {
+        "problem": "Compute $\\int (3x^2 + 4x - 1)\\,dx$.",
+        "solution": "$\\int 3x^2\\,dx + \\int 4x\\,dx - \\int 1\\,dx = x^3 + 2x^2 - x + C$."
+      },
+      {
+        "problem": "Compute $\\int \\frac{1}{x}\\,dx$.",
+        "solution": "Since $n = -1$ is the special case: $\\int \\frac{1}{x}\\,dx = \\ln|x| + C$."
+      }
+    ]
+  },
+  "substitution": {
+    "intuitionTitle": "The Intuition",
+    "intuition": "Substitution is the chain rule in reverse. If the integral contains a function and its derivative appears as a factor, we can replace that function with a variable $u$, simplifying everything. It's like changing the outfit of a complicated integral into a simpler one. The key is finding the right $u$: usually it's the \"inner\" function.",
+    "formulaLatex": "\\int f(g(x))\\,g'(x)\\,dx = \\int f(u)\\,du \\quad \\text{com } u = g(x)",
+    "proofTitle": "Why does it work?",
+    "proof": "Substitution is the chain rule read backwards — and understanding this is the key to everything. If $F$ is the antiderivative of $f$ (i.e., $F' = f$), then by the chain rule: $\\frac{d}{dx}[F(g(x))] = f(g(x)) \\cdot g'(x)$. Reading this equality from right to left: $\\int f(g(x)) \\cdot g'(x)\\,dx = F(g(x)) + C$. The notation $u = g(x)$, $du = g'(x)\\,dx$ is simply an organized way of seeing this fact: the $g'(x)\\,dx$ transforms into $du$, and the complicated integral in $x$ becomes a simple one in $u$. That's why we look for an \"inner\" function whose derivative appears as a factor \"on the outside\": when that happens, the chain rule guarantees that the substitution will work.",
+    "examples": [
+      {
+        "problem": "Compute $\\int 2x \\cdot e^{x^2}\\,dx$.",
+        "solution": "Setting $u = x^2$, we have $du = 2x\\,dx$. The integral becomes $\\int e^u\\,du = e^u + C = e^{x^2} + C$."
+      },
+      {
+        "problem": "Compute $\\int \\cos(3x)\\,dx$.",
+        "solution": "With $u = 3x$, $du = 3\\,dx$, so $dx = \\frac{du}{3}$. $\\int \\cos(u)\\frac{du}{3} = \\frac{1}{3}\\sin(u) + C = \\frac{1}{3}\\sin(3x) + C$."
+      }
+    ]
+  },
+  "by_parts": {
+    "intuitionTitle": "The Intuition",
+    "intuition": "Integration by parts is the product rule in reverse. When we have the product of two functions and can't integrate directly, we \"transfer\" the derivative from one to the other. We choose one part to differentiate ($u$) and another to integrate ($dv$). The LIATE rule (Logarithmic, Inverse trig, Algebraic, Trigonometric, Exponential) helps choose $u$.",
+    "formulaLatex": "\\int u\\,dv = uv - \\int v\\,du",
+    "proofTitle": "Why does it work?",
+    "proof": "By the product rule: $\\frac{d}{dx}[u \\cdot v] = u'v + uv'$. Integrating both sides: $uv = \\int u'v\\,dx + \\int uv'\\,dx$. Rearranging: $\\int uv'\\,dx = uv - \\int u'v\\,dx$, or in differential notation: $\\int u\\,dv = uv - \\int v\\,du$. But why is this useful? Because it transfers the derivative from one function to the other. If $u$ is something that simplifies when differentiated (like $x^2 \\to 2x \\to 2 \\to 0$) and $dv$ is something easy to integrate (like $e^x$ or $\\sin x$), then the new integral $\\int v\\,du$ is simpler than the original. The LIATE rule (Logarithmic, Inverse trig, Algebraic, Trigonometric, Exponential) orders from \"most wants to be $u$\" to \"most wants to be $dv$\": logarithms simplify greatly when differentiated, while exponentials don't even change when integrated. It's not a trick — it's the product rule in reverse.",
+    "examples": [
+      {
+        "problem": "Compute $\\int x e^x\\,dx$.",
+        "solution": "We choose $u = x$ ($du = dx$) and $dv = e^x dx$ ($v = e^x$). $\\int xe^x\\,dx = xe^x - \\int e^x\\,dx = xe^x - e^x + C = e^x(x-1) + C$."
+      },
+      {
+        "problem": "Compute $\\int x^2 \\sin(x)\\,dx$.",
+        "solution": "With $u = x^2$, $dv = \\sin(x)dx$: $\\int x^2\\sin x\\,dx = -x^2\\cos x + 2\\int x\\cos x\\,dx$. Applying by parts again with $u=x$, $dv=\\cos x\\,dx$: $= -x^2\\cos x + 2(x\\sin x - \\int \\sin x\\,dx) = -x^2\\cos x + 2x\\sin x + 2\\cos x + C$."
+      }
+    ]
+  },
+  "trig_integrals": {
+    "intuitionTitle": "The Intuition",
+    "intuition": "Trigonometric integrals involve powers and products of sine and cosine. The main strategy is to use trigonometric identities to reduce the complexity. If one of the exponents is odd, we separate one factor and use $\\sin^2 + \\cos^2 = 1$ to convert the rest into a single function — opening the way for a simple substitution.",
+    "formulaLatex": "\\sin^2(x) = \\frac{1 - \\cos(2x)}{2} \\qquad \\cos^2(x) = \\frac{1 + \\cos(2x)}{2}",
+    "proofTitle": "Why does it work?",
+    "proof": "The strategy depends on an observation about parity. When one of the exponents is odd, we separate a factor of $\\sin x$ or $\\cos x$ and use $\\sin^2 x + \\cos^2 x = 1$ to convert the rest. Example: $\\sin^3 x = (1 - \\cos^2 x) \\cdot \\sin x$. With $u = \\cos x$, $du = -\\sin x\\,dx$, everything becomes a polynomial in $u$. It works because the Pythagorean identity converts between $\\sin^2$ and $\\cos^2$, and the separated factor provides exactly the $du$ for the substitution. When both exponents are even, there's no factor left to separate. Then we use the double-angle formulas: from $\\cos(2x) = 1 - 2\\sin^2 x = 2\\cos^2 x - 1$ we isolate $\\sin^2 x = \\frac{1-\\cos(2x)}{2}$ and $\\cos^2 x = \\frac{1+\\cos(2x)}{2}$. Each application cuts the power in half, until we reach simple $\\cos$ and $\\sin$ integrals.",
+    "examples": [
+      {
+        "problem": "Compute $\\int \\sin^3(x)\\,dx$.",
+        "solution": "We separate: $\\int \\sin^2(x)\\sin(x)\\,dx = \\int (1-\\cos^2(x))\\sin(x)\\,dx$. With $u = \\cos(x)$, $du = -\\sin(x)dx$: $-\\int (1-u^2)du = -u + \\frac{u^3}{3} + C = -\\cos(x) + \\frac{\\cos^3(x)}{3} + C$."
+      },
+      {
+        "problem": "Compute $\\int \\cos^2(x)\\,dx$.",
+        "solution": "By the identity: $\\int \\frac{1+\\cos(2x)}{2}\\,dx = \\frac{x}{2} + \\frac{\\sin(2x)}{4} + C$."
+      }
+    ]
+  },
+  "trig_sub": {
+    "intuitionTitle": "The Intuition",
+    "intuition": "When expressions like $\\sqrt{a^2 - x^2}$, $\\sqrt{a^2 + x^2}$, or $\\sqrt{x^2 - a^2}$ appear, a trigonometric substitution transforms the radical into something simple. The idea is to use the right triangle: the sides and the hypotenuse create relationships that eliminate the radical. It's like dressing the integral in a \"trigonometric outfit\" that simplifies the expression.",
+    "formulaLatex": "\\sqrt{a^2 - x^2} \\Rightarrow x = a\\sin\\theta \\qquad \\sqrt{a^2 + x^2} \\Rightarrow x = a\\tan\\theta",
+    "proofTitle": "Why does it work?",
+    "proof": "The idea starts from a right triangle. When we see $\\sqrt{a^2 - x^2}$, we think: this looks like a leg of a triangle with hypotenuse $a$. If $x = a\\sin\\theta$, then $a^2 - x^2 = a^2(1 - \\sin^2\\theta) = a^2\\cos^2\\theta$ by the Pythagorean identity, so $\\sqrt{a^2 - x^2} = a\\cos\\theta$ — the radical disappears and becomes a simple monomial. For $\\sqrt{a^2 + x^2}$, the triangle has legs $a$ and $x$ and hypotenuse $\\sqrt{a^2+x^2}$. With $x = a\\tan\\theta$: $a^2 + a^2\\tan^2\\theta = a^2\\sec^2\\theta$, so $\\sqrt{a^2+x^2} = a\\sec\\theta$. For $\\sqrt{x^2 - a^2}$, we use $x = a\\sec\\theta$ and $\\sec^2\\theta - 1 = \\tan^2\\theta$. In all cases, the same logic: the Pythagorean identity \"absorbs\" the square root, turning it into a trigonometric monomial. The substitution is not arbitrary — each form of radical corresponds to a side of the right triangle.",
+    "examples": [
+      {
+        "problem": "Compute $\\int \\frac{dx}{\\sqrt{4-x^2}}$.",
+        "solution": "With $x = 2\\sin\\theta$, $dx = 2\\cos\\theta\\,d\\theta$ and $\\sqrt{4-x^2} = 2\\cos\\theta$. The integral becomes $\\int \\frac{2\\cos\\theta}{2\\cos\\theta}d\\theta = \\int d\\theta = \\theta + C = \\arcsin\\!\\left(\\frac{x}{2}\\right) + C$."
+      },
+      {
+        "problem": "Compute $\\int \\frac{x^2}{\\sqrt{x^2+9}}\\,dx$.",
+        "solution": "With $x = 3\\tan\\theta$, $dx = 3\\sec^2\\theta\\,d\\theta$, $\\sqrt{x^2+9} = 3\\sec\\theta$. The integral becomes $\\int \\frac{9\\tan^2\\theta}{3\\sec\\theta} \\cdot 3\\sec^2\\theta\\,d\\theta = 9\\int \\tan^2\\theta\\sec\\theta\\,d\\theta$. Using $\\tan^2\\theta = \\sec^2\\theta - 1$: $9\\int(\\sec^3\\theta - \\sec\\theta)d\\theta$. Solving and converting back to $x$: $\\frac{x\\sqrt{x^2+9}}{2} - \\frac{9}{2}\\ln\\!\\left|\\frac{x+\\sqrt{x^2+9}}{3}\\right| + C$."
+      }
+    ]
+  },
+  "partial_fractions": {
+    "intuitionTitle": "The Intuition",
+    "intuition": "When we have a fraction of polynomials, we can break it into simpler fractions — it's like decomposing a numerical fraction: $\\frac{5}{6} = \\frac{1}{2} + \\frac{1}{3}$. Each factor of the denominator contributes a partial fraction, and each of those is easy to integrate. The crucial step is factoring the denominator and finding the coefficients.",
+    "formulaLatex": "\\frac{P(x)}{(x-a)(x-b)} = \\frac{A}{x-a} + \\frac{B}{x-b}",
+    "proofTitle": "Why does it work?",
+    "proof": "The idea is that polynomial fractions can be taken apart into simpler pieces — just like $\\frac{5}{6} = \\frac{1}{2} + \\frac{1}{3}$. The Decomposition Theorem guarantees: if the degree of the numerator is less than the degree of the denominator and the denominator is factored, there exists a unique partial fraction decomposition. To find the coefficients, we multiply both sides by the original denominator, obtaining an equality between polynomials. Substituting strategic values of $x$ (the roots of the denominator), each equation reveals a coefficient directly. Then, each fraction $\\frac{A}{x-a}$ integrates as $A\\ln|x-a|$ — something much simpler than the original fraction. We are not simplifying the function — we are rewriting it in a form where each piece is immediately integrable.",
+    "examples": [
+      {
+        "problem": "Compute $\\int \\frac{5x+1}{x^2-x-2}\\,dx$.",
+        "solution": "Factoring: $x^2-x-2 = (x-2)(x+1)$. We decompose: $\\frac{5x+1}{(x-2)(x+1)} = \\frac{A}{x-2} + \\frac{B}{x+1}$. Multiplying: $5x+1 = A(x+1) + B(x-2)$. With $x=2$: $11 = 3A \\Rightarrow A = \\frac{11}{3}$. With $x=-1$: $-4 = -3B \\Rightarrow B = \\frac{4}{3}$. Therefore $\\int\\frac{11/3}{x-2}+\\frac{4/3}{x+1}\\,dx = \\frac{11}{3}\\ln|x-2| + \\frac{4}{3}\\ln|x+1| + C$."
+      },
+      {
+        "problem": "Compute $\\int \\frac{3}{x^2-9}\\,dx$.",
+        "solution": "$x^2-9 = (x-3)(x+3)$. Decomposition: $\\frac{3}{(x-3)(x+3)} = \\frac{A}{x-3}+\\frac{B}{x+3}$. $3 = A(x+3)+B(x-3)$. With $x=3$: $A = \\frac{1}{2}$. With $x=-3$: $B = -\\frac{1}{2}$. Integral: $\\frac{1}{2}\\ln|x-3| - \\frac{1}{2}\\ln|x+3| + C = \\frac{1}{2}\\ln\\!\\left|\\frac{x-3}{x+3}\\right| + C$."
+      }
+    ]
+  },
+  "improper": {
+    "intuitionTitle": "The Intuition",
+    "intuition": "An improper integral has some kind of \"problem\": the interval goes to infinity, or the integrand has a vertical asymptote. It seems impossible to compute the area of an infinite region, but sometimes that area is finite! The idea is to use limits: we replace the infinity (or the problematic point) with a variable and see if the result converges.",
+    "formulaLatex": "\\int_a^{\\infty} f(x)\\,dx = \\lim_{b \\to \\infty} \\int_a^b f(x)\\,dx",
+    "proofTitle": "Why does it work?",
+    "proof": "How can an infinite region have finite area? The answer lies in how fast the function goes to zero. We define $\\int_a^{\\infty} f(x)\\,dx = \\lim_{b \\to \\infty} \\int_a^b f(x)\\,dx$: we compute the integral up to $b$ and see if the result stabilizes as $b$ grows. The revealing example: $\\int_1^{\\infty} \\frac{1}{x^p}\\,dx$ converges if $p > 1$ and diverges if $p \\leq 1$. Why? The antiderivative is $\\frac{x^{1-p}}{1-p}$, and when $1-p < 0$ (i.e., $p > 1$), $x^{1-p} \\to 0$ as $x \\to \\infty$ — the function falls fast enough for the sum of all area slices to converge. With $p = 1$ we get $\\ln x$, which grows without bound. For integrals with a vertical asymptote (like $\\int_0^1 \\frac{1}{\\sqrt{x}}\\,dx$), the logic is the same: we replace the problematic point with a limit and check if the area stabilizes. Infinity does not automatically mean divergent — it depends on how fast the function behaves.",
+    "examples": [
+      {
+        "problem": "Compute $\\int_1^{\\infty} \\frac{1}{x^2}\\,dx$.",
+        "solution": "$\\lim_{b \\to \\infty}\\int_1^b x^{-2}dx = \\lim_{b \\to \\infty}\\left[-\\frac{1}{x}\\right]_1^b = \\lim_{b \\to \\infty}\\left(-\\frac{1}{b}+1\\right) = 1$. The integral converges to $1$."
+      },
+      {
+        "problem": "Determine whether $\\int_0^1 \\frac{1}{\\sqrt{x}}\\,dx$ converges.",
+        "solution": "There is a discontinuity at $x=0$. $\\lim_{a \\to 0^+}\\int_a^1 x^{-1/2}dx = \\lim_{a \\to 0^+}[2\\sqrt{x}]_a^1 = \\lim_{a \\to 0^+}(2-2\\sqrt{a}) = 2$. It converges to $2$."
+      }
+    ]
+  },
+  "separable": {
+    "intuitionTitle": "The Intuition",
+    "intuition": "A separable ODE is one where we can put everything that depends on $y$ on one side and everything that depends on $x$ on the other. It's like separating ingredients into two containers: the \"$y$-ingredients\" on one side, the \"$x$-ingredients\" on the other. Then we integrate each side separately.",
+    "formulaLatex": "\\frac{dy}{dx} = f(x)g(y) \\implies \\int \\frac{dy}{g(y)} = \\int f(x)\\,dx",
+    "proofTitle": "Why does it work?",
+    "proof": "Separation of variables seems informal — \"we move $dx$ to the other side\" — but it has a rigorous foundation. If $\\frac{dy}{dx} = f(x)g(y)$ and $g(y) \\neq 0$, we divide: $\\frac{1}{g(y)}\\frac{dy}{dx} = f(x)$. Integrating both sides with respect to $x$: $\\int \\frac{1}{g(y)}\\frac{dy}{dx}\\,dx = \\int f(x)\\,dx$. By the substitution theorem (with $y = y(x)$), the left side is $\\int \\frac{1}{g(y)}\\,dy$. Done: $\\int \\frac{dy}{g(y)} = \\int f(x)\\,dx$, in a completely rigorous way. The \"separation\" is not magical manipulation with differentials — it is integration of both sides followed by a substitution. The result is the same as the informal notation, but now we know exactly why it's valid: the chain rule and the substitution theorem working together.",
+    "examples": [
+      {
+        "problem": "Solve $\\frac{dy}{dx} = xy$ with $y(0) = 2$.",
+        "solution": "Separating: $\\frac{dy}{y} = x\\,dx$. Integrating: $\\ln|y| = \\frac{x^2}{2} + C$, so $y = Ae^{x^2/2}$. With $y(0) = 2$: $A = 2$. Solution: $y = 2e^{x^2/2}$."
+      },
+      {
+        "problem": "Solve $\\frac{dy}{dx} = \\frac{x^2}{y}$.",
+        "solution": "Separating: $y\\,dy = x^2\\,dx$. Integrating: $\\frac{y^2}{2} = \\frac{x^3}{3} + C$, so $y^2 = \\frac{2x^3}{3} + C_1$, that is, $y = \\pm\\sqrt{\\frac{2x^3}{3} + C_1}$."
+      }
+    ]
+  },
+  "first_order_linear": {
+    "intuitionTitle": "The Intuition",
+    "intuition": "A first-order linear ODE has the form $y' + P(x)y = Q(x)$. The brilliant trick is to multiply the equation by an \"integrating factor\" $\\mu(x) = e^{\\int P(x)dx}$ that transforms the left side into the exact derivative of $\\mu \\cdot y$. It's like finding the magic multiplier that makes everything fit into a product derivative.",
+    "formulaLatex": "y' + P(x)y = Q(x) \\implies y = \\frac{1}{\\mu}\\int \\mu\\,Q\\,dx, \\quad \\mu = e^{\\int P\\,dx}",
+    "proofTitle": "Why does it work?",
+    "proof": "Where does the integrating factor $\\mu = e^{\\int P\\,dx}$ come from? It's not magic — it's reverse engineering. We want to multiply $y' + Py = Q$ by some function $\\mu(x)$ such that the left side becomes $(\\mu y)'$. Expanding by the product rule: $(\\mu y)' = \\mu' y + \\mu y'$. Comparing with $\\mu(y' + Py) = \\mu y' + \\mu P y$, we need $\\mu' = \\mu P$, that is, $\\frac{\\mu'}{\\mu} = P$. Integrating: $\\ln|\\mu| = \\int P\\,dx$, so $\\mu = e^{\\int P\\,dx}$. With this $\\mu$, the equation becomes $(\\mu y)' = \\mu Q$. Integrating: $\\mu y = \\int \\mu Q\\,dx + C$. The integrating factor is the unique function that transforms the equation into a product derivative — and the beauty is that $\\frac{\\mu'}{\\mu} = P$ is, itself, a separable ODE that we already know how to solve.",
+    "examples": [
+      {
+        "problem": "Solve $y' + 2y = e^{-x}$.",
+        "solution": "$P(x) = 2$, $\\mu = e^{2x}$. Multiplying: $(e^{2x}y)' = e^{2x} \\cdot e^{-x} = e^x$. Integrating: $e^{2x}y = e^x + C$, so $y = e^{-x} + Ce^{-2x}$."
+      },
+      {
+        "problem": "Solve $y' - \\frac{y}{x} = x^2$ for $x > 0$.",
+        "solution": "$P(x) = -\\frac{1}{x}$, $\\mu = e^{-\\ln x} = \\frac{1}{x}$. Multiplying: $\\left(\\frac{y}{x}\\right)' = x$. Integrating: $\\frac{y}{x} = \\frac{x^2}{2} + C$, so $y = \\frac{x^3}{2} + Cx$."
+      }
+    ]
+  },
+  "exact": {
+    "intuitionTitle": "The Intuition",
+    "intuition": "An exact equation $M\\,dx + N\\,dy = 0$ is one where there already exists a function $F(x,y)$ whose total differential is exactly $M\\,dx + N\\,dy$. That is, $dF = 0$, so $F(x,y) = C$ is the solution. The test is simple: if $\\frac{\\partial M}{\\partial y} = \\frac{\\partial N}{\\partial x}$, the equation is exact. It's like discovering that a combination of pieces forms a perfect puzzle.",
+    "formulaLatex": "M\\,dx + N\\,dy = 0 \\text{ é exata se } \\frac{\\partial M}{\\partial y} = \\frac{\\partial N}{\\partial x}",
+    "proofTitle": "Why does it work?",
+    "proof": "Imagine a surface $F(x,y)$ in space. The level curves $F(x,y) = C$ are like altitude lines on a topographic map. If we move along a level curve, $F$ doesn't change: $dF = F_x\\,dx + F_y\\,dy = 0$. This is exactly the form $M\\,dx + N\\,dy = 0$ with $M = F_x$ and $N = F_y$. The condition $M_y = N_x$ checks whether such a surface $F$ exists: by Schwarz's theorem, if $F$ exists, then $F_{xy} = F_{yx}$, so $M_y = N_x$. To find $F$, we integrate $M$ with respect to $x$: $F = \\int M\\,dx + g(y)$, where $g(y)$ is a \"constant\" that may depend on $y$. We determine $g(y)$ by requiring $F_y = N$: this gives an equation for $g'(y)$ that involves only $y$. The solution to the ODE is $F(x,y) = C$ — we are finding the level curves of the surface.",
+    "examples": [
+      {
+        "problem": "Solve $(2xy + 3)dx + (x^2 + 4y)dy = 0$.",
+        "solution": "Verification: $M_y = 2x$ and $N_x = 2x$ — exact! $F = \\int (2xy+3)dx = x^2y + 3x + g(y)$. $F_y = x^2 + g'(y) = x^2 + 4y \\implies g'(y) = 4y \\implies g(y) = 2y^2$. Solution: $x^2y + 3x + 2y^2 = C$."
+      },
+      {
+        "problem": "Solve $(ye^{xy} + 2x)dx + (xe^{xy} + 1)dy = 0$.",
+        "solution": "$M_y = e^{xy} + xye^{xy}$ and $N_x = e^{xy} + xye^{xy}$ — exact! $F = \\int (xe^{xy}+1)dy = e^{xy} + y + h(x)$. $F_x = ye^{xy} + h'(x) = ye^{xy} + 2x \\implies h'(x) = 2x \\implies h(x) = x^2$. Solution: $e^{xy} + y + x^2 = C$."
+      }
+    ]
+  },
+  "homogeneous": {
+    "intuitionTitle": "The Intuition",
+    "intuition": "A homogeneous ODE is one where $\\frac{dy}{dx}$ depends only on the ratio $\\frac{y}{x}$. The substitution $v = \\frac{y}{x}$ (that is, $y = vx$) transforms the equation into a separable ODE in $v$ and $x$. The intuition is that if the equation \"doesn't distinguish scale\" (multiplying $x$ and $y$ by the same factor changes nothing), then the ratio $v = y/x$ is the natural variable.",
+    "formulaLatex": "\\frac{dy}{dx} = \\phi\\!\\left(\\frac{y}{x}\\right) \\implies v + x\\frac{dv}{dx} = \\phi(v), \\quad v = \\frac{y}{x}",
+    "proofTitle": "Why does it work?",
+    "proof": "A homogeneous ODE of degree 0 has the property $f(tx,ty) = f(x,y)$ for all $t > 0$: multiplying $x$ and $y$ by the same factor changes nothing. Setting $t = 1/x$: $f(x,y) = f(1, y/x) = \\phi(y/x)$. This proves that $\\frac{dy}{dx}$ depends only on the ratio $v = y/x$, not on $x$ and $y$ separately. The substitution $y = vx$ is natural: if the ratio is what matters, we make it the new variable. Differentiating $y = vx$ by the product rule: $\\frac{dy}{dx} = v + x\\frac{dv}{dx}$. Substituting into the ODE: $v + x\\frac{dv}{dx} = \\phi(v)$, so $x\\frac{dv}{dx} = \\phi(v) - v$. This equation is separable: $\\frac{dv}{\\phi(v) - v} = \\frac{dx}{x}$. Scale invariance is what guaranteed that $v = y/x$ would reduce the equation to something simpler — it was not a random substitution, it was the natural substitution for the problem.",
+    "examples": [
+      {
+        "problem": "Solve $\\frac{dy}{dx} = \\frac{x + y}{x}$.",
+        "solution": "Rewriting: $\\frac{dy}{dx} = 1 + \\frac{y}{x}$. With $v = y/x$: $v + xv' = 1 + v$, so $xv' = 1$, that is, $\\frac{dv}{1} = \\frac{dx}{x}$. Integrating: $v = \\ln|x| + C$, therefore $y = x(\\ln|x| + C)$."
+      },
+      {
+        "problem": "Solve $(x^2 + y^2)dx - 2xy\\,dy = 0$.",
+        "solution": "$\\frac{dy}{dx} = \\frac{x^2+y^2}{2xy}$. With $y = vx$: $v + xv' = \\frac{1+v^2}{2v}$. Then $xv' = \\frac{1+v^2}{2v} - v = \\frac{1-v^2}{2v}$. Separating: $\\frac{2v}{1-v^2}dv = \\frac{dx}{x}$. Integrating: $-\\ln|1-v^2| = \\ln|x| + C_1$, so $\\frac{1}{1-v^2} = Ax$. Substituting back: $\\frac{x^2}{x^2-y^2} = Ax$, that is, $x = A(x^2-y^2)$."
+      }
+    ]
+  },
+  "second_order_linear": {
+    "intuitionTitle": "The Intuition",
+    "intuition": "Second-order linear ODEs with constant coefficients ($ay'' + by' + cy = 0$) model oscillations — springs, circuits, pendulums. The brilliant idea is to guess $y = e^{rx}$ and see which value of $r$ works. This transforms the ODE into a quadratic equation (the characteristic equation), and the roots $r$ determine the behavior of the solution: oscillating, decaying, or growing.",
+    "formulaLatex": "ay'' + by' + cy = 0 \\implies ar^2 + br + c = 0",
+    "proofTitle": "Why does it work?",
+    "proof": "Why do we try $y = e^{rx}$? Because differentiating an exponential returns an exponential: $y' = re^{rx}$, $y'' = r^2 e^{rx}$. Substituting into $ay'' + by' + cy = 0$: $e^{rx}(ar^2 + br + c) = 0$. Since $e^{rx}$ is never zero, we must have $ar^2 + br + c = 0$ — the characteristic equation, a simple quadratic. If there are two distinct real roots $r_1, r_2$: the general solution is $y = C_1 e^{r_1 x} + C_2 e^{r_2 x}$. If the root is repeated $r$: one solution is $e^{rx}$, but we need two independent ones; the second is $xe^{rx}$, where the factor $x$ ensures independence. If the roots are complex $\\alpha \\pm \\beta i$: by Euler's formula, $e^{(\\alpha + \\beta i)x} = e^{\\alpha x}(\\cos \\beta x + i\\sin \\beta x)$. Taking real and imaginary parts: $e^{\\alpha x}\\cos \\beta x$ and $e^{\\alpha x}\\sin \\beta x$. The $\\alpha$ controls growth or decay and the $\\beta$ controls the oscillation — exactly what we observe in springs, pendulums, and electrical circuits.",
+    "examples": [
+      {
+        "problem": "Solve $y'' - 5y' + 6y = 0$.",
+        "solution": "Characteristic equation: $r^2 - 5r + 6 = 0 \\implies (r-2)(r-3) = 0$, so $r_1 = 2$, $r_2 = 3$. General solution: $y = C_1 e^{2x} + C_2 e^{3x}$."
+      },
+      {
+        "problem": "Solve $y'' + 4y = 0$.",
+        "solution": "Characteristic equation: $r^2 + 4 = 0 \\implies r = \\pm 2i$. Complex roots with $\\alpha = 0$, $\\beta = 2$. General solution: $y = C_1 \\cos(2x) + C_2 \\sin(2x)$."
+      }
+    ]
+  },
+  "undetermined_coeffs": {
+    "intuitionTitle": "The Intuition",
+    "intuition": "The method of undetermined coefficients solves non-homogeneous ODEs ($ay'' + by' + cy = g(x)$) when $g(x)$ is a polynomial, exponential, sine/cosine, or a combination of these. We \"guess\" that the particular solution has the same form as $g(x)$, substitute into the ODE, and determine the coefficients by comparing both sides. The general solution is: homogeneous + particular.",
+    "formulaLatex": "y = y_h + y_p \\quad \\text{onde } y_p \\text{ tem a forma de } g(x)",
+    "proofTitle": "Why does it work?",
+    "proof": "The \"guess\" has a precise logic behind it. Differentiating a polynomial gives another polynomial; differentiating $e^{kx}$ gives a multiple of $e^{kx}$; differentiating $\\sin$ and $\\cos$ gives $\\cos$ and $-\\sin$. These families are closed under differentiation — they don't escape from themselves. If $g(x) = e^{5x}$, then $y_p$, $y_p'$, $y_p''$ are all multiples of $e^{5x}$, and the equation $ay_p'' + by_p' + cy_p = g(x)$ becomes an algebraic equation for the coefficient. The superposition principle guarantees that $y = y_h + y_p$ is the general solution: $y_h$ captures all solutions of the homogeneous equation, and $y_p$ adjusts for the forcing term. Special case: if $g(x)$ is already a solution of the homogeneous equation (for example $g(x) = e^{r_1 x}$), the guess $Ae^{r_1 x}$ gives zero when substituted into the homogeneous part. We multiply by $x$: $y_p = Axe^{r_1 x}$. If the root is repeated, by $x^2$. Each factor of $x$ ensures linear independence, providing a genuine particular solution.",
+    "examples": [
+      {
+        "problem": "Solve $y'' - 3y' + 2y = 4e^{5x}$.",
+        "solution": "Homogeneous: $r^2-3r+2=0 \\implies r=1,2$, so $y_h = C_1e^x + C_2e^{2x}$. Particular: we guess $y_p = Ae^{5x}$. $y_p'' - 3y_p' + 2y_p = 25Ae^{5x} - 15Ae^{5x} + 2Ae^{5x} = 12Ae^{5x} = 4e^{5x}$. So $A = \\frac{1}{3}$. Solution: $y = C_1e^x + C_2e^{2x} + \\frac{1}{3}e^{5x}$."
+      },
+      {
+        "problem": "Solve $y'' + y = 3\\sin(2x)$.",
+        "solution": "Homogeneous: $r^2+1=0 \\implies r = \\pm i$, $y_h = C_1\\cos x + C_2\\sin x$. We guess $y_p = A\\cos(2x) + B\\sin(2x)$. Substituting: $-4A\\cos(2x) - 4B\\sin(2x) + A\\cos(2x) + B\\sin(2x) = 3\\sin(2x)$. So $-3A = 0$ and $-3B = 3$, that is, $A = 0$, $B = -1$. Solution: $y = C_1\\cos x + C_2\\sin x - \\sin(2x)$."
+      }
+    ]
+  },
+  "laplace": {
+    "intuitionTitle": "The Intuition",
+    "intuition": "The Laplace Transform converts a (difficult) ODE into an (easy) algebraic equation. The idea is to transform the function from the \"time domain\" $t$ to the \"frequency domain\" $s$, where derivatives become multiplications by $s$. We solve the algebra, and then apply the inverse transform to return to the $t$ domain.",
+    "formulaLatex": "\\mathcal{L}\\{f(t)\\} = F(s) = \\int_0^{\\infty} e^{-st} f(t)\\,dt",
+    "proofTitle": "Why does it work?",
+    "proof": "The brilliant idea is to convert derivatives into multiplications — transforming differential equations into algebra. The central property: $\\mathcal{L}\\{f'(t)\\} = sF(s) - f(0)$, obtained by integration by parts: $\\int_0^\\infty e^{-st}f'(t)\\,dt = [e^{-st}f(t)]_0^\\infty + s\\int_0^\\infty e^{-st}f(t)\\,dt = -f(0) + sF(s)$ (assuming $f(t)e^{-st} \\to 0$ as $t \\to \\infty$). Each derivative becomes multiplication by $s$, and the initial conditions enter automatically. Thus, $y'' + ay' + by = g(t)$ becomes $(s^2Y - sy(0) - y'(0)) + a(sY - y(0)) + bY = G(s)$ — an algebraic equation in $Y(s)$ that we solve with basic algebra. Then, consulting a table of known pairs, we apply the inverse transform to return to the time domain. It's like translating a difficult problem into a language where it becomes easy, solving it there, and translating the answer back.",
+    "examples": [
+      {
+        "problem": "Solve $y' + 2y = 0$, $y(0) = 3$, using Laplace.",
+        "solution": "Applying $\\mathcal{L}$: $sY(s) - y(0) + 2Y(s) = 0$, so $(s+2)Y(s) = 3$. $Y(s) = \\frac{3}{s+2}$. Inverting: $y(t) = 3e^{-2t}$."
+      },
+      {
+        "problem": "Solve $y'' + y = 0$, $y(0) = 1$, $y'(0) = 0$.",
+        "solution": "Applying $\\mathcal{L}$: $s^2Y - sy(0) - y'(0) + Y = 0$, so $(s^2+1)Y = s$. $Y(s) = \\frac{s}{s^2+1}$. From the table: $\\mathcal{L}^{-1}\\left\\{\\frac{s}{s^2+1}\\right\\} = \\cos(t)$. Solution: $y(t) = \\cos(t)$."
+      }
+    ]
+  }
+}

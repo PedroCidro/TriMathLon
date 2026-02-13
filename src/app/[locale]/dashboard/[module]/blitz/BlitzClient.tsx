@@ -2,12 +2,13 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { ArrowLeft, Zap, RotateCcw, Trophy, Crown, Star } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
 import MathRenderer from '@/components/ui/MathRenderer';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
 import { curriculum } from '@/data/curriculum';
+import { useTranslations } from 'next-intl';
 
 type Question = {
     id: string;
@@ -40,6 +41,9 @@ function shuffleArray<T>(arr: T[]): T[] {
 
 export default function BlitzClient({ moduleId }: { moduleId: string }) {
     const moduleData = curriculum.find(m => m.id === moduleId);
+    const t = useTranslations('Blitz');
+    const tc = useTranslations('Curriculum');
+    const tCommon = useTranslations('Common');
 
     const [gameState, setGameState] = useState<GameState>('ready');
     const [questions, setQuestions] = useState<Question[]>([]);
@@ -231,17 +235,19 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
         );
     };
 
+    const moduleTitle = tc.has(`${moduleId}.title`) ? tc(`${moduleId}.title`) : (moduleData?.title || moduleId);
+
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
             {/* Top Bar */}
             <header className="bg-white border-b border-gray-200 px-3 sm:px-6 py-3 sm:py-4 flex items-center justify-between sticky top-0 z-20">
                 <div className="flex items-center gap-4">
-                    <Link href={`/dashboard/${moduleId}`} className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500">
+                    <Link href={{ pathname: '/dashboard/[module]', params: { module: moduleId } }} className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500">
                         <ArrowLeft className="w-6 h-6" />
                     </Link>
                     <div className="flex items-center gap-2">
                         <Zap className="w-5 h-5 text-yellow-500 fill-yellow-500" />
-                        <h1 className="text-base sm:text-lg font-bold text-gray-900">Blitz — {moduleData?.title}</h1>
+                        <h1 className="text-base sm:text-lg font-bold text-gray-900">{t('title')} — {moduleTitle}</h1>
                     </div>
                 </div>
 
@@ -287,19 +293,19 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
                         <div className="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
                             <Zap className="w-10 h-10 text-yellow-500 fill-yellow-500" />
                         </div>
-                        <h2 className="text-3xl font-bold text-gray-900 mb-3">Modo Blitz</h2>
+                        <h2 className="text-3xl font-bold text-gray-900 mb-3">{t('title')}</h2>
                         <p className="text-gray-500 text-lg mb-2">
-                            Escolha a resposta correta o mais rapido possivel em <span className="font-bold text-gray-900">3 minutos</span>.
+                            {t('readyDesc', { duration: t('readyDuration') })}
                         </p>
                         <p className="text-gray-400 mb-8">
-                            3 erros e o jogo acaba. Problemas ficam progressivamente mais dificeis.
+                            {t('readySubdesc')}
                         </p>
                         <button
                             onClick={startGame}
                             disabled={loading}
                             className="px-10 py-4 bg-yellow-500 text-white rounded-xl font-bold text-lg shadow-[0_4px_0_0_rgb(202,138,4)] hover:-translate-y-1 hover:shadow-[0_6px_0_0_rgb(202,138,4)] active:translate-y-[2px] active:shadow-none transition-all"
                         >
-                            {loading ? 'Carregando...' : 'Comecar!'}
+                            {loading ? tCommon('loading') : t('startButton')}
                         </button>
                     </motion.div>
                 )}
@@ -380,20 +386,20 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
                                     className="inline-flex items-center gap-1 px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-bold mb-3"
                                 >
                                     <Star className="w-4 h-4 fill-yellow-500" />
-                                    Novo recorde!
+                                    {t('newRecord')}
                                 </motion.div>
                             )}
                             <div className="text-5xl sm:text-7xl font-bold text-yellow-500 mb-2">{score}</div>
                             <h2 className="text-2xl font-bold text-gray-900 mb-1">
-                                {strikes >= MAX_STRIKES ? 'Game Over!' : 'Tempo Esgotado!'}
+                                {strikes >= MAX_STRIKES ? t('gameOver') : t('timeUp')}
                             </h2>
                             <p className="text-gray-500 mb-1">
-                                {score === 1 ? '1 problema resolvido' : `${score} problemas resolvidos`}
-                                {' '}em {formatTime(GAME_DURATION - timeLeft)}
+                                {t('problemsSolved', { count: score })}
+                                {' '}{formatTime(GAME_DURATION - timeLeft)}
                             </p>
                             <p className="text-gray-400 text-sm">
-                                {strikes} {strikes === 1 ? 'erro' : 'erros'}
-                                {personalBest > 0 && ` · Melhor: ${personalBest}`}
+                                {t('errorsCount', { count: strikes })}
+                                {personalBest > 0 && ` · ${t('bestScore', { score: personalBest })}`}
                             </p>
                         </div>
 
@@ -402,7 +408,7 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
                             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm mb-6 overflow-hidden">
                                 <div className="px-5 py-3 border-b border-gray-100 flex items-center gap-2">
                                     <Crown className="w-4 h-4 text-yellow-500" />
-                                    <span className="text-sm font-bold text-gray-900">Top 10 — {moduleData?.title}</span>
+                                    <span className="text-sm font-bold text-gray-900">{t('topLeaderboard', { module: moduleTitle })}</span>
                                 </div>
                                 <div className="divide-y divide-gray-50">
                                     {leaderboard.map((entry, i) => (
@@ -414,7 +420,7 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
                                                 {i < 3 ? ['1o', '2o', '3o'][i] : `${i + 1}o`}
                                             </span>
                                             <span className="flex-1 text-sm font-medium text-gray-700 truncate text-left">
-                                                {entry.full_name || 'Anonimo'}
+                                                {entry.full_name || t('anonymous')}
                                             </span>
                                             <span className="text-sm font-bold text-gray-900">{entry.score}</span>
                                         </div>
@@ -424,7 +430,7 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
                         )}
 
                         {savingScore && (
-                            <p className="text-xs text-gray-400 mb-4">Salvando pontuacao...</p>
+                            <p className="text-xs text-gray-400 mb-4">{t('savingScore')}</p>
                         )}
 
                         {/* Action buttons */}
@@ -437,13 +443,13 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
                                 className="px-6 sm:px-8 py-2.5 sm:py-3 bg-yellow-500 text-white rounded-xl font-bold transition-all hover:-translate-y-0.5 shadow-lg flex items-center justify-center gap-2"
                             >
                                 <RotateCcw className="w-5 h-5" />
-                                Jogar Novamente
+                                {tCommon('playAgain')}
                             </button>
                             <Link
-                                href={`/dashboard/${moduleId}`}
+                                href={{ pathname: '/dashboard/[module]', params: { module: moduleId } }}
                                 className="px-6 sm:px-8 py-2.5 sm:py-3 border-2 border-gray-200 rounded-xl font-bold text-gray-600 hover:border-gray-400 transition-all flex items-center justify-center"
                             >
-                                Voltar
+                                {tCommon('back')}
                             </Link>
                         </div>
                     </motion.div>

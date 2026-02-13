@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { ArrowRight, Check, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { curriculum } from '@/data/curriculum';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 
 const MODULE_COLORS: Record<string, { accent: string; bg: string; border: string }> = {
     derivadas: { accent: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200' },
@@ -30,6 +31,9 @@ export default function PremiumClient({
     premiumHeadline,
 }: PremiumClientProps) {
     const [loading, setLoading] = useState(false);
+    const t = useTranslations('Premium');
+    const tc = useTranslations('Curriculum');
+    const tCommon = useTranslations('Common');
 
     const isInstitutional = !!institutionId;
     const price = isInstitutional ? 'R$ 14,95' : 'R$ 29,90';
@@ -53,7 +57,7 @@ export default function PremiumClient({
                 throw new Error('No URL returned from checkout session');
             }
         } catch {
-            toast.error('Erro ao iniciar checkout. Tente novamente.');
+            toast.error(t('checkoutError'));
         } finally {
             setLoading(false);
         }
@@ -61,7 +65,6 @@ export default function PremiumClient({
 
     const premiumTopics = curriculum.map((mod) => ({
         id: mod.id,
-        title: mod.title,
         topics: mod.topics.slice(3),
     }));
 
@@ -87,17 +90,17 @@ export default function PremiumClient({
                     )}
 
                     <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight text-gray-900 leading-[1.1]">
-                        Aprenda sem limites.
+                        {t('heroTitle')}
                     </h1>
 
                     <p className="text-xl text-gray-500 max-w-lg mx-auto">
-                        Acesso completo a todos os topicos de Derivadas, Integrais e EDOs.
+                        {t('heroSubtitle')}
                     </p>
 
                     <div className="pt-4">
                         <div className="flex items-baseline justify-center gap-1 mb-6">
                             <span className="text-3xl sm:text-5xl font-bold text-gray-900">{price}</span>
-                            <span className="text-xl text-gray-400 font-medium">/mes</span>
+                            <span className="text-xl text-gray-400 font-medium">/{tCommon('month')}</span>
                         </div>
 
                         <button
@@ -105,12 +108,12 @@ export default function PremiumClient({
                             disabled={loading}
                             className="inline-flex items-center gap-3 bg-blue-600 text-white font-bold py-4 px-10 rounded-full text-lg shadow-[0_4px_0_0_rgb(29,78,216)] active:shadow-none active:translate-y-[4px] transition-all hover:bg-blue-500 hover:-translate-y-1 hover:shadow-[0_6px_0_0_rgb(29,78,216)] disabled:opacity-60 disabled:pointer-events-none"
                         >
-                            {loading ? 'Processando...' : 'Assinar Premium'}
+                            {loading ? t('processing') : t('subscribe')}
                             {!loading && <ArrowRight className="w-5 h-5" />}
                         </button>
 
                         <p className="text-sm text-gray-400 mt-4 font-medium">
-                            Cancele quando quiser.
+                            {t('cancelAnytime')}
                         </p>
                     </div>
                 </div>
@@ -120,10 +123,10 @@ export default function PremiumClient({
             <section className="bg-gray-50 px-6 py-20">
                 <div className="max-w-5xl mx-auto">
                     <h2 className="text-3xl font-bold text-gray-900 text-center mb-4">
-                        O que voce desbloqueia
+                        {t('whatYouUnlock')}
                     </h2>
                     <p className="text-gray-500 text-center mb-12 text-lg">
-                        13 topicos avancados em 3 modulos
+                        {t('unlockSubtitle')}
                     </p>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
@@ -132,7 +135,7 @@ export default function PremiumClient({
                             return (
                                 <div key={mod.id} className={`bg-white rounded-2xl border-2 ${colors.border} p-4 sm:p-6`}>
                                     <h3 className={`font-bold text-lg mb-5 ${colors.accent}`}>
-                                        {mod.title}
+                                        {tc(`${mod.id}.title`)}
                                     </h3>
                                     <div className="space-y-3">
                                         {mod.topics.map((topic) => (
@@ -141,8 +144,8 @@ export default function PremiumClient({
                                                     <Check className={`w-3.5 h-3.5 ${colors.accent}`} />
                                                 </div>
                                                 <div>
-                                                    <span className="font-bold text-gray-900 text-sm">{topic.title}</span>
-                                                    <p className="text-gray-400 text-xs">{topic.description}</p>
+                                                    <span className="font-bold text-gray-900 text-sm">{tc(`${topic.id}.title`)}</span>
+                                                    <p className="text-gray-400 text-xs">{tc(`${topic.id}.description`)}</p>
                                                 </div>
                                             </div>
                                         ))}
@@ -159,12 +162,12 @@ export default function PremiumClient({
                                 <Eye className="w-5 h-5 text-blue-600" />
                             </div>
                             <div>
-                                <h3 className="font-bold text-lg text-gray-900">Modo Reconhecimento</h3>
-                                <p className="text-gray-400 text-sm">Disponivel em todos os topicos</p>
+                                <h3 className="font-bold text-lg text-gray-900">{t('recognitionMode')}</h3>
+                                <p className="text-gray-400 text-sm">{t('recognitionAvailability')}</p>
                             </div>
                         </div>
                         <p className="text-gray-500 ml-14">
-                            Treine a identificacao de qual tecnica usar em cada problema — a habilidade mais importante nas provas.
+                            {t('recognitionDesc')}
                         </p>
                     </div>
                 </div>
@@ -175,7 +178,7 @@ export default function PremiumClient({
                 <div className="max-w-2xl mx-auto text-center space-y-6">
                     <div className="flex items-baseline justify-center gap-1 mb-2">
                         <span className="text-3xl sm:text-4xl font-bold text-gray-900">{price}</span>
-                        <span className="text-lg text-gray-400 font-medium">/mes</span>
+                        <span className="text-lg text-gray-400 font-medium">/{tCommon('month')}</span>
                     </div>
 
                     <button
@@ -183,12 +186,12 @@ export default function PremiumClient({
                         disabled={loading}
                         className="inline-flex items-center gap-3 bg-blue-600 text-white font-bold py-4 px-10 rounded-full text-lg shadow-[0_4px_0_0_rgb(29,78,216)] active:shadow-none active:translate-y-[4px] transition-all hover:bg-blue-500 hover:-translate-y-1 hover:shadow-[0_6px_0_0_rgb(29,78,216)] disabled:opacity-60 disabled:pointer-events-none"
                     >
-                        {loading ? 'Processando...' : 'Assinar Premium'}
+                        {loading ? t('processing') : t('subscribe')}
                         {!loading && <ArrowRight className="w-5 h-5" />}
                     </button>
 
                     <p className="text-sm text-gray-400 font-medium">
-                        Sem compromisso. Cancele a qualquer momento.
+                        {t('cancelAnytimeLong')}
                     </p>
                 </div>
             </section>

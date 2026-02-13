@@ -1,11 +1,15 @@
 'use client';
 
 import { ArrowRight, Dumbbell, Eye, BookOpen, Zap } from 'lucide-react';
-import Link from 'next/link';
+import { Link } from '@/i18n/routing';
 import { motion } from 'framer-motion';
 import MathRenderer from '@/components/ui/MathRenderer';
+import { useTranslations } from 'next-intl';
+import LocaleToggle from '@/components/ui/LocaleToggle';
 
 export default function LandingPage() {
+  const t = useTranslations('Landing');
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
       {/* Navigation */}
@@ -18,25 +22,25 @@ export default function LandingPage() {
             href="/sobre"
             className="hidden sm:flex font-bold text-gray-500 hover:text-gray-900 transition-colors"
           >
-            Sobre
+            {t('about')}
           </Link>
           <Link
-            href="/sign-in"
+            href="/sign-in/[[...sign-in]]"
             className="hidden sm:flex font-bold text-gray-900 hover:text-blue-600 transition-colors mr-4"
           >
-            Entrar
+            {t('signIn')}
           </Link>
+          <LocaleToggle />
           <Link
-            href="/sign-up"
+            href="/sign-up/[[...sign-up]]"
             className="bg-blue-600 text-white font-bold py-2.5 px-6 sm:py-3 sm:px-8 text-sm sm:text-base rounded-full shadow-[0_4px_0_0_rgb(29,78,216)] active:shadow-none active:translate-y-[4px] transition-all hover:bg-blue-500 hover:-translate-y-1 hover:shadow-[0_6px_0_0_rgb(29,78,216)]"
           >
-            Começar Agora
+            {t('getStarted')}
           </Link>
         </div>
       </nav>
 
       <main className="flex-1 flex flex-col items-center justify-center px-4 pt-10 pb-20">
-
         {/* Hero Section */}
         <div className="max-w-4xl mx-auto text-center space-y-8">
           <motion.h1
@@ -45,7 +49,7 @@ export default function LandingPage() {
             transition={{ duration: 0.6 }}
             className="text-4xl sm:text-6xl md:text-8xl font-bold tracking-tight text-gray-900 leading-[1.1]"
           >
-            Masterize o <span className="text-blue-600">Cálculo</span>.
+            {t('heroTitle')}<span className="text-blue-600">{t('heroHighlight')}</span>.
           </motion.h1>
 
           <motion.p
@@ -54,7 +58,9 @@ export default function LandingPage() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-lg sm:text-xl md:text-2xl text-gray-500 max-w-2xl mx-auto leading-relaxed"
           >
-            A melhor maneira de aprender a <em>fazer</em> matemática. Substitua palestras passivas por resolução de problemas interativa e prática deliberada.
+            {t.rich('heroSubtitle', {
+              em: (chunks) => <em>{chunks}</em>,
+            })}
           </motion.p>
 
           <motion.div
@@ -64,10 +70,10 @@ export default function LandingPage() {
             className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4"
           >
             <Link
-              href="/sign-up"
+              href="/sign-up/[[...sign-up]]"
               className="flex items-center gap-2 text-lg px-10 py-4 bg-blue-600 text-white font-bold rounded-full shadow-[0_4px_0_0_rgb(29,78,216)] active:shadow-none active:translate-y-[4px] transition-all hover:bg-blue-500 hover:-translate-y-1 hover:shadow-[0_6px_0_0_rgb(29,78,216)]"
             >
-              Começar Treino Grátis
+              {t('heroCtaFree')}
               <ArrowRight className="w-5 h-5" />
             </Link>
           </motion.div>
@@ -77,18 +83,18 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mt-24 w-full">
           {[
             {
-              title: "Derivadas",
-              desc: "Regras de derivação, regra da cadeia e taxas relacionadas.",
+              title: t('moduleDerivatives'),
+              desc: t('moduleDerivativesDesc'),
               icon: <MathRenderer latex="\frac{d}{dx}" className="text-4xl text-blue-600 font-bold" />
             },
             {
-              title: "Integrais",
-              desc: "Técnicas de integração, áreas e volumes.",
+              title: t('moduleIntegrals'),
+              desc: t('moduleIntegralsDesc'),
               icon: <MathRenderer latex="\int" className="text-5xl text-purple-600 font-bold" />
             },
             {
-              title: "EDOs",
-              desc: "Equações diferenciais de 1ª e 2ª ordem.",
+              title: t('moduleODEs'),
+              desc: t('moduleODEsDesc'),
               icon: <MathRenderer latex="\frac{dy}{dt}" className="text-3xl text-yellow-600 font-bold" />
             }
           ].map((item, i) => (
@@ -107,37 +113,36 @@ export default function LandingPage() {
             </motion.div>
           ))}
         </div>
-
       </main>
 
       {/* How it Works */}
       <section className="bg-gray-50 px-6 py-24">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-4">
-            Como funciona
+            {t('howItWorks')}
           </h2>
           <p className="text-gray-500 text-center text-lg mb-16 max-w-2xl mx-auto">
-            Cada tópico tem três modos de estudo, pensados para levar você da teoria à fluência.
+            {t('howItWorksSubtitle')}
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             {[
               {
                 icon: <BookOpen className="w-6 h-6 text-blue-600" />,
-                title: 'Aprender',
-                desc: 'Entenda a intuição por trás de cada técnica com explicações claras, provas e exemplos resolvidos passo a passo.',
+                title: t('modeLearn'),
+                desc: t('modeLearnDesc'),
                 color: 'bg-blue-50',
               },
               {
                 icon: <Dumbbell className="w-6 h-6 text-green-600" />,
-                title: 'Treinar',
-                desc: 'Resolva problemas no seu ritmo. Confira a resposta e avalie sua confiança — o sistema se adapta a você.',
+                title: t('modeTrain'),
+                desc: t('modeTrainDesc'),
                 color: 'bg-green-50',
               },
               {
                 icon: <Eye className="w-6 h-6 text-purple-600" />,
-                title: 'Reconhecer',
-                desc: 'Dado um problema, identifique qual técnica usar. Essa é a habilidade que separa quem sabe a matéria de quem passa na prova.',
+                title: t('modeRecognize'),
+                desc: t('modeRecognizeDesc'),
                 color: 'bg-purple-50',
               },
             ].map((item, i) => (
@@ -164,23 +169,14 @@ export default function LandingPage() {
       <section className="px-6 py-24">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-16">
-            O que oferecemos
+            {t('whatWeOffer')}
           </h2>
 
           <div className="space-y-12">
             {[
-              {
-                title: '22 tópicos de Cálculo I, II e III',
-                desc: 'De regra da potência até transformada de Laplace — derivadas, integrais e EDOs organizados em ordem crescente de dificuldade.',
-              },
-              {
-                title: 'Problemas com feedback na hora',
-                desc: 'Cada exercício tem resposta e autoavaliação. Você sabe exatamente onde está antes de ir para o próximo.',
-              },
-              {
-                title: 'Feito para quem aprende fazendo',
-                desc: 'Menos teoria passiva, mais resolução. O foco é colocar a caneta no papel desde o primeiro minuto.',
-              },
+              { title: t('offer1Title'), desc: t('offer1Desc') },
+              { title: t('offer2Title'), desc: t('offer2Desc') },
+              { title: t('offer3Title'), desc: t('offer3Desc') },
             ].map((item, i) => (
               <motion.div
                 key={i}
@@ -210,10 +206,10 @@ export default function LandingPage() {
             <Zap className="w-6 h-6 text-yellow-600 fill-yellow-600" />
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            Modo Blitz
+            {t('blitzMode')}
           </h2>
           <p className="text-gray-500 text-lg leading-relaxed max-w-xl mx-auto">
-            3 minutos no relógio. Máximo de problemas. 3 erros e acabou. Teste sua velocidade e consistência sob pressão — do jeito que a prova vai cobrar.
+            {t('blitzModeDesc')}
           </p>
         </div>
       </section>
@@ -222,16 +218,16 @@ export default function LandingPage() {
       <section className="px-6 py-24">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            Comece agora, de graça.
+            {t('ctaTitle')}
           </h2>
           <p className="text-gray-500 text-lg mb-8">
-            9 tópicos liberados. Sem cartão de crédito.
+            {t('ctaSubtitle')}
           </p>
           <Link
-            href="/sign-up"
+            href="/sign-up/[[...sign-up]]"
             className="inline-flex items-center gap-2 text-lg px-10 py-4 bg-blue-600 text-white font-bold rounded-full shadow-[0_4px_0_0_rgb(29,78,216)] active:shadow-none active:translate-y-[4px] transition-all hover:bg-blue-500 hover:-translate-y-1 hover:shadow-[0_6px_0_0_rgb(29,78,216)]"
           >
-            Criar Conta Grátis
+            {t('ctaButton')}
             <ArrowRight className="w-5 h-5" />
           </Link>
         </div>
