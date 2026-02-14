@@ -47,8 +47,15 @@ export default function DashboardClient({
 
             {/* Top Navigation */}
             <nav className="bg-white border-b border-gray-200 px-3 sm:px-6 py-3 sm:py-4 flex justify-between items-center sticky top-0 z-10">
-                <div className="flex items-center gap-2 font-bold text-xl tracking-tight text-gray-900">
+                <div className="flex items-center gap-3">
                     <Image src="/logo-icon.png" alt="JustMathing Logo" width={261} height={271} priority className="h-8 sm:h-10 w-auto" />
+                    <Link
+                        href="/dashboard/stats"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 hover:bg-green-100 border border-green-200 rounded-xl font-bold text-sm text-green-700 transition-colors"
+                    >
+                        <Trophy className="w-4 h-4 text-green-600" />
+                        <span>{exercisesSolved}</span>
+                    </Link>
                 </div>
 
                 <div className="flex items-center gap-3 sm:gap-5">
@@ -67,12 +74,6 @@ export default function DashboardClient({
                         <Zap className="w-4 h-4 fill-yellow-500 text-yellow-500" />
                         <span className="hidden sm:inline">{xpTotal}</span>
                     </div>
-
-                    {/* Exercise count -- links to stats */}
-                    <Link href="/dashboard/stats" className="flex items-center gap-1.5 text-gray-500 font-medium text-sm hover:text-green-600 transition-colors">
-                        <Trophy className="w-4 h-4 text-green-500" />
-                        <span className="hidden sm:inline">{exercisesSolved}</span>
-                    </Link>
 
                     {/* Settings */}
                     <Link href="/dashboard/settings" className="text-gray-400 hover:text-gray-700 transition-colors">
