@@ -136,7 +136,12 @@
         "newRecord": "New record!",
         "topLeaderboard": "Top 10 — {module}",
         "anonymous": "Anonymous",
-        "savingScore": "Saving score..."
+        "savingScore": "Saving score...",
+        "modeSolve": "Solve",
+        "modeSolveDesc": "Pick the correct answer",
+        "modeRecognize": "Recognize",
+        "modeRecognizeDesc": "Identify the method used",
+        "whichMethod": "Which method solves this problem?"
     },
     "Stats": {
         "title": "Your Statistics",

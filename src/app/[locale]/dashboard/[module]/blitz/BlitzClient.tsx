@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { ArrowLeft, Zap, RotateCcw, Trophy, Crown, Star } from 'lucide-react';
+import { ArrowLeft, Zap, RotateCcw, Trophy, Crown, Star, Eye, Dumbbell } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
 import MathRenderer from '@/components/ui/MathRenderer';
@@ -18,6 +18,13 @@ type Question = {
     difficulty: number;
 };
 
+type RecognizeQuestion = {
+    id: string;
+    problem: string;
+    subcategory: string;
+};
+
+type BlitzMode = 'solve' | 'recognize';
 type GameState = 'ready' | 'playing' | 'finished';
 
 type LeaderboardEntry = {
@@ -45,15 +52,21 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
     const tc = useTranslations('Curriculum');
     const tCommon = useTranslations('Common');
 
+    const [blitzMode, setBlitzMode] = useState<BlitzMode>('solve');
     const [gameState, setGameState] = useState<GameState>('ready');
-    const [questions, setQuestions] = useState<Question[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
     const [strikes, setStrikes] = useState(0);
     const [score, setScore] = useState(0);
     const [loading, setLoading] = useState(false);
 
-    // Multiple choice state
+    // Solve mode state
+    const [questions, setQuestions] = useState<Question[]>([]);
+
+    // Recognize mode state
+    const [recognizeQuestions, setRecognizeQuestions] = useState<RecognizeQuestion[]>([]);
+
+    // Shared multiple choice state
     const [options, setOptions] = useState<string[]>([]);
     const [selectedOption, setSelectedOption] = useState<number | null>(null);
     const [correctOptionIndex, setCorrectOptionIndex] = useState<number>(0);
@@ -69,8 +82,17 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
     const supabaseRef = useRef(createClient());
     const gameStartTimeRef = useRef<number>(0);
 
-    // Build shuffled options for the current question
-    const buildOptions = useCallback((question: Question) => {
+    // Strip Portuguese instruction prefixes from DB problem text
+    const stripProblemPrefix = (text: string) =>
+        text.replace(/^(Resolva a EDO:\s*|Calcule\s+|Derive\s+|Resolva\s+|Encontre\s+|Determine\s+)/i, '');
+
+    // Helper to get topic title from id
+    const getTopicTitle = (topicId: string) => {
+        return tc.has(`${topicId}.title`) ? tc(`${topicId}.title`) : topicId;
+    };
+
+    // Build shuffled options for solve mode
+    const buildSolveOptions = useCallback((question: Question) => {
         const correct = question.solution_latex;
         const allOptions = shuffleArray([correct, ...question.distractors]);
         setOptions(allOptions);
@@ -78,8 +100,20 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
         setSelectedOption(null);
     }, []);
 
-    // Fetch questions with distractors
-    const fetchQuestions = useCallback(async () => {
+    // Build shuffled options for recognize mode
+    const buildRecognizeOptions = useCallback((question: RecognizeQuestion) => {
+        const correctId = question.subcategory;
+        const allTopics = moduleData?.topics.map(t => t.id) || [];
+        const others = allTopics.filter(id => id !== correctId);
+        const shuffledOthers = shuffleArray(others);
+        const topicOptions = shuffleArray([correctId, ...shuffledOthers.slice(0, 3)]);
+        setOptions(topicOptions);
+        setCorrectOptionIndex(topicOptions.indexOf(correctId));
+        setSelectedOption(null);
+    }, [moduleData]);
+
+    // Fetch questions for solve mode
+    const fetchSolveQuestions = useCallback(async () => {
         setLoading(true);
         const supabase = supabaseRef.current;
         const topicIds = moduleData?.topics.map(t => t.id) || [];
@@ -94,9 +128,28 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
         if (error) {
             console.error('Failed to fetch blitz questions:', error.message);
         } else if (data) {
-            // Sort by difficulty then shuffle within tiers
             const sorted = [...data].sort((a, b) => a.difficulty - b.difficulty) as Question[];
             setQuestions(sorted);
+        }
+        setLoading(false);
+    }, [moduleData]);
+
+    // Fetch questions for recognize mode
+    const fetchRecognizeQuestions = useCallback(async () => {
+        setLoading(true);
+        const supabase = supabaseRef.current;
+        const topicIds = moduleData?.topics.map(t => t.id) || [];
+
+        const { data, error } = await supabase
+            .from('questions')
+            .select('id, problem, subcategory')
+            .in('subcategory', topicIds)
+            .limit(50);
+
+        if (error) {
+            console.error('Failed to fetch recognize questions:', error.message);
+        } else if (data) {
+            setRecognizeQuestions(shuffleArray(data));
         }
         setLoading(false);
     }, [moduleData]);
@@ -130,8 +183,13 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
     }, [moduleId]);
 
     // Start the game
-    const startGame = async () => {
-        await fetchQuestions();
+    const startGame = async (mode: BlitzMode) => {
+        setBlitzMode(mode);
+        if (mode === 'solve') {
+            await fetchSolveQuestions();
+        } else {
+            await fetchRecognizeQuestions();
+        }
         setGameState('playing');
         setCurrentIndex(0);
         setTimeLeft(GAME_DURATION);
@@ -143,12 +201,18 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
         gameStartTimeRef.current = Date.now();
     };
 
+    // Total questions for current mode
+    const totalQuestions = blitzMode === 'solve' ? questions.length : recognizeQuestions.length;
+
     // Set up options when currentIndex changes
     useEffect(() => {
-        if (gameState === 'playing' && questions.length > 0 && currentIndex < questions.length) {
-            buildOptions(questions[currentIndex]);
+        if (gameState !== 'playing' || currentIndex >= totalQuestions) return;
+        if (blitzMode === 'solve' && questions.length > 0) {
+            buildSolveOptions(questions[currentIndex]);
+        } else if (blitzMode === 'recognize' && recognizeQuestions.length > 0) {
+            buildRecognizeOptions(recognizeQuestions[currentIndex]);
         }
-    }, [currentIndex, gameState, questions, buildOptions]);
+    }, [currentIndex, gameState, blitzMode, questions, recognizeQuestions, buildSolveOptions, buildRecognizeOptions, totalQuestions]);
 
     // Timer
     useEffect(() => {
@@ -186,7 +250,7 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
     }, []);
 
     const handleOptionSelect = (index: number) => {
-        if (selectedOption !== null) return; // Already selected
+        if (selectedOption !== null) return;
         setSelectedOption(index);
 
         const isCorrect = index === correctOptionIndex;
@@ -200,12 +264,11 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
             setStrikes(newStrikes);
         }
 
-        // After feedback delay, advance or end
         feedbackTimerRef.current = setTimeout(() => {
             if (newStrikes >= MAX_STRIKES) {
                 if (timerRef.current) clearInterval(timerRef.current);
                 setGameState('finished');
-            } else if (currentIndex + 1 >= questions.length) {
+            } else if (currentIndex + 1 >= totalQuestions) {
                 if (timerRef.current) clearInterval(timerRef.current);
                 setGameState('finished');
             } else {
@@ -236,6 +299,11 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
     };
 
     const moduleTitle = tc.has(`${moduleId}.title`) ? tc(`${moduleId}.title`) : (moduleData?.title || moduleId);
+
+    // Current problem text
+    const currentProblem = blitzMode === 'solve'
+        ? questions[currentIndex]?.problem ?? ''
+        : recognizeQuestions[currentIndex]?.problem ?? '';
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -300,33 +368,56 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
                         <p className="text-gray-400 mb-8">
                             {t('readySubdesc')}
                         </p>
-                        <button
-                            onClick={startGame}
-                            disabled={loading}
-                            className="px-10 py-4 bg-yellow-500 text-white rounded-xl font-bold text-lg shadow-[0_4px_0_0_rgb(202,138,4)] hover:-translate-y-1 hover:shadow-[0_6px_0_0_rgb(202,138,4)] active:translate-y-[2px] active:shadow-none transition-all"
-                        >
-                            {loading ? tCommon('loading') : t('startButton')}
-                        </button>
+
+                        {/* Mode selector */}
+                        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                            <button
+                                onClick={() => startGame('solve')}
+                                disabled={loading}
+                                className="px-8 py-4 bg-yellow-500 text-white rounded-xl font-bold text-lg shadow-[0_4px_0_0_rgb(202,138,4)] hover:-translate-y-1 hover:shadow-[0_6px_0_0_rgb(202,138,4)] active:translate-y-[2px] active:shadow-none transition-all flex items-center justify-center gap-2"
+                            >
+                                <Dumbbell className="w-5 h-5" />
+                                {loading ? tCommon('loading') : t('modeSolve')}
+                            </button>
+                            <button
+                                onClick={() => startGame('recognize')}
+                                disabled={loading}
+                                className="px-8 py-4 bg-purple-500 text-white rounded-xl font-bold text-lg shadow-[0_4px_0_0_rgb(126,34,206)] hover:-translate-y-1 hover:shadow-[0_6px_0_0_rgb(126,34,206)] active:translate-y-[2px] active:shadow-none transition-all flex items-center justify-center gap-2"
+                            >
+                                <Eye className="w-5 h-5" />
+                                {loading ? tCommon('loading') : t('modeRecognize')}
+                            </button>
+                        </div>
+                        <div className="flex flex-col sm:flex-row gap-3 justify-center mt-2">
+                            <span className="text-xs text-gray-400 sm:w-40">{t('modeSolveDesc')}</span>
+                            <span className="text-xs text-gray-400 sm:w-40">{t('modeRecognizeDesc')}</span>
+                        </div>
                     </motion.div>
                 )}
 
                 {/* Playing state */}
-                {gameState === 'playing' && questions.length > 0 && currentIndex < questions.length && (
+                {gameState === 'playing' && totalQuestions > 0 && currentIndex < totalQuestions && (
                     <div className="w-full">
                         <div className="bg-white rounded-3xl p-5 sm:p-8 shadow-sm border border-gray-200 text-center min-h-[200px] flex flex-col items-center justify-center w-full relative mb-6">
                             <div className="absolute top-6 right-6 text-sm font-bold text-gray-300">
                                 #{currentIndex + 1}
                             </div>
 
+                            {blitzMode === 'recognize' && (
+                                <span className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4 block">
+                                    {t('whichMethod')}
+                                </span>
+                            )}
+
                             <div className="min-h-[80px] flex items-center justify-center">
                                 {renderFormattedText(
-                                    questions[currentIndex].problem,
+                                    stripProblemPrefix(currentProblem),
                                     "text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900"
                                 )}
                             </div>
                         </div>
 
-                        {/* 2x2 option grid */}
+                        {/* Option grid */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {options.map((option, i) => {
                                 const isSelected = selectedOption === i;
@@ -362,7 +453,10 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
                                             selectedOption !== null && "cursor-default",
                                         )}
                                     >
-                                        {renderFormattedText(option, "text-gray-800")}
+                                        {blitzMode === 'recognize'
+                                            ? <span className="text-gray-800">{getTopicTitle(option)}</span>
+                                            : renderFormattedText(option, "text-gray-800")
+                                        }
                                     </button>
                                 );
                             })}
@@ -439,6 +533,7 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
                                 onClick={() => {
                                     setGameState('ready');
                                     setQuestions([]);
+                                    setRecognizeQuestions([]);
                                 }}
                                 className="px-6 sm:px-8 py-2.5 sm:py-3 bg-yellow-500 text-white rounded-xl font-bold transition-all hover:-translate-y-0.5 shadow-lg flex items-center justify-center gap-2"
                             >

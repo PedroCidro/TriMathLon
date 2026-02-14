@@ -530,7 +530,7 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
             </main>
 
             {/* Watermark */}
-            <div className="pb-6 -mt-4 text-center text-base text-gray-300 font-extrabold tracking-wide select-none">
+            <div className="pb-6 -mt-4 text-center text-lg text-gray-400 font-extrabold tracking-wide select-none">
                 JustMathing.com
             </div>
         </div>

@@ -1,6 +1,8 @@
 import { ArrowRight } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { auth } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
 import Image from 'next/image';
 import LocaleToggle from '@/components/ui/LocaleToggle';
 import LandingSections from '@/components/landing/LandingSections';
@@ -8,6 +10,13 @@ import LandingSections from '@/components/landing/LandingSections';
 export default async function LandingPage({ params }: { params: Promise<{ locale: string }> }) {
     const { locale } = await params;
     setRequestLocale(locale);
+
+    // If already logged in, go straight to dashboard
+    const { userId } = await auth();
+    if (userId) {
+        return redirect('/dashboard');
+    }
+
     const t = await getTranslations('Landing');
 
     return (

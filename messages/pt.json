@@ -136,7 +136,12 @@
         "newRecord": "Novo recorde!",
         "topLeaderboard": "Top 10 — {module}",
         "anonymous": "Anonimo",
-        "savingScore": "Salvando pontuacao..."
+        "savingScore": "Salvando pontuacao...",
+        "modeSolve": "Resolver",
+        "modeSolveDesc": "Escolha a resposta correta",
+        "modeRecognize": "Reconhecer",
+        "modeRecognizeDesc": "Identifique o metodo usado",
+        "whichMethod": "Qual metodo resolve este problema?"
     },
     "Stats": {
         "title": "Suas Estatisticas",
