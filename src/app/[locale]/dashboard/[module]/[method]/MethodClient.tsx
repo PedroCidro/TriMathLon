@@ -205,6 +205,11 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
         return tc.has(`${topicId}.title`) ? tc(`${topicId}.title`) : topicId;
     };
 
+    // Strip Portuguese instruction prefixes from DB problem text
+    // (the translated prompt is already shown separately via i18n)
+    const stripProblemPrefix = (text: string) =>
+        text.replace(/^(Resolva a EDO:\s*|Calcule\s+|Derive\s+|Resolva\s+|Encontre\s+|Determine\s+)/i, '');
+
     // Helper to render mixed text and LaTeX (e.g. "Derive $f(x)$")
     const renderFormattedText = (text: string, className: string = "") => {
         const parts = text.split('$');
@@ -351,7 +356,7 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
                                         </span>
 
                                         <div className="mb-12 min-h-[120px] flex items-center justify-center">
-                                            {renderFormattedText(questions[currentIndex].problem.replace('Derive', ''), "text-2xl sm:text-4xl md:text-5xl font-bold text-blue-600")}
+                                            {renderFormattedText(stripProblemPrefix(questions[currentIndex].problem), "text-2xl sm:text-4xl md:text-5xl font-bold text-blue-600")}
                                         </div>
 
                                         <AnimatePresence>
@@ -454,7 +459,7 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
 
                                             <div className="mb-12 min-h-[120px] flex items-center justify-center">
                                                 {renderFormattedText(
-                                                    recognizeQuestions[recognizeIndex].problem,
+                                                    stripProblemPrefix(recognizeQuestions[recognizeIndex].problem),
                                                     "text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900"
                                                 )}
                                             </div>
