@@ -347,7 +347,7 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
                                         </div>
 
                                         <span className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6 block">
-                                            {t('calculateDerivative')}
+                                            {t(`prompt${moduleId.charAt(0).toUpperCase() + moduleId.slice(1)}`)}
                                         </span>
 
                                         <div className="mb-12 min-h-[120px] flex items-center justify-center">
