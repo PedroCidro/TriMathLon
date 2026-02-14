@@ -528,6 +528,11 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
                     </motion.div>
                 </AnimatePresence>
             </main>
+
+            {/* Watermark */}
+            <div className="py-4 text-center text-xs text-gray-300 font-medium tracking-wide select-none">
+                JustMathing.com
+            </div>
         </div>
     );
 }
