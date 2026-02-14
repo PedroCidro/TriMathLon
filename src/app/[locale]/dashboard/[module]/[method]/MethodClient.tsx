@@ -87,7 +87,7 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
         if (error) {
             console.error('Failed to fetch questions:', error.message);
         } else if (data) {
-            setQuestions(data);
+            setQuestions([...data].sort(() => Math.random() - 0.5));
             questionsFetched.current = true;
         }
         setLoading(false);
@@ -530,7 +530,7 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
             </main>
 
             {/* Watermark */}
-            <div className="pb-6 -mt-4 text-center text-sm text-gray-300 font-bold tracking-wide select-none">
+            <div className="pb-6 -mt-4 text-center text-base text-gray-300 font-extrabold tracking-wide select-none">
                 JustMathing.com
             </div>
         </div>
