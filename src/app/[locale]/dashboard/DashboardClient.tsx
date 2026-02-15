@@ -1,6 +1,7 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Flame, Trophy, Zap, Settings, Building2, ArrowRight } from 'lucide-react';
 import MathRenderer from '@/components/ui/MathRenderer';
 import { cn } from '@/lib/utils';
@@ -12,6 +13,8 @@ import { useTranslations } from 'next-intl';
 import UpgradeButton from '@/components/UpgradeButton';
 import LocaleToggle from '@/components/ui/LocaleToggle';
 import { curriculum } from '@/data/curriculum';
+
+const RANKING_TOOLTIP_KEY = 'dashboard_ranking_tooltip_seen';
 
 const modules = curriculum;
 
@@ -42,20 +45,62 @@ export default function DashboardClient({
 
     const xpPercent = Math.min(100, Math.round((xpToday / DAILY_XP_GOAL) * 100));
 
+    const [showRankingTooltip, setShowRankingTooltip] = useState(false);
+    const tooltipRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (!localStorage.getItem(RANKING_TOOLTIP_KEY)) {
+            setShowRankingTooltip(true);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (!showRankingTooltip) return;
+        function handleClick(e: MouseEvent) {
+            if (tooltipRef.current && !tooltipRef.current.contains(e.target as Node)) {
+                dismissTooltip();
+            }
+        }
+        document.addEventListener('click', handleClick, true);
+        return () => document.removeEventListener('click', handleClick, true);
+    }, [showRankingTooltip]);
+
+    function dismissTooltip() {
+        setShowRankingTooltip(false);
+        localStorage.setItem(RANKING_TOOLTIP_KEY, '1');
+    }
+
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
 
             {/* Top Navigation */}
-            <nav className="bg-white border-b border-gray-200 px-3 sm:px-6 py-3 sm:py-4 flex justify-between items-center sticky top-0 z-10 overflow-hidden">
+            <nav className="bg-white border-b border-gray-200 px-3 sm:px-6 py-3 sm:py-4 flex justify-between items-center sticky top-0 z-10">
                 <div className="flex items-center gap-3">
                     <Image src="/logo-icon.png" alt="JustMathing Logo" width={261} height={271} priority className="h-8 sm:h-10 w-auto" />
-                    <Link
-                        href="/dashboard/stats"
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 hover:bg-green-100 border border-green-200 rounded-xl font-bold text-sm text-green-700 transition-colors"
-                    >
-                        <Trophy className="w-4 h-4 text-green-600" />
-                        <span>{exercisesSolved}</span>
-                    </Link>
+                    <div className="relative" ref={tooltipRef}>
+                        <Link
+                            href="/dashboard/stats"
+                            onClick={showRankingTooltip ? dismissTooltip : undefined}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 hover:bg-green-100 border border-green-200 rounded-xl font-bold text-sm text-green-700 transition-colors"
+                        >
+                            <Trophy className="w-4 h-4 text-green-600" />
+                            <span>{exercisesSolved}</span>
+                        </Link>
+                        <AnimatePresence>
+                            {showRankingTooltip && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -4 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -4 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 w-52 bg-gray-900 text-white text-xs font-medium rounded-lg px-3 py-2 shadow-lg text-center"
+                                >
+                                    <div className="absolute left-1/2 -translate-x-1/2 -top-1.5 w-3 h-3 bg-gray-900 rotate-45 rounded-sm" />
+                                    <span className="relative">{t('rankingTooltip')}</span>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
                 </div>
 
                 <div className="flex items-center gap-2 sm:gap-3 md:gap-5">

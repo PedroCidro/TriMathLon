@@ -96,7 +96,8 @@
         "dailyGoalDone": "Goal completed! Keep training to climb the ranking.",
         "uniQualified": "{name} has {count} exercises solved!",
         "uniQualifiedCta": "View full ranking",
-        "uniNotQualified": "{remaining} exercises left for {name} to enter the ranking!"
+        "uniNotQualified": "{remaining} exercises left for {name} to enter the ranking!",
+        "rankingTooltip": "Tap here to see your stats and ranking!"
     },
     "Module": {
         "notFound": "Module not found",
