@@ -49,5 +49,6 @@ export default async function StatsPage() {
         rankingData={rankingData}
         rankingOptIn={profile?.ranking_opt_in ?? false}
         blitzBests={blitzBests}
+        userId={userId}
     />
 }

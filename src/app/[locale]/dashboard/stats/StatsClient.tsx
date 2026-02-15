@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { ArrowLeft, Trophy, Flame, Zap, Target, BarChart3, TrendingUp, TrendingDown, Award, Crown, Users, Building2 } from 'lucide-react';
+import { useState, useCallback } from 'react';
+import { ArrowLeft, Trophy, Flame, Zap, Target, BarChart3, TrendingUp, TrendingDown, Award, Crown, Users, Building2, Share2, Check as CheckIcon } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
 import { curriculum } from '@/data/curriculum';
@@ -35,6 +35,7 @@ interface StatsClientProps {
     rankingData: RankingData;
     rankingOptIn: boolean;
     blitzBests: Record<string, number>;
+    userId: string;
 }
 
 const MODULE_COLORS: Record<string, { accent: string; bg: string; text: string; fill: string }> = {
@@ -68,9 +69,18 @@ export default function StatsClient({
     rankingData,
     rankingOptIn: initialOptIn,
     blitzBests,
+    userId,
 }: StatsClientProps) {
     const [optIn, setOptIn] = useState(initialOptIn);
     const [togglingOptIn, setTogglingOptIn] = useState(false);
+    const [copied, setCopied] = useState(false);
+
+    const handleShareProfile = useCallback(async () => {
+        const url = `${window.location.origin}/profile/${userId}`;
+        await navigator.clipboard.writeText(url);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    }, [userId]);
     const t = useTranslations('Stats');
     const tc = useTranslations('Curriculum');
     const tCommon = useTranslations('Common');
@@ -188,8 +198,26 @@ export default function StatsClient({
                 </Link>
 
                 <header className="mb-10">
-                    <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
-                    <p className="text-gray-500 mt-2">{t('subtitle')}</p>
+                    <div className="flex items-start justify-between">
+                        <div>
+                            <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
+                            <p className="text-gray-500 mt-2">{t('subtitle')}</p>
+                        </div>
+                        {optIn && (
+                            <button
+                                onClick={handleShareProfile}
+                                className={cn(
+                                    "inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all border",
+                                    copied
+                                        ? "bg-green-50 text-green-700 border-green-200"
+                                        : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
+                                )}
+                            >
+                                {copied ? <CheckIcon className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
+                                {copied ? t('linkCopied') : t('shareProfile')}
+                            </button>
+                        )}
+                    </div>
                 </header>
 
                 {/* Section 1 -- Overview Cards */}

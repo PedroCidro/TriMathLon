@@ -182,7 +182,9 @@
         "ratingWrong": "Wrong",
         "ratingHard": "Hard",
         "ratingGood": "Good",
-        "ratingEasy": "Easy"
+        "ratingEasy": "Easy",
+        "shareProfile": "Share Profile",
+        "linkCopied": "Link copied!"
     },
     "Settings": {
         "title": "Settings",
@@ -253,6 +255,25 @@
     },
     "Institutional": {
         "continueToArena": "Continue to the Arena"
+    },
+    "Profile": {
+        "title": "Profile",
+        "exercisesLabel": "Exercises",
+        "streakLabel": "Streak",
+        "longestStreakLabel": "Longest Streak",
+        "xpLabel": "XP Total",
+        "accuracyByModule": "Accuracy by Module",
+        "blitzRecords": "Blitz Records",
+        "bestScoreLabel": "best score",
+        "ctaTitle": "Train with {name} on JustMathing",
+        "ctaButton": "Create Free Account",
+        "levelFundamental": "Elementary School",
+        "levelMedio": "High School",
+        "levelGraduacao": "Undergraduate (STEM)",
+        "levelPos": "Graduate School",
+        "levelEnthusiast": "Enthusiast",
+        "shareProfile": "Share Profile",
+        "linkCopied": "Link copied!"
     },
     "Error": {
         "oops": "Oops!",

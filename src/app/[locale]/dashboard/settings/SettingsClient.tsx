@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ArrowLeft, Check, User, GraduationCap, School, BookOpen, Brain, Users, CreditCard, Trophy, Building2 } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
+import { formatDisplayName } from '@/lib/rankings';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 
@@ -12,15 +13,6 @@ type Level = {
     title: string;
     icon: React.ReactNode;
 };
-
-function formatDisplayName(fullName: string | null): string {
-    if (!fullName || fullName.trim() === '') return 'Anonimo';
-    const parts = fullName.trim().split(/\s+/);
-    if (parts.length === 1) return parts[0];
-    const first = parts[0];
-    const lastInitial = parts[parts.length - 1][0].toUpperCase();
-    return `${first} ${lastInitial}.`;
-}
 
 interface SettingsClientProps {
     academicLevel: string | null;

@@ -36,6 +36,8 @@ const CONFIGS = {
     checkout: { limit: 5, windowSeconds: 60 },
     /** Blitz score saves — one game takes ~60s minimum */
     blitz: { limit: 10, windowSeconds: 60 },
+    /** Public endpoints — rate limited by IP */
+    public: { limit: 20, windowSeconds: 60 },
 } as const satisfies Record<string, RateLimitConfig>;
 
 export type RateLimitPreset = keyof typeof CONFIGS;

@@ -182,7 +182,9 @@
         "ratingWrong": "Errei",
         "ratingHard": "Dificil",
         "ratingGood": "Bom",
-        "ratingEasy": "Facil"
+        "ratingEasy": "Facil",
+        "shareProfile": "Compartilhar Perfil",
+        "linkCopied": "Link copiado!"
     },
     "Settings": {
         "title": "Configuracoes",
@@ -253,6 +255,25 @@
     },
     "Institutional": {
         "continueToArena": "Continuar para a Arena"
+    },
+    "Profile": {
+        "title": "Perfil",
+        "exercisesLabel": "Exercicios",
+        "streakLabel": "Sequencia",
+        "longestStreakLabel": "Maior Sequencia",
+        "xpLabel": "XP Total",
+        "accuracyByModule": "Acerto por Modulo",
+        "blitzRecords": "Recordes Blitz",
+        "bestScoreLabel": "melhor pontuacao",
+        "ctaTitle": "Treine com {name} no JustMathing",
+        "ctaButton": "Criar Conta Gratis",
+        "levelFundamental": "Ensino Fundamental",
+        "levelMedio": "Ensino Medio",
+        "levelGraduacao": "Graduacao (STEM)",
+        "levelPos": "Pos-Graduacao",
+        "levelEnthusiast": "Entusiasta",
+        "shareProfile": "Compartilhar Perfil",
+        "linkCopied": "Link copiado!"
     },
     "Error": {
         "oops": "Ops!",

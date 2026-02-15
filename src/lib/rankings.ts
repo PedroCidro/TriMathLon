@@ -23,7 +23,7 @@ export type RankingData = {
     uni_qualified: boolean;
 };
 
-function formatDisplayName(fullName: string | null): string {
+export function formatDisplayName(fullName: string | null): string {
     if (!fullName || fullName.trim() === '') return 'Anonimo';
     const parts = fullName.trim().split(/\s+/);
     if (parts.length === 1) return parts[0];
