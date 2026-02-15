@@ -42,7 +42,7 @@ export default function PremiumClient({
     const isInstitutional = !!institutionId;
     const price = isInternational
         ? '$9.99'
-        : isInstitutional ? 'R$ 14,95' : 'R$ 29,90';
+        : isInstitutional ? 'R$ 14,95' : 'R$ 19,99';
     const accent = institutionId ? INSTITUTION_ACCENTS[institutionId] : null;
 
     const handleCheckout = async () => {
@@ -54,16 +54,31 @@ export default function PremiumClient({
                 body: JSON.stringify({ locale }),
             });
 
+            if (!response.ok) {
+                const body = await response.text();
+                let message: string;
+                try {
+                    message = JSON.parse(body).error || `HTTP ${response.status}`;
+                } catch {
+                    message = `HTTP ${response.status}: ${body.slice(0, 200)}`;
+                }
+                throw new Error(message);
+            }
+
             const { url, error } = await response.json();
             if (error) throw new Error(error);
 
             if (url) {
                 window.location.href = url;
             } else {
-                throw new Error('No URL returned from checkout session');
+                throw new Error('No checkout URL returned');
             }
-        } catch {
-            toast.error(t('checkoutError'));
+        } catch (err) {
+            console.error('Checkout error:', err);
+            const message = err instanceof Error
+                ? err.message
+                : String(err) !== '[object Object]' ? String(err) : t('checkoutError');
+            toast.error(message);
         } finally {
             setLoading(false);
         }

@@ -7,12 +7,11 @@ import { rateLimit } from '@/lib/rate-limit';
 
 const UNI_COUPON_ID = 'UNI_STUDENT_50';
 
-const PRICE_UNIVERSAL = process.env.STRIPE_PRICE_ID_UNIVERSAL!;
-const PRICE_STUDENT = process.env.STRIPE_PRICE_ID_STUDENT!;
-const PRICE_INTERNATIONAL = process.env.STRIPE_PRICE_ID_INTERNATIONAL!;
-
 export async function POST(req: NextRequest) {
     try {
+        const PRICE_UNIVERSAL = process.env.STRIPE_PRICE_ID_UNIVERSAL;
+        const PRICE_STUDENT = process.env.STRIPE_PRICE_ID_STUDENT;
+        const PRICE_INTERNATIONAL = process.env.STRIPE_PRICE_ID_INTERNATIONAL;
         const { userId } = await auth();
         if (!userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -50,6 +49,17 @@ export async function POST(req: NextRequest) {
             ? PRICE_INTERNATIONAL
             : isInstitutional ? PRICE_STUDENT : PRICE_UNIVERSAL;
 
+        if (!priceId) {
+            const varName = isInternational
+                ? 'STRIPE_PRICE_ID_INTERNATIONAL'
+                : isInstitutional ? 'STRIPE_PRICE_ID_STUDENT' : 'STRIPE_PRICE_ID_UNIVERSAL';
+            console.error('Missing env var:', varName);
+            return NextResponse.json(
+                { error: `Server misconfiguration: missing ${varName}` },
+                { status: 500 },
+            );
+        }
+
         const sessionParams: Stripe.Checkout.SessionCreateParams = {
             payment_method_types: ['card'],
             line_items: [
@@ -78,7 +88,8 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json({ url: session.url });
     } catch (err) {
-        console.error('Checkout error:', err instanceof Error ? err.message : 'Unknown error');
-        return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
+        const message = err instanceof Error ? err.message : 'Unknown error';
+        console.error('Checkout error:', message);
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }
