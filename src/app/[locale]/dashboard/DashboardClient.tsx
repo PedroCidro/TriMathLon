@@ -46,7 +46,7 @@ export default function DashboardClient({
         <div className="min-h-screen bg-gray-50 flex flex-col">
 
             {/* Top Navigation */}
-            <nav className="bg-white border-b border-gray-200 px-3 sm:px-6 py-3 sm:py-4 flex justify-between items-center sticky top-0 z-10">
+            <nav className="bg-white border-b border-gray-200 px-3 sm:px-6 py-3 sm:py-4 flex justify-between items-center sticky top-0 z-10 overflow-hidden">
                 <div className="flex items-center gap-3">
                     <Image src="/logo-icon.png" alt="JustMathing Logo" width={261} height={271} priority className="h-8 sm:h-10 w-auto" />
                     <Link
@@ -58,7 +58,7 @@ export default function DashboardClient({
                     </Link>
                 </div>
 
-                <div className="flex items-center gap-3 sm:gap-5">
+                <div className="flex items-center gap-2 sm:gap-3 md:gap-5">
                     {!isPremium && <UpgradeButton />}
 
                     {/* Streak */}
@@ -76,7 +76,7 @@ export default function DashboardClient({
                     </div>
 
                     {/* Settings */}
-                    <Link href="/dashboard/settings" className="text-gray-400 hover:text-gray-700 transition-colors">
+                    <Link href="/dashboard/settings" className="hidden sm:block text-gray-400 hover:text-gray-700 transition-colors">
                         <Settings className="w-4.5 h-4.5" />
                     </Link>
 
