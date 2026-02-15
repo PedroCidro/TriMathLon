@@ -1,12 +1,20 @@
 'use client';
 
-import { useRef, useState, useEffect, type RefObject } from 'react';
-import { ArrowRight, Dumbbell, Eye, BookOpen, Zap } from 'lucide-react';
+import { useRef, useState, useEffect, useCallback, type RefObject } from 'react';
+import { ArrowRight, Dumbbell, Eye, BookOpen, Zap, Trophy, Users, Crown } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 
 const MathRenderer = dynamic(() => import('../ui/MathRenderer'), { ssr: false });
+
+type PublicStats = {
+    total_exercises_solved: number;
+    total_active_students: number;
+    total_questions_available: number;
+    top_students: { user_id: string; display_name: string; exercises_solved: number; position: number }[];
+    university_battle: { institution_id: string; institution_name: string; total_exercises: number }[];
+};
 
 function useInView(ref: RefObject<HTMLElement | null>, threshold = 0.15) {
     const [inView, setInView] = useState(false);
@@ -41,8 +49,50 @@ function FadeInSection({ children, className = '', delay = 0 }: { children: Reac
     );
 }
 
+function AnimatedCounter({ target, suffix = '' }: { target: number; suffix?: string }) {
+    const ref = useRef<HTMLSpanElement>(null);
+    const inView = useInView(ref as RefObject<HTMLElement | null>);
+    const [value, setValue] = useState(0);
+
+    useEffect(() => {
+        if (!inView || target === 0) return;
+        const duration = 1500;
+        const steps = 40;
+        const increment = target / steps;
+        let current = 0;
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                setValue(target);
+                clearInterval(timer);
+            } else {
+                setValue(Math.floor(current));
+            }
+        }, duration / steps);
+        return () => clearInterval(timer);
+    }, [inView, target]);
+
+    return (
+        <span ref={ref}>
+            {value.toLocaleString('pt-BR')}{suffix}
+        </span>
+    );
+}
+
+const RANK_MEDALS = ['\u{1F947}', '\u{1F948}', '\u{1F949}'];
+
 export default function LandingSections() {
     const t = useTranslations('Landing');
+    const [stats, setStats] = useState<PublicStats | null>(null);
+
+    const fetchStats = useCallback(async () => {
+        try {
+            const res = await fetch('/api/public/stats');
+            if (res.ok) setStats(await res.json());
+        } catch { /* silent — sections just won't render */ }
+    }, []);
+
+    useEffect(() => { fetchStats(); }, [fetchStats]);
 
     return (
         <>
@@ -75,8 +125,67 @@ export default function LandingSections() {
                 ))}
             </div>
 
+            {/* Live Stats Banner */}
+            {stats && (
+                <section className="px-6 py-20 mt-16">
+                    <div className="max-w-4xl mx-auto">
+                        <FadeInSection>
+                            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-12">
+                                {t('statsTitle')}
+                            </h2>
+                        </FadeInSection>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {/* Trophy card — links to ranking */}
+                            <FadeInSection delay={0}>
+                                <Link
+                                    href="/sign-up/[[...sign-up]]"
+                                    className="block bg-white border border-gray-200 rounded-2xl shadow-sm p-6 text-center hover:shadow-lg hover:-translate-y-1 hover:border-green-300 transition-all group"
+                                >
+                                    <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:bg-green-100 transition-colors">
+                                        <Trophy className="w-6 h-6 text-green-600" />
+                                    </div>
+                                    <p className="text-3xl sm:text-4xl font-bold text-gray-900">
+                                        <AnimatedCounter target={stats.total_exercises_solved} />
+                                    </p>
+                                    <p className="text-gray-500 font-medium mt-1">{t('statsExercisesSolved')}</p>
+                                    <p className="text-green-600 font-bold text-sm mt-3 flex items-center justify-center gap-1">
+                                        {t('statsViewRanking')} <ArrowRight className="w-4 h-4" />
+                                    </p>
+                                </Link>
+                            </FadeInSection>
+
+                            {[
+                                {
+                                    icon: <Users className="w-6 h-6 text-blue-600" />,
+                                    value: stats.total_active_students,
+                                    label: t('statsActiveStudents'),
+                                    color: 'bg-blue-50',
+                                },
+                                {
+                                    icon: <BookOpen className="w-6 h-6 text-purple-600" />,
+                                    value: stats.total_questions_available,
+                                    label: t('statsQuestionsAvailable'),
+                                    color: 'bg-purple-50',
+                                    suffix: '+',
+                                },
+                            ].map((item, i) => (
+                                <FadeInSection key={i} delay={(i + 1) * 0.1} className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 text-center">
+                                    <div className={`w-12 h-12 ${item.color} rounded-xl flex items-center justify-center mx-auto mb-4`}>
+                                        {item.icon}
+                                    </div>
+                                    <p className="text-3xl sm:text-4xl font-bold text-gray-900">
+                                        <AnimatedCounter target={item.value} suffix={'suffix' in item ? item.suffix : ''} />
+                                    </p>
+                                    <p className="text-gray-500 font-medium mt-1">{item.label}</p>
+                                </FadeInSection>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            )}
+
             {/* How it Works */}
-            <section className="bg-gray-50 px-6 py-24 mt-24">
+            <section className="bg-gray-50 px-6 py-24 mt-8">
                 <div className="max-w-5xl mx-auto">
                     <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-4">
                         {t('howItWorks')}
@@ -145,8 +254,48 @@ export default function LandingSections() {
                 </div>
             </section>
 
+            {/* Hall of Fame — Public Leaderboard */}
+            {stats && stats.top_students.length > 0 && (
+                <section className="bg-gray-50 px-6 py-24">
+                    <div className="max-w-2xl mx-auto">
+                        <FadeInSection>
+                            <div className="text-center mb-10">
+                                <div className="w-14 h-14 bg-yellow-50 rounded-2xl flex items-center justify-center mx-auto mb-5">
+                                    <Crown className="w-6 h-6 text-yellow-600" />
+                                </div>
+                                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+                                    {t('hallOfFame')}
+                                </h2>
+                                <p className="text-gray-500 text-lg">{t('hallOfFameSubtitle')}</p>
+                            </div>
+                        </FadeInSection>
+
+                        <div className="space-y-3">
+                            {stats.top_students.map((student, i) => (
+                                <FadeInSection key={student.user_id} delay={i * 0.08}>
+                                    <Link
+                                        href={`/profile/${student.user_id}` as '/'}
+                                        className="flex items-center gap-4 p-4 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
+                                    >
+                                        <span className="text-2xl w-8 text-center">
+                                            {i < 3 ? RANK_MEDALS[i] : `#${student.position}`}
+                                        </span>
+                                        <div className="flex-1">
+                                            <p className="font-bold text-gray-900">{student.display_name}</p>
+                                        </div>
+                                        <span className="text-sm font-bold text-gray-500">
+                                            {student.exercises_solved.toLocaleString('pt-BR')} {t('exerciseCount')}
+                                        </span>
+                                    </Link>
+                                </FadeInSection>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            )}
+
             {/* Blitz Mode highlight */}
-            <section className="bg-gray-50 px-6 py-24">
+            <section className="px-6 py-24">
                 <div className="max-w-3xl mx-auto text-center">
                     <div className="w-14 h-14 bg-yellow-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
                         <Zap className="w-6 h-6 text-yellow-600 fill-yellow-600" />
