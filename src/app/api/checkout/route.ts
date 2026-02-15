@@ -9,6 +9,7 @@ const UNI_COUPON_ID = 'UNI_STUDENT_50';
 
 const PRICE_UNIVERSAL = process.env.STRIPE_PRICE_ID_UNIVERSAL!;
 const PRICE_STUDENT = process.env.STRIPE_PRICE_ID_STUDENT!;
+const PRICE_INTERNATIONAL = process.env.STRIPE_PRICE_ID_INTERNATIONAL!;
 
 export async function POST(req: NextRequest) {
     try {
@@ -38,12 +39,16 @@ export async function POST(req: NextRequest) {
             });
         }
 
+        const { locale } = await req.json().catch(() => ({ locale: undefined }));
+        const isInternational = locale === 'en';
         const isInstitutional = !!existingProfile?.institution;
 
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
         const stripe = getStripe();
 
-        const priceId = isInstitutional ? PRICE_STUDENT : PRICE_UNIVERSAL;
+        const priceId = isInternational
+            ? PRICE_INTERNATIONAL
+            : isInstitutional ? PRICE_STUDENT : PRICE_UNIVERSAL;
 
         const sessionParams: Stripe.Checkout.SessionCreateParams = {
             payment_method_types: ['card'],
@@ -59,8 +64,8 @@ export async function POST(req: NextRequest) {
             cancel_url: `${baseUrl}/dashboard`,
         };
 
-        // Apply institutional coupon silently
-        if (isInstitutional) {
+        // Apply institutional coupon silently (BRL plans only)
+        if (isInstitutional && !isInternational) {
             try {
                 await stripe.coupons.retrieve(UNI_COUPON_ID);
                 sessionParams.discounts = [{ coupon: UNI_COUPON_ID }];

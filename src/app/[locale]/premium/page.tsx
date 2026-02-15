@@ -3,7 +3,8 @@ import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { getInstitutionById } from '@/data/institutions';
 import PremiumClient from './PremiumClient';
 
-export default async function PremiumPage() {
+export default async function PremiumPage({ params }: { params: Promise<{ locale: string }> }) {
+    const { locale } = await params;
     const { userId } = await auth();
 
     let institutionId: string | null = null;
@@ -28,6 +29,7 @@ export default async function PremiumPage() {
     }
 
     return <PremiumClient
+        locale={locale}
         institutionId={institutionId}
         institutionName={institutionName}
         premiumHeadline={premiumHeadline}

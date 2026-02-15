@@ -21,12 +21,14 @@ const INSTITUTION_ACCENTS: Record<string, { badge: string; badgeBg: string; badg
 };
 
 interface PremiumClientProps {
+    locale: string;
     institutionId: string | null;
     institutionName: string | null;
     premiumHeadline: string | null;
 }
 
 export default function PremiumClient({
+    locale,
     institutionId,
     institutionName,
     premiumHeadline,
@@ -36,8 +38,11 @@ export default function PremiumClient({
     const tc = useTranslations('Curriculum');
     const tCommon = useTranslations('Common');
 
+    const isInternational = locale === 'en';
     const isInstitutional = !!institutionId;
-    const price = isInstitutional ? 'R$ 14,95' : 'R$ 29,90';
+    const price = isInternational
+        ? '$9.99'
+        : isInstitutional ? 'R$ 14,95' : 'R$ 29,90';
     const accent = institutionId ? INSTITUTION_ACCENTS[institutionId] : null;
 
     const handleCheckout = async () => {
@@ -46,7 +51,7 @@ export default function PremiumClient({
             const response = await fetch('/api/checkout', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({}),
+                body: JSON.stringify({ locale }),
             });
 
             const { url, error } = await response.json();
