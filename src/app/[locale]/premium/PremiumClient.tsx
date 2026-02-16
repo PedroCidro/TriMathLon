@@ -41,8 +41,8 @@ export default function PremiumClient({
     const isInternational = locale === 'en';
     const isInstitutional = !!institutionId;
     const price = isInternational
-        ? '$9.99'
-        : isInstitutional ? 'R$ 14,95' : 'R$ 19,99';
+        ? '$49.99'
+        : isInstitutional ? 'R$ 99,99' : 'R$ 139,99';
     const accent = institutionId ? INSTITUTION_ACCENTS[institutionId] : null;
 
     const handleCheckout = async () => {
@@ -119,9 +119,9 @@ export default function PremiumClient({
                     </p>
 
                     <div className="pt-4">
-                        <div className="flex items-baseline justify-center gap-1 mb-6">
+                        <div className="flex flex-col items-center gap-1 mb-6">
                             <span className="text-3xl sm:text-5xl font-bold text-gray-900">{price}</span>
-                            <span className="text-xl text-gray-400 font-medium">/{tCommon('month')}</span>
+                            <span className="text-lg text-gray-400 font-medium">{t('lifetime')}</span>
                         </div>
 
                         <button
@@ -134,7 +134,7 @@ export default function PremiumClient({
                         </button>
 
                         <p className="text-sm text-gray-400 mt-4 font-medium">
-                            {t('cancelAnytime')}
+                            {t('oneTimePayment')}
                         </p>
                     </div>
                 </div>
@@ -197,9 +197,9 @@ export default function PremiumClient({
             {/* Bottom CTA */}
             <section className="px-6 py-20">
                 <div className="max-w-2xl mx-auto text-center space-y-6">
-                    <div className="flex items-baseline justify-center gap-1 mb-2">
+                    <div className="flex flex-col items-center gap-1 mb-2">
                         <span className="text-3xl sm:text-4xl font-bold text-gray-900">{price}</span>
-                        <span className="text-lg text-gray-400 font-medium">/{tCommon('month')}</span>
+                        <span className="text-lg text-gray-400 font-medium">{t('lifetime')}</span>
                     </div>
 
                     <button
@@ -212,7 +212,7 @@ export default function PremiumClient({
                     </button>
 
                     <p className="text-sm text-gray-400 font-medium">
-                        {t('cancelAnytimeLong')}
+                        {t('oneTimePaymentLong')}
                     </p>
                 </div>
             </section>

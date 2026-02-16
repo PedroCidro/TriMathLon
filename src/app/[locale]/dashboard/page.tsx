@@ -25,11 +25,9 @@ export default async function DashboardPage({
             const session = await getStripe().checkout.sessions.retrieve(params.session_id)
             if (session.payment_status === 'paid' && session.metadata?.clerk_user_id === userId) {
                 const customerId = typeof session.customer === 'string' ? session.customer : null
-                const subscriptionId = typeof session.subscription === 'string' ? session.subscription : null
                 await supabase.from('profiles').update({
                     is_premium: true,
                     stripe_customer_id: customerId,
-                    stripe_subscription_id: subscriptionId,
                 }).eq('id', userId)
             }
         } catch (e) {

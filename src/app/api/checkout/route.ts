@@ -5,8 +5,6 @@ import { auth } from '@clerk/nextjs/server';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { rateLimit } from '@/lib/rate-limit';
 
-const UNI_COUPON_ID = 'UNI_STUDENT_50';
-
 export async function POST(req: NextRequest) {
     try {
         const PRICE_UNIVERSAL = process.env.STRIPE_PRICE_ID_UNIVERSAL;
@@ -68,21 +66,11 @@ export async function POST(req: NextRequest) {
                     quantity: 1,
                 },
             ],
-            mode: 'subscription',
+            mode: 'payment',
             metadata: { clerk_user_id: userId },
             success_url: `${baseUrl}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${baseUrl}/dashboard`,
         };
-
-        // Apply institutional coupon silently (BRL plans only)
-        if (isInstitutional && !isInternational) {
-            try {
-                await stripe.coupons.retrieve(UNI_COUPON_ID);
-                sessionParams.discounts = [{ coupon: UNI_COUPON_ID }];
-            } catch (couponErr) {
-                console.error('Coupon not found, proceeding without discount:', couponErr instanceof Error ? couponErr.message : 'Unknown');
-            }
-        }
 
         const session = await stripe.checkout.sessions.create(sessionParams);
 

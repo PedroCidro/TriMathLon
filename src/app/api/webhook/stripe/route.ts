@@ -35,7 +35,6 @@ export async function POST(req: NextRequest) {
             }
 
             const customerId = typeof session.customer === 'string' ? session.customer : null;
-            const subscriptionId = typeof session.subscription === 'string' ? session.subscription : null;
 
             const { error } = await getSupabaseAdmin()
                 .from('profiles')
@@ -43,7 +42,6 @@ export async function POST(req: NextRequest) {
                     id: clerkUserId,
                     is_premium: true,
                     stripe_customer_id: customerId,
-                    stripe_subscription_id: subscriptionId,
                 }, { onConflict: 'id' });
 
             if (error) {
