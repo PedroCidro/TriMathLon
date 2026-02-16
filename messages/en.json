@@ -364,7 +364,8 @@
         "difficultyEasy": "Easy",
         "difficultyMedium": "Medium",
         "difficultyHard": "Hard",
-        "randomizeOrder": "Random order"
+        "randomizeOrder": "Random order",
+        "playAgain": "Play Again?"
     },
     "Groups": {
         "title": "Study Groups",

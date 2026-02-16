@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { ArrowLeft, Swords, Trophy, Loader2, Crown, Copy, Check } from 'lucide-react';
+import { ArrowLeft, Swords, Trophy, Loader2, Crown, Copy, Check, RotateCcw } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
 import MathRenderer from '@/components/ui/MathRenderer';
@@ -707,11 +707,21 @@ export default function ChallengeBlitzClient({
                         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
                             <Link
                                 href={{ pathname: '/dashboard/[module]', params: { module: moduleId } }}
+                                className="px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-bold shadow-lg hover:-translate-y-0.5 hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                            >
+                                <RotateCcw className="w-4 h-4" />
+                                {t('playAgain')}
+                            </Link>
+                            <Link
+                                href={{ pathname: '/dashboard/[module]', params: { module: moduleId } }}
                                 className="px-6 sm:px-8 py-2.5 sm:py-3 border-2 border-gray-200 rounded-xl font-bold text-gray-600 hover:border-gray-400 transition-all flex items-center justify-center"
                             >
                                 {t('backToModule')}
                             </Link>
                         </div>
+
+                        {/* Watermark */}
+                        <p className="text-xs text-gray-300 mt-6">justmathing.com</p>
                     </motion.div>
                 )}
 
@@ -787,11 +797,21 @@ export default function ChallengeBlitzClient({
                         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
                             <Link
                                 href={{ pathname: '/dashboard/[module]', params: { module: moduleId } }}
+                                className="px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-bold shadow-lg hover:-translate-y-0.5 hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                            >
+                                <RotateCcw className="w-4 h-4" />
+                                {t('playAgain')}
+                            </Link>
+                            <Link
+                                href={{ pathname: '/dashboard/[module]', params: { module: moduleId } }}
                                 className="px-6 sm:px-8 py-2.5 sm:py-3 border-2 border-gray-200 rounded-xl font-bold text-gray-600 hover:border-gray-400 transition-all flex items-center justify-center"
                             >
                                 {t('backToModule')}
                             </Link>
                         </div>
+
+                        {/* Watermark */}
+                        <p className="text-xs text-gray-300 mt-6">justmathing.com</p>
                     </motion.div>
                 )}
             </main>

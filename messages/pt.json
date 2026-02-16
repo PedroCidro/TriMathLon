@@ -364,7 +364,8 @@
         "difficultyEasy": "Fácil",
         "difficultyMedium": "Médio",
         "difficultyHard": "Difícil",
-        "randomizeOrder": "Ordem aleatória"
+        "randomizeOrder": "Ordem aleatória",
+        "playAgain": "Jogar de Novo?"
     },
     "Groups": {
         "title": "Grupos de Estudo",
