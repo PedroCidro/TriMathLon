@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
     const supabase = getSupabaseAdmin();
 
     // Run queries in parallel
-    const [exercisesResult, activeResult, topStudentsResult, ...uniResults] = await Promise.all([
+    const [exercisesResult, activeResult, questionsCountResult, topStudentsResult, ...uniResults] = await Promise.all([
         // Total exercises solved across all users
         supabase.from('profiles').select('exercises_solved'),
         // Active students (anyone with >= 1 exercise)
@@ -38,6 +38,10 @@ export async function GET(req: NextRequest) {
             .from('profiles')
             .select('id', { count: 'exact', head: true })
             .gt('exercises_solved', 0),
+        // Total questions available
+        supabase
+            .from('questions')
+            .select('id', { count: 'exact', head: true }),
         // Top 5 opted-in students
         supabase
             .from('profiles')
@@ -87,7 +91,7 @@ export async function GET(req: NextRequest) {
     const data: CachedData = {
         total_exercises_solved,
         total_active_students,
-        total_questions_available: 56000,
+        total_questions_available: questionsCountResult.count ?? 0,
         top_students,
         university_battle,
     };

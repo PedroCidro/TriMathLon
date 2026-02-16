@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { X, Check, Copy, Loader2, Swords } from 'lucide-react';
+import { X, Check, Copy, Loader2, Swords, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useRouter } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import type { Module } from '@/data/curriculum';
 
-type ModalStep = 'select' | 'sharing' | 'waiting';
+type ChallengeMode = 'duel' | 'public';
+type ModalStep = 'mode' | 'select' | 'sharing' | 'waiting';
 
 export default function ChallengeCreatorModal({
     moduleData,
@@ -20,7 +21,8 @@ export default function ChallengeCreatorModal({
     const tc = useTranslations('Curriculum');
     const router = useRouter();
 
-    const [step, setStep] = useState<ModalStep>('select');
+    const [mode, setMode] = useState<ChallengeMode>('duel');
+    const [step, setStep] = useState<ModalStep>('mode');
     const [selectedTopics, setSelectedTopics] = useState<string[]>(
         moduleData.topics.map(t => t.id)
     );
@@ -54,6 +56,7 @@ export default function ChallengeCreatorModal({
                 body: JSON.stringify({
                     module_id: moduleData.id,
                     topic_ids: selectedTopics,
+                    type: mode,
                 }),
             });
 
@@ -65,7 +68,17 @@ export default function ChallengeCreatorModal({
 
             const data = await res.json();
             setChallengeId(data.challenge_id);
-            setStep('sharing');
+
+            if (mode === 'public') {
+                // Score Attack: redirect straight to gameplay
+                router.push({
+                    pathname: '/dashboard/[module]/challenge/[challengeId]',
+                    params: { module: moduleData.id, challengeId: data.challenge_id },
+                });
+            } else {
+                // Duel: show sharing step
+                setStep('sharing');
+            }
         } catch {
             setError('Failed to create challenge');
         } finally {
@@ -88,7 +101,7 @@ export default function ChallengeCreatorModal({
         setStep('waiting');
     };
 
-    // Poll for opponent acceptance
+    // Poll for opponent acceptance (duel only)
     useEffect(() => {
         if (step !== 'waiting' || !challengeId) return;
 
@@ -144,6 +157,56 @@ export default function ChallengeCreatorModal({
                     </div>
                 </div>
 
+                {/* Step: Mode Selection */}
+                {step === 'mode' && (
+                    <>
+                        <div className="space-y-3 mb-6">
+                            <button
+                                onClick={() => setMode('duel')}
+                                className={cn(
+                                    "w-full flex items-start gap-3 p-4 rounded-xl border-2 transition-all text-left",
+                                    mode === 'duel'
+                                        ? "border-orange-400 bg-orange-50"
+                                        : "border-gray-200 hover:border-gray-300"
+                                )}
+                            >
+                                <div className="p-2 bg-white rounded-lg shadow-sm">
+                                    <Swords className="w-5 h-5 text-orange-500" />
+                                </div>
+                                <div>
+                                    <p className="font-bold text-gray-900">{t('duel')}</p>
+                                    <p className="text-sm text-gray-500">{t('duelDesc')}</p>
+                                </div>
+                            </button>
+
+                            <button
+                                onClick={() => setMode('public')}
+                                className={cn(
+                                    "w-full flex items-start gap-3 p-4 rounded-xl border-2 transition-all text-left",
+                                    mode === 'public'
+                                        ? "border-orange-400 bg-orange-50"
+                                        : "border-gray-200 hover:border-gray-300"
+                                )}
+                            >
+                                <div className="p-2 bg-white rounded-lg shadow-sm">
+                                    <Trophy className="w-5 h-5 text-orange-500" />
+                                </div>
+                                <div>
+                                    <p className="font-bold text-gray-900">{t('scoreAttack')}</p>
+                                    <p className="text-sm text-gray-500">{t('scoreAttackDesc')}</p>
+                                </div>
+                            </button>
+                        </div>
+
+                        <button
+                            onClick={() => setStep('select')}
+                            className="w-full px-6 py-3.5 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-bold text-base shadow-lg hover:-translate-y-0.5 hover:shadow-xl transition-all"
+                        >
+                            {t('selectTopics')}
+                        </button>
+                    </>
+                )}
+
                 {/* Step: Select Topics */}
                 {step === 'select' && (
                     <>
@@ -191,6 +254,8 @@ export default function ChallengeCreatorModal({
                                     <Loader2 className="w-5 h-5 animate-spin" />
                                     {t('creating')}
                                 </>
+                            ) : mode === 'public' ? (
+                                t('playNow')
                             ) : (
                                 t('createChallenge')
                             )}
@@ -198,7 +263,7 @@ export default function ChallengeCreatorModal({
                     </>
                 )}
 
-                {/* Step: Share Link */}
+                {/* Step: Share Link (duel only) */}
                 {step === 'sharing' && (
                     <>
                         <p className="text-sm text-gray-600 mb-4">{t('shareLink')}</p>
@@ -244,7 +309,7 @@ export default function ChallengeCreatorModal({
                     </>
                 )}
 
-                {/* Step: Waiting */}
+                {/* Step: Waiting (duel only) */}
                 {step === 'waiting' && (
                     <div className="text-center py-6">
                         <Loader2 className="w-10 h-10 animate-spin text-orange-500 mx-auto mb-4" />

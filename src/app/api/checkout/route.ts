@@ -10,6 +10,9 @@ export async function POST(req: NextRequest) {
         const PRICE_UNIVERSAL = process.env.STRIPE_PRICE_ID_UNIVERSAL;
         const PRICE_STUDENT = process.env.STRIPE_PRICE_ID_STUDENT;
         const PRICE_INTERNATIONAL = process.env.STRIPE_PRICE_ID_INTERNATIONAL;
+        const PRICE_MONTHLY_UNIVERSAL = process.env.STRIPE_PRICE_ID_MONTHLY_UNIVERSAL;
+        const PRICE_MONTHLY_STUDENT = process.env.STRIPE_PRICE_ID_MONTHLY_STUDENT;
+        const PRICE_MONTHLY_INTERNATIONAL = process.env.STRIPE_PRICE_ID_MONTHLY_INTERNATIONAL;
         const { userId } = await auth();
         if (!userId) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -36,24 +39,30 @@ export async function POST(req: NextRequest) {
             });
         }
 
-        const { locale } = await req.json().catch(() => ({ locale: undefined }));
+        const { locale, plan } = await req.json().catch(() => ({ locale: undefined, plan: undefined }));
         const isInternational = locale === 'en';
         const isInstitutional = !!existingProfile?.institution;
+        const isMonthly = plan === 'monthly';
 
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
         const stripe = getStripe();
 
-        const priceId = isInternational
-            ? PRICE_INTERNATIONAL
-            : isInstitutional ? PRICE_STUDENT : PRICE_UNIVERSAL;
+        const priceId = isMonthly
+            ? (isInternational
+                ? PRICE_MONTHLY_INTERNATIONAL
+                : isInstitutional ? PRICE_MONTHLY_STUDENT : PRICE_MONTHLY_UNIVERSAL)
+            : (isInternational
+                ? PRICE_INTERNATIONAL
+                : isInstitutional ? PRICE_STUDENT : PRICE_UNIVERSAL);
 
         if (!priceId) {
-            const varName = isInternational
-                ? 'STRIPE_PRICE_ID_INTERNATIONAL'
-                : isInstitutional ? 'STRIPE_PRICE_ID_STUDENT' : 'STRIPE_PRICE_ID_UNIVERSAL';
-            console.error('Missing env var:', varName);
+            const prefix = isMonthly ? 'STRIPE_PRICE_ID_MONTHLY_' : 'STRIPE_PRICE_ID_';
+            const suffix = isInternational
+                ? 'INTERNATIONAL'
+                : isInstitutional ? 'STUDENT' : 'UNIVERSAL';
+            console.error('Missing env var:', prefix + suffix);
             return NextResponse.json(
-                { error: `Server misconfiguration: missing ${varName}` },
+                { error: `Server misconfiguration: missing ${prefix + suffix}` },
                 { status: 500 },
             );
         }
@@ -66,11 +75,17 @@ export async function POST(req: NextRequest) {
                     quantity: 1,
                 },
             ],
-            mode: 'payment',
+            mode: isMonthly ? 'subscription' : 'payment',
             metadata: { clerk_user_id: userId },
             success_url: `${baseUrl}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${baseUrl}/dashboard`,
         };
+
+        if (isMonthly) {
+            sessionParams.subscription_data = {
+                metadata: { clerk_user_id: userId },
+            };
+        }
 
         const session = await stripe.checkout.sessions.create(sessionParams);
 

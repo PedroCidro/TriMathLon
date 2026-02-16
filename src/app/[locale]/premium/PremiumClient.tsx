@@ -20,6 +20,8 @@ const INSTITUTION_ACCENTS: Record<string, { badge: string; badgeBg: string; badg
     ufscar: { badge: 'text-red-700', badgeBg: 'bg-red-50', badgeBorder: 'border-red-200' },
 };
 
+type Plan = 'monthly' | 'lifetime';
+
 interface PremiumClientProps {
     locale: string;
     institutionId: string | null;
@@ -34,15 +36,21 @@ export default function PremiumClient({
     premiumHeadline,
 }: PremiumClientProps) {
     const [loading, setLoading] = useState(false);
+    const [selectedPlan, setSelectedPlan] = useState<Plan>('lifetime');
     const t = useTranslations('Premium');
     const tc = useTranslations('Curriculum');
     const tCommon = useTranslations('Common');
 
     const isInternational = locale === 'en';
     const isInstitutional = !!institutionId;
-    const price = isInternational
+
+    const monthlyPrice = isInternational
+        ? '$9.99'
+        : isInstitutional ? 'R$ 14,99' : 'R$ 19,99';
+    const lifetimePrice = isInternational
         ? '$49.99'
         : isInstitutional ? 'R$ 99,99' : 'R$ 139,99';
+
     const accent = institutionId ? INSTITUTION_ACCENTS[institutionId] : null;
 
     const handleCheckout = async () => {
@@ -51,7 +59,7 @@ export default function PremiumClient({
             const response = await fetch('/api/checkout', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ locale }),
+                body: JSON.stringify({ locale, plan: selectedPlan }),
             });
 
             if (!response.ok) {
@@ -89,6 +97,56 @@ export default function PremiumClient({
         topics: mod.topics.slice(3),
     }));
 
+    const ctaLabel = selectedPlan === 'monthly' ? t('subscribeMonthly') : t('subscribe');
+
+    const PlanCards = () => (
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 max-w-md mx-auto w-full">
+            {/* Monthly card */}
+            <button
+                type="button"
+                onClick={() => setSelectedPlan('monthly')}
+                className={cn(
+                    "relative rounded-2xl border-2 p-4 sm:p-5 text-left transition-all",
+                    selectedPlan === 'monthly'
+                        ? "border-blue-600 bg-blue-50/50 shadow-md"
+                        : "border-gray-200 bg-white hover:border-gray-300"
+                )}
+            >
+                <span className="text-sm font-bold text-gray-500 uppercase tracking-wide">
+                    {t('monthlyLabel')}
+                </span>
+                <div className="mt-2">
+                    <span className="text-2xl sm:text-3xl font-bold text-gray-900">{monthlyPrice}</span>
+                    <span className="text-sm text-gray-400 font-medium">/{tCommon('month')}</span>
+                </div>
+                <p className="text-xs text-gray-400 mt-2 font-medium">{t('cancelAnytime')}</p>
+            </button>
+
+            {/* Lifetime card */}
+            <button
+                type="button"
+                onClick={() => setSelectedPlan('lifetime')}
+                className={cn(
+                    "relative rounded-2xl border-2 p-4 sm:p-5 text-left transition-all",
+                    selectedPlan === 'lifetime'
+                        ? "border-blue-600 bg-blue-50/50 shadow-md"
+                        : "border-gray-200 bg-white hover:border-gray-300"
+                )}
+            >
+                <div className="absolute -top-3 right-3 bg-blue-600 text-white text-xs font-bold px-2.5 py-0.5 rounded-full">
+                    {t('bestValue')}
+                </div>
+                <span className="text-sm font-bold text-gray-500 uppercase tracking-wide">
+                    {t('lifetimeLabel')}
+                </span>
+                <div className="mt-2">
+                    <span className="text-2xl sm:text-3xl font-bold text-gray-900">{lifetimePrice}</span>
+                </div>
+                <p className="text-xs text-gray-400 mt-2 font-medium">{t('payOnce')}</p>
+            </button>
+        </div>
+    );
+
     return (
         <div className="min-h-screen flex flex-col bg-white">
             {/* Navigation */}
@@ -118,24 +176,17 @@ export default function PremiumClient({
                         {t('heroSubtitle')}
                     </p>
 
-                    <div className="pt-4">
-                        <div className="flex flex-col items-center gap-1 mb-6">
-                            <span className="text-3xl sm:text-5xl font-bold text-gray-900">{price}</span>
-                            <span className="text-lg text-gray-400 font-medium">{t('lifetime')}</span>
-                        </div>
+                    <div className="pt-4 space-y-6">
+                        <PlanCards />
 
                         <button
                             onClick={handleCheckout}
                             disabled={loading}
                             className="inline-flex items-center gap-3 bg-blue-600 text-white font-bold py-4 px-10 rounded-full text-lg shadow-[0_4px_0_0_rgb(29,78,216)] active:shadow-none active:translate-y-[4px] transition-all hover:bg-blue-500 hover:-translate-y-1 hover:shadow-[0_6px_0_0_rgb(29,78,216)] disabled:opacity-60 disabled:pointer-events-none"
                         >
-                            {loading ? t('processing') : t('subscribe')}
+                            {loading ? t('processing') : ctaLabel}
                             {!loading && <ArrowRight className="w-5 h-5" />}
                         </button>
-
-                        <p className="text-sm text-gray-400 mt-4 font-medium">
-                            {t('oneTimePayment')}
-                        </p>
                     </div>
                 </div>
             </section>
@@ -197,23 +248,16 @@ export default function PremiumClient({
             {/* Bottom CTA */}
             <section className="px-6 py-20">
                 <div className="max-w-2xl mx-auto text-center space-y-6">
-                    <div className="flex flex-col items-center gap-1 mb-2">
-                        <span className="text-3xl sm:text-4xl font-bold text-gray-900">{price}</span>
-                        <span className="text-lg text-gray-400 font-medium">{t('lifetime')}</span>
-                    </div>
+                    <PlanCards />
 
                     <button
                         onClick={handleCheckout}
                         disabled={loading}
                         className="inline-flex items-center gap-3 bg-blue-600 text-white font-bold py-4 px-10 rounded-full text-lg shadow-[0_4px_0_0_rgb(29,78,216)] active:shadow-none active:translate-y-[4px] transition-all hover:bg-blue-500 hover:-translate-y-1 hover:shadow-[0_6px_0_0_rgb(29,78,216)] disabled:opacity-60 disabled:pointer-events-none"
                     >
-                        {loading ? t('processing') : t('subscribe')}
+                        {loading ? t('processing') : ctaLabel}
                         {!loading && <ArrowRight className="w-5 h-5" />}
                     </button>
-
-                    <p className="text-sm text-gray-400 font-medium">
-                        {t('oneTimePaymentLong')}
-                    </p>
                 </div>
             </section>
         </div>

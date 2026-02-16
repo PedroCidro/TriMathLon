@@ -3,6 +3,8 @@ import { auth } from '@clerk/nextjs/server';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { rateLimit } from '@/lib/rate-limit';
 
+const ONE_HOUR_MS = 60 * 60 * 1000;
+
 export async function GET(request: Request) {
     try {
         const { userId } = await auth();
@@ -25,7 +27,7 @@ export async function GET(request: Request) {
         // Fetch challenge
         const { data: challenge, error: fetchErr } = await supabase
             .from('challenges')
-            .select('creator_id, opponent_id, status, question_ids')
+            .select('creator_id, opponent_id, status, question_ids, type, game_started_at')
             .eq('id', challengeId)
             .single();
 
@@ -33,14 +35,46 @@ export async function GET(request: Request) {
             return NextResponse.json({ error: 'Challenge not found' }, { status: 404 });
         }
 
-        // Only participants
-        if (challenge.creator_id !== userId && challenge.opponent_id !== userId) {
-            return NextResponse.json({ error: 'Not a participant' }, { status: 403 });
-        }
+        const isPublic = challenge.type === 'public';
 
-        // Only serve questions when status >= ready (not 'waiting')
-        if (challenge.status === 'waiting') {
-            return NextResponse.json({ error: 'Challenge not ready yet' }, { status: 400 });
+        if (isPublic) {
+            // Stale cleanup: if public + playing + game_started_at > 1 hour ago, auto-expire
+            if (challenge.status === 'playing' && challenge.game_started_at) {
+                const elapsed = Date.now() - new Date(challenge.game_started_at).getTime();
+                if (elapsed > ONE_HOUR_MS) {
+                    await supabase.from('challenges').update({ status: 'expired' }).eq('id', challengeId);
+                    return NextResponse.json({ error: 'Challenge has expired' }, { status: 410 });
+                }
+            }
+
+            // Public challenges: allow when status is 'playing' or 'open'
+            if (challenge.status !== 'playing' && challenge.status !== 'open') {
+                return NextResponse.json({ error: 'Challenge is not available' }, { status: 400 });
+            }
+
+            // For 'open' status: check user hasn't already played
+            if (challenge.status === 'open') {
+                const { data: existing } = await supabase
+                    .from('challenge_attempts')
+                    .select('id')
+                    .eq('challenge_id', challengeId)
+                    .eq('user_id', userId)
+                    .maybeSingle();
+
+                if (existing) {
+                    return NextResponse.json({ error: 'You have already played this challenge' }, { status: 409 });
+                }
+            }
+        } else {
+            // Duel: only participants
+            if (challenge.creator_id !== userId && challenge.opponent_id !== userId) {
+                return NextResponse.json({ error: 'Not a participant' }, { status: 403 });
+            }
+
+            // Only serve questions when status >= ready (not 'waiting')
+            if (challenge.status === 'waiting') {
+                return NextResponse.json({ error: 'Challenge not ready yet' }, { status: 400 });
+            }
         }
 
         // Fetch full question data in seeded order

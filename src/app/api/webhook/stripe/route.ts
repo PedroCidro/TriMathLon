@@ -35,14 +35,20 @@ export async function POST(req: NextRequest) {
             }
 
             const customerId = typeof session.customer === 'string' ? session.customer : null;
+            const subscriptionId = typeof session.subscription === 'string' ? session.subscription : null;
+
+            const upsertData: Record<string, unknown> = {
+                id: clerkUserId,
+                is_premium: true,
+                stripe_customer_id: customerId,
+            };
+            if (subscriptionId) {
+                upsertData.stripe_subscription_id = subscriptionId;
+            }
 
             const { error } = await getSupabaseAdmin()
                 .from('profiles')
-                .upsert({
-                    id: clerkUserId,
-                    is_premium: true,
-                    stripe_customer_id: customerId,
-                }, { onConflict: 'id' });
+                .upsert(upsertData, { onConflict: 'id' });
 
             if (error) {
                 console.error('Failed to update premium status:', error.message);

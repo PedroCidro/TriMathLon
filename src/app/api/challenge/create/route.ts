@@ -34,7 +34,11 @@ export async function POST(request: Request) {
         if (limited) return limited;
 
         const body = await request.json();
-        const { module_id, topic_ids } = body;
+        const { module_id, topic_ids, type = 'duel' } = body;
+
+        if (type !== 'duel' && type !== 'public') {
+            return NextResponse.json({ error: 'Invalid type (must be duel or public)' }, { status: 400 });
+        }
 
         // Validate module
         if (!module_id || !VALID_MODULES.has(module_id)) {
@@ -83,17 +87,21 @@ export async function POST(request: Request) {
         const challengeId = nanoid(12);
         const gameDuration = GAME_DURATION[module_id] ?? 180;
 
+        const isPublic = type === 'public';
+
         const { error: insertErr } = await supabase
             .from('challenges')
             .insert({
                 id: challengeId,
                 creator_id: userId,
-                status: 'waiting',
+                status: isPublic ? 'playing' : 'waiting',
+                type,
                 module_id,
                 topic_ids,
                 question_ids: sortedIds,
                 game_duration_seconds: gameDuration,
                 unlocked_premium_topics: premiumTopics,
+                ...(isPublic ? { game_started_at: new Date().toISOString(), creator_finished: false } : {}),
             });
 
         if (insertErr) {
