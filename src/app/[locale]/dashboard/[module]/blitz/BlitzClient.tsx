@@ -33,7 +33,11 @@ type LeaderboardEntry = {
     position: number;
 };
 
-const GAME_DURATION = 180; // 3 minutes
+const GAME_DURATION: Record<string, number> = {
+    derivadas: 180,  // 3 minutes
+    integrais: 180,  // 3 minutes
+    edos: 600,       // 10 minutes
+};
 const MAX_STRIKES = 3;
 const FEEDBACK_DELAY = 1000; // 1s delay after answer selection
 
@@ -55,7 +59,8 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
     const [blitzMode, setBlitzMode] = useState<BlitzMode>('solve');
     const [gameState, setGameState] = useState<GameState>('ready');
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
+    const gameDuration = GAME_DURATION[moduleId] ?? 180;
+    const [timeLeft, setTimeLeft] = useState(gameDuration);
     const [strikes, setStrikes] = useState(0);
     const [score, setScore] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -192,7 +197,7 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
         }
         setGameState('playing');
         setCurrentIndex(0);
-        setTimeLeft(GAME_DURATION);
+        setTimeLeft(gameDuration);
         setStrikes(0);
         setScore(0);
         setLeaderboard([]);
@@ -489,7 +494,7 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
                             </h2>
                             <p className="text-gray-500 mb-1">
                                 {t('problemsSolved', { count: score })}
-                                {' '}{formatTime(GAME_DURATION - timeLeft)}
+                                {' '}{formatTime(gameDuration - timeLeft)}
                             </p>
                             <p className="text-gray-400 text-sm">
                                 {t('errorsCount', { count: strikes })}

@@ -132,15 +132,19 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
     };
 
     // ── Recognize: Fetch Questions ──
+    const allTopicIds = useMemo(() => {
+        return moduleData?.topics.map(t => t.id) || [];
+    }, [moduleData]);
+
     const fetchRecognizeQuestions = useCallback(async () => {
-        if (recognizeFetched.current || cumulativeTopicIds.length === 0) return;
+        if (recognizeFetched.current || allTopicIds.length === 0) return;
         setRecognizeLoading(true);
         const supabase = supabaseRef.current;
 
         const { data, error } = await supabase
             .from('questions')
             .select('id, problem, subcategory')
-            .in('subcategory', cumulativeTopicIds)
+            .in('subcategory', allTopicIds)
             .limit(20);
 
         if (error) {
@@ -152,7 +156,7 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
             recognizeFetched.current = true;
         }
         setRecognizeLoading(false);
-    }, [cumulativeTopicIds]);
+    }, [allTopicIds]);
 
     useEffect(() => {
         if (activeTab === 'recognize' && !recognizeFetched.current) {

@@ -5,7 +5,11 @@ import { rateLimit } from '@/lib/rate-limit';
 
 const VALID_MODULES = ['derivadas', 'integrais', 'edos'];
 const MAX_STRIKES = 3;
-const GAME_DURATION = 180; // 3 minutes
+const GAME_DURATION: Record<string, number> = {
+    derivadas: 180,  // 3 minutes
+    integrais: 180,  // 3 minutes
+    edos: 600,       // 10 minutes
+};
 const MAX_SCORE_PER_SECOND = 1; // at most 1 correct answer per second
 
 export async function POST(request: Request) {
@@ -30,7 +34,8 @@ export async function POST(request: Request) {
         if (typeof strikes !== 'number' || !Number.isInteger(strikes) || strikes < 0 || strikes > MAX_STRIKES) {
             return NextResponse.json({ error: 'Invalid strikes' }, { status: 400 });
         }
-        if (typeof duration_seconds !== 'number' || !Number.isInteger(duration_seconds) || duration_seconds < 1 || duration_seconds > GAME_DURATION + 5) {
+        const maxDuration = GAME_DURATION[module_id] ?? 180;
+        if (typeof duration_seconds !== 'number' || !Number.isInteger(duration_seconds) || duration_seconds < 1 || duration_seconds > maxDuration + 5) {
             return NextResponse.json({ error: 'Invalid duration_seconds' }, { status: 400 });
         }
 
