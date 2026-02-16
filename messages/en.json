@@ -358,7 +358,13 @@
         "signUpToPlay": "Sign Up to Play",
         "playChallenge": "Play",
         "scoreAttackBy": "Score Attack by {name}",
-        "creatorLabel": "Creator"
+        "creatorLabel": "Creator",
+        "difficultyLabel": "Difficulty",
+        "difficultyAll": "All",
+        "difficultyEasy": "Easy",
+        "difficultyMedium": "Medium",
+        "difficultyHard": "Hard",
+        "randomizeOrder": "Random order"
     },
     "Groups": {
         "title": "Study Groups",

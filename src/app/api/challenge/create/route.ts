@@ -34,7 +34,7 @@ export async function POST(request: Request) {
         if (limited) return limited;
 
         const body = await request.json();
-        const { module_id, topic_ids, type = 'duel' } = body;
+        const { module_id, topic_ids, type = 'duel', difficulty, randomize } = body;
 
         if (type !== 'duel' && type !== 'public') {
             return NextResponse.json({ error: 'Invalid type (must be duel or public)' }, { status: 400 });
@@ -57,15 +57,25 @@ export async function POST(request: Request) {
             }
         }
 
+        // Validate difficulty filter
+        if (difficulty !== undefined && ![1, 2, 3].includes(difficulty)) {
+            return NextResponse.json({ error: 'difficulty must be 1, 2, or 3' }, { status: 400 });
+        }
+
         const supabase = getSupabaseAdmin();
 
-        // Seed questions: fetch from selected topics, with distractors, sorted by difficulty
-        const { data: questions, error: qErr } = await supabase
+        // Seed questions: fetch from selected topics, with distractors
+        let query = supabase
             .from('questions')
             .select('id, difficulty')
             .in('subcategory', topic_ids)
-            .not('distractors', 'is', null)
-            .limit(50);
+            .not('distractors', 'is', null);
+
+        if (difficulty) {
+            query = query.eq('difficulty', difficulty);
+        }
+
+        const { data: questions, error: qErr } = await query.limit(50);
 
         if (qErr) {
             console.error('Failed to fetch questions for challenge:', qErr.message);
@@ -76,10 +86,21 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Not enough questions for selected topics' }, { status: 400 });
         }
 
-        // Sort by difficulty ascending
-        const sortedIds = questions
-            .sort((a, b) => a.difficulty - b.difficulty)
-            .map(q => q.id);
+        // Shuffle or sort by difficulty ascending
+        let orderedIds: string[];
+        if (randomize) {
+            // Fisher-Yates shuffle
+            const arr = [...questions];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            orderedIds = arr.map(q => q.id);
+        } else {
+            orderedIds = questions
+                .sort((a, b) => a.difficulty - b.difficulty)
+                .map(q => q.id);
+        }
 
         // Identify premium topics used
         const premiumTopics = topic_ids.filter((t: string) => PREMIUM_TOPICS.has(t));
@@ -98,7 +119,7 @@ export async function POST(request: Request) {
                 type,
                 module_id,
                 topic_ids,
-                question_ids: sortedIds,
+                question_ids: orderedIds,
                 game_duration_seconds: gameDuration,
                 unlocked_premium_topics: premiumTopics,
                 ...(isPublic ? { game_started_at: new Date().toISOString(), creator_finished: false } : {}),
@@ -111,7 +132,7 @@ export async function POST(request: Request) {
 
         return NextResponse.json({
             challenge_id: challengeId,
-            question_count: sortedIds.length,
+            question_count: orderedIds.length,
         });
     } catch (err) {
         console.error('Create challenge error:', err instanceof Error ? err.message : 'Unknown error');

@@ -358,7 +358,13 @@
         "signUpToPlay": "Criar Conta para Jogar",
         "playChallenge": "Jogar",
         "scoreAttackBy": "Score Attack de {name}",
-        "creatorLabel": "Criador"
+        "creatorLabel": "Criador",
+        "difficultyLabel": "Dificuldade",
+        "difficultyAll": "Todas",
+        "difficultyEasy": "Fácil",
+        "difficultyMedium": "Médio",
+        "difficultyHard": "Difícil",
+        "randomizeOrder": "Ordem aleatória"
     },
     "Groups": {
         "title": "Grupos de Estudo",

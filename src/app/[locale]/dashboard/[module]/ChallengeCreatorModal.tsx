@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { X, Check, Copy, Loader2, Swords, Trophy } from 'lucide-react';
+import { X, Check, Copy, Loader2, Swords, Trophy, Shuffle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useRouter } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
@@ -9,6 +9,7 @@ import type { Module } from '@/data/curriculum';
 
 type ChallengeMode = 'duel' | 'public';
 type ModalStep = 'mode' | 'select' | 'sharing' | 'waiting';
+type DifficultyFilter = 'all' | 1 | 2 | 3;
 
 export default function ChallengeCreatorModal({
     moduleData,
@@ -26,6 +27,8 @@ export default function ChallengeCreatorModal({
     const [selectedTopics, setSelectedTopics] = useState<string[]>(
         moduleData.topics.map(t => t.id)
     );
+    const [difficulty, setDifficulty] = useState<DifficultyFilter>('all');
+    const [randomize, setRandomize] = useState(false);
     const [creating, setCreating] = useState(false);
     const [challengeId, setChallengeId] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
@@ -57,6 +60,8 @@ export default function ChallengeCreatorModal({
                     module_id: moduleData.id,
                     topic_ids: selectedTopics,
                     type: mode,
+                    difficulty: difficulty === 'all' ? undefined : difficulty,
+                    randomize,
                 }),
             });
 
@@ -239,6 +244,45 @@ export default function ChallengeCreatorModal({
                                 </button>
                             ))}
                         </div>
+
+                        {/* Difficulty filter */}
+                        <p className="text-sm font-medium text-gray-700 mb-2">{t('difficultyLabel')}</p>
+                        <div className="flex gap-2 mb-4">
+                            {([['all', t('difficultyAll')], [1, t('difficultyEasy')], [2, t('difficultyMedium')], [3, t('difficultyHard')]] as [DifficultyFilter, string][]).map(([value, label]) => (
+                                <button
+                                    key={String(value)}
+                                    onClick={() => setDifficulty(value)}
+                                    className={cn(
+                                        "flex-1 py-2 rounded-xl text-sm font-bold border-2 transition-all",
+                                        difficulty === value
+                                            ? "border-orange-400 bg-orange-50 text-orange-700"
+                                            : "border-gray-200 text-gray-500 hover:border-gray-300"
+                                    )}
+                                >
+                                    {label}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Randomize toggle */}
+                        <button
+                            onClick={() => setRandomize(prev => !prev)}
+                            className={cn(
+                                "w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all mb-6",
+                                randomize
+                                    ? "border-orange-400 bg-orange-50"
+                                    : "border-gray-200 hover:border-gray-300"
+                            )}
+                        >
+                            <div className={cn(
+                                "w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors flex-shrink-0",
+                                randomize ? "bg-orange-500 border-orange-500" : "border-gray-300"
+                            )}>
+                                {randomize && <Check className="w-3.5 h-3.5 text-white" />}
+                            </div>
+                            <Shuffle className="w-4 h-4 text-gray-500" />
+                            <span className="text-sm font-medium text-gray-800">{t('randomizeOrder')}</span>
+                        </button>
 
                         {error && (
                             <p className="text-sm text-red-500 mb-3">{error}</p>
