@@ -146,31 +146,6 @@ export default function DashboardClient({
                         <span className="hidden sm:inline">{xpTotal}</span>
                     </div>
 
-                    {/* Groups */}
-                    <div className="relative" ref={groupsTooltipRef}>
-                        <Link
-                            href="/groups"
-                            onClick={showGroupsTooltip ? dismissGroupsTooltip : undefined}
-                            className="text-gray-400 hover:text-gray-700 transition-colors"
-                        >
-                            <Users className="w-4.5 h-4.5" />
-                        </Link>
-                        <AnimatePresence>
-                            {showGroupsTooltip && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: -4 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -4 }}
-                                    transition={{ duration: 0.2 }}
-                                    className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 w-52 bg-gray-900 text-white text-xs font-medium rounded-lg px-3 py-2 shadow-lg text-center"
-                                >
-                                    <div className="absolute left-1/2 -translate-x-1/2 -top-1.5 w-3 h-3 bg-gray-900 rotate-45 rounded-sm" />
-                                    <span className="relative">{t('groupsTooltip')}</span>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
-
                     {/* Settings */}
                     <Link href="/dashboard/settings" className="hidden sm:block text-gray-400 hover:text-gray-700 transition-colors">
                         <Settings className="w-4.5 h-4.5" />
@@ -186,7 +161,36 @@ export default function DashboardClient({
             <main className="flex-1 max-w-5xl mx-auto w-full p-4 sm:p-6 md:p-12">
 
                 <header className="mb-10">
-                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('yourArena')}</h1>
+                    <div className="flex items-center justify-between">
+                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('yourArena')}</h1>
+                        <div className="flex items-center gap-3">
+                            {/* Groups */}
+                            <div className="relative" ref={groupsTooltipRef}>
+                                <Link
+                                    href="/groups"
+                                    onClick={showGroupsTooltip ? dismissGroupsTooltip : undefined}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-xl font-bold text-sm text-blue-700 transition-colors"
+                                >
+                                    <Users className="w-4 h-4 text-blue-600" />
+                                    <span className="hidden sm:inline">{t('groupsLabel')}</span>
+                                </Link>
+                                <AnimatePresence>
+                                    {showGroupsTooltip && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: -4 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -4 }}
+                                            transition={{ duration: 0.2 }}
+                                            className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 w-52 bg-gray-900 text-white text-xs font-medium rounded-lg px-3 py-2 shadow-lg text-center"
+                                        >
+                                            <div className="absolute left-1/2 -translate-x-1/2 -top-1.5 w-3 h-3 bg-gray-900 rotate-45 rounded-sm" />
+                                            <span className="relative">{t('groupsTooltip')}</span>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                        </div>
+                    </div>
                     <p className="text-gray-500 mt-2">{t('chooseModule')}</p>
                 </header>
 

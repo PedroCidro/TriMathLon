@@ -98,7 +98,8 @@
         "uniQualifiedCta": "View full ranking",
         "uniNotQualified": "{remaining} exercises left for {name} to enter the ranking!",
         "rankingTooltip": "Tap here to see your stats and ranking!",
-        "groupsTooltip": "Create study groups and compete with friends!"
+        "groupsTooltip": "Create study groups and compete with friends!",
+        "groupsLabel": "Groups"
     },
     "Module": {
         "notFound": "Module not found",
