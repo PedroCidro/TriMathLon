@@ -316,17 +316,19 @@ export default function ChallengeBlitzClient({
         };
     }, [gameState]);
 
-    // Poll opponent during playing/waiting states (duel only)
+    // Poll opponent during playing/waiting/finished states (duel only)
     useEffect(() => {
         if (isPublic) return;
-        if (gameState !== 'playing' && gameState !== 'waiting') return;
+        if (gameState !== 'playing' && gameState !== 'waiting' && gameState !== 'finished') return;
+        // Stop polling once opponent is done
+        if (gameState === 'finished' && opponentFinished) return;
 
         pollRef.current = setInterval(pollOpponent, 4000);
 
         return () => {
             if (pollRef.current) clearInterval(pollRef.current);
         };
-    }, [gameState, pollOpponent, isPublic]);
+    }, [gameState, pollOpponent, isPublic, opponentFinished]);
 
     // Send final score when game finishes
     useEffect(() => {
@@ -362,8 +364,8 @@ export default function ChallengeBlitzClient({
 
         answerCountRef.current++;
 
-        // Send score update every 2 answers (duel only)
-        if (!isPublic && answerCountRef.current % 2 === 0) {
+        // Send score update after every answer (duel only)
+        if (!isPublic) {
             fetch('/api/challenge/update-score', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
