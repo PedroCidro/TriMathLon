@@ -131,9 +131,14 @@ export default function ChallengeBlitzClient({
         );
     };
 
+    // Strip answer prefixes like "f'(x) = ", "y = ", "y' = " so correct answer matches distractor format
+    const stripAnswerPrefix = (latex: string): string => {
+        return latex.replace(/^\$\s*(?:f'\(x\)\s*=\s*|y'\s*=\s*|y\s*=\s*)/i, '$');
+    };
+
     // Build shuffled options
     const buildOptions = useCallback((question: Question) => {
-        const correct = question.solution_latex;
+        const correct = stripAnswerPrefix(question.solution_latex);
         const allOptions = shuffleArray([correct, ...question.distractors]);
         setOptions(allOptions);
         setCorrectOptionIndex(allOptions.indexOf(correct));
