@@ -15,6 +15,8 @@ export const routing = defineRouting({
         '/dashboard/[module]': '/dashboard/[module]',
         '/dashboard/[module]/[method]': '/dashboard/[module]/[method]',
         '/dashboard/[module]/blitz': '/dashboard/[module]/blitz',
+        '/dashboard/[module]/challenge/[challengeId]': '/dashboard/[module]/challenge/[challengeId]',
+        '/challenge/[challengeId]': '/challenge/[challengeId]',
         '/onboarding': '/onboarding',
         '/profile/[userId]': '/profile/[userId]',
         '/institutional/[institution]': '/institutional/[institution]',

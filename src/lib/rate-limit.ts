@@ -38,6 +38,8 @@ const CONFIGS = {
     blitz: { limit: 10, windowSeconds: 60 },
     /** Public endpoints — rate limited by IP */
     public: { limit: 20, windowSeconds: 60 },
+    /** Challenge mode — create, accept, update scores */
+    challenge: { limit: 20, windowSeconds: 60 },
 } as const satisfies Record<string, RateLimitConfig>;
 
 export type RateLimitPreset = keyof typeof CONFIGS;

@@ -1,0 +1,96 @@
+import { NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
+import { rateLimit } from '@/lib/rate-limit';
+import { MAX_STRIKES } from '@/lib/blitz-constants';
+
+export async function POST(request: Request) {
+    try {
+        const { userId } = await auth();
+        if (!userId) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const limited = rateLimit(userId, 'challenge');
+        if (limited) return limited;
+
+        const body = await request.json();
+        const { challenge_id, score, strikes, current_index, finished } = body;
+
+        if (!challenge_id || typeof challenge_id !== 'string') {
+            return NextResponse.json({ error: 'challenge_id is required' }, { status: 400 });
+        }
+        if (typeof score !== 'number' || !Number.isInteger(score) || score < 0) {
+            return NextResponse.json({ error: 'Invalid score' }, { status: 400 });
+        }
+        if (typeof strikes !== 'number' || !Number.isInteger(strikes) || strikes < 0 || strikes > MAX_STRIKES) {
+            return NextResponse.json({ error: 'Invalid strikes' }, { status: 400 });
+        }
+        if (typeof current_index !== 'number' || !Number.isInteger(current_index) || current_index < 0) {
+            return NextResponse.json({ error: 'Invalid current_index' }, { status: 400 });
+        }
+
+        const supabase = getSupabaseAdmin();
+
+        // Fetch challenge
+        const { data: challenge, error: fetchErr } = await supabase
+            .from('challenges')
+            .select('creator_id, opponent_id, status, question_ids, creator_finished, opponent_finished')
+            .eq('id', challenge_id)
+            .single();
+
+        if (fetchErr || !challenge) {
+            return NextResponse.json({ error: 'Challenge not found' }, { status: 404 });
+        }
+
+        if (challenge.status !== 'playing') {
+            return NextResponse.json({ error: 'Challenge is not in playing state' }, { status: 400 });
+        }
+
+        const isCreator = challenge.creator_id === userId;
+        const isOpponent = challenge.opponent_id === userId;
+        if (!isCreator && !isOpponent) {
+            return NextResponse.json({ error: 'Not a participant' }, { status: 403 });
+        }
+
+        // Validate against question count
+        if (current_index > challenge.question_ids.length) {
+            return NextResponse.json({ error: 'current_index exceeds question count' }, { status: 400 });
+        }
+        if (score > current_index) {
+            return NextResponse.json({ error: 'score exceeds current_index' }, { status: 400 });
+        }
+
+        const prefix = isCreator ? 'creator' : 'opponent';
+        const updateData: Record<string, number | boolean> = {
+            [`${prefix}_score`]: score,
+            [`${prefix}_strikes`]: strikes,
+            [`${prefix}_current_index`]: current_index,
+        };
+
+        if (finished) {
+            updateData[`${prefix}_finished`] = true;
+        }
+
+        // Check if both finished after this update
+        const otherFinished = isCreator ? challenge.opponent_finished : challenge.creator_finished;
+        if (finished && otherFinished) {
+            (updateData as Record<string, string | number | boolean>).status = 'finished';
+        }
+
+        const { error: updateErr } = await supabase
+            .from('challenges')
+            .update(updateData)
+            .eq('id', challenge_id);
+
+        if (updateErr) {
+            console.error('Failed to update challenge score:', updateErr.message);
+            return NextResponse.json({ error: 'Failed to update score' }, { status: 500 });
+        }
+
+        return NextResponse.json({ success: true, both_finished: finished && otherFinished });
+    } catch (err) {
+        console.error('Update score error:', err instanceof Error ? err.message : 'Unknown error');
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    }
+}

@@ -1,18 +1,22 @@
 'use client';
 
+import { useState } from 'react';
 import { useParams } from 'next/navigation';
-import { ArrowLeft, Play, BookOpen, Lock, Zap } from 'lucide-react';
+import { ArrowLeft, Play, BookOpen, Lock, Zap, Swords } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
 import MathRenderer from '@/components/ui/MathRenderer';
 import { curriculum } from '@/data/curriculum';
 import { useTranslations } from 'next-intl';
+import ChallengeCreatorModal from './ChallengeCreatorModal';
 
 export default function ModuleClient({ isPremium }: { isPremium: boolean }) {
     const params = useParams();
     const t = useTranslations('Module');
     const tc = useTranslations('Curriculum');
     const tCommon = useTranslations('Common');
+    const tChallenge = useTranslations('Challenge');
+    const [showChallengeModal, setShowChallengeModal] = useState(false);
 
     const moduleId = typeof params.module === 'string' ? params.module : '';
     const moduleData = curriculum.find(m => m.id === moduleId);
@@ -62,6 +66,37 @@ export default function ModuleClient({ isPremium }: { isPremium: boolean }) {
                         </div>
                     </div>
                 </Link>
+
+                {/* Challenge a Friend Card */}
+                <button
+                    onClick={() => setShowChallengeModal(true)}
+                    className="block mb-8 w-full text-left"
+                >
+                    <div className="group relative p-6 bg-gradient-to-r from-orange-50 to-red-50 border-2 border-orange-200 rounded-2xl transition-all hover:border-orange-400 hover:shadow-lg hover:-translate-y-1 cursor-pointer">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="p-3 bg-orange-100 rounded-xl">
+                                    <Swords className="w-6 h-6 text-orange-600" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-gray-900">{tChallenge('challengeFriend')}</h3>
+                                    <p className="text-gray-500 font-medium hidden sm:block">{tChallenge('challengeDesc')}</p>
+                                </div>
+                            </div>
+                            <div className="inline-flex items-center gap-2 text-xs font-bold text-orange-600 bg-orange-100 px-3 py-1 rounded-full uppercase tracking-wider group-hover:bg-orange-600 group-hover:text-white transition-colors">
+                                <Play className="w-3 h-3 fill-current" />
+                                {tCommon('play')}
+                            </div>
+                        </div>
+                    </div>
+                </button>
+
+                {showChallengeModal && moduleData && (
+                    <ChallengeCreatorModal
+                        moduleData={moduleData}
+                        onClose={() => setShowChallengeModal(false)}
+                    />
+                )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {moduleData.topics.map((topic, i) => {

@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
 import { curriculum } from '@/data/curriculum';
 import { useTranslations } from 'next-intl';
+import { GAME_DURATION, MAX_STRIKES, FEEDBACK_DELAY, shuffleArray, stripProblemPrefix, formatTime } from '@/lib/blitz-constants';
 
 type Question = {
     id: string;
@@ -32,23 +33,6 @@ type LeaderboardEntry = {
     score: number;
     position: number;
 };
-
-const GAME_DURATION: Record<string, number> = {
-    derivadas: 180,  // 3 minutes
-    integrais: 180,  // 3 minutes
-    edos: 600,       // 10 minutes
-};
-const MAX_STRIKES = 3;
-const FEEDBACK_DELAY = 1000; // 1s delay after answer selection
-
-function shuffleArray<T>(arr: T[]): T[] {
-    const shuffled = [...arr];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled;
-}
 
 export default function BlitzClient({ moduleId }: { moduleId: string }) {
     const moduleData = curriculum.find(m => m.id === moduleId);
@@ -86,10 +70,6 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
     const feedbackTimerRef = useRef<NodeJS.Timeout | null>(null);
     const supabaseRef = useRef(createClient());
     const gameStartTimeRef = useRef<number>(0);
-
-    // Strip Portuguese instruction prefixes from DB problem text
-    const stripProblemPrefix = (text: string) =>
-        text.replace(/^(Resolva a EDO:\s*|Calcule\s+|Derive\s+|Resolva\s+|Encontre\s+|Determine\s+)/i, '');
 
     // Helper to get topic title from id
     const getTopicTitle = (topicId: string) => {
@@ -280,12 +260,6 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
                 setCurrentIndex(prev => prev + 1);
             }
         }, FEEDBACK_DELAY);
-    };
-
-    const formatTime = (seconds: number) => {
-        const m = Math.floor(seconds / 60);
-        const s = seconds % 60;
-        return `${m}:${s.toString().padStart(2, '0')}`;
     };
 
     const renderFormattedText = (text: string, className: string = "") => {
