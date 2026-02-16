@@ -103,30 +103,6 @@ export default function DashboardClient({
             <nav className="bg-white border-b border-gray-200 px-3 sm:px-6 py-3 sm:py-4 flex justify-between items-center sticky top-0 z-10">
                 <div className="flex items-center gap-3">
                     <Image src="/logo-icon.png" alt="JustMathing Logo" width={261} height={271} priority className="h-8 sm:h-10 w-auto" />
-                    <div className="relative" ref={tooltipRef}>
-                        <Link
-                            href="/dashboard/stats"
-                            onClick={showRankingTooltip ? dismissRankingTooltip : undefined}
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 hover:bg-green-100 border border-green-200 rounded-xl font-bold text-sm text-green-700 transition-colors"
-                        >
-                            <Trophy className="w-4 h-4 text-green-600" />
-                            <span>{exercisesSolved}</span>
-                        </Link>
-                        <AnimatePresence>
-                            {showRankingTooltip && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: -4 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -4 }}
-                                    transition={{ duration: 0.2 }}
-                                    className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 w-52 bg-gray-900 text-white text-xs font-medium rounded-lg px-3 py-2 shadow-lg text-center"
-                                >
-                                    <div className="absolute left-1/2 -translate-x-1/2 -top-1.5 w-3 h-3 bg-gray-900 rotate-45 rounded-sm" />
-                                    <span className="relative">{t('rankingTooltip')}</span>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
                 </div>
 
                 <div className="flex items-center gap-2 sm:gap-3 md:gap-5">
@@ -161,9 +137,12 @@ export default function DashboardClient({
             <main className="flex-1 max-w-5xl mx-auto w-full p-4 sm:p-6 md:p-12">
 
                 <header className="mb-10">
-                    <div className="flex items-center justify-between">
-                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('yourArena')}</h1>
-                        <div className="flex items-center gap-3">
+                    <div className="flex items-start justify-between">
+                        <div>
+                            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('yourArena')}</h1>
+                            <p className="text-gray-500 mt-2">{t('chooseModule')}</p>
+                        </div>
+                        <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2 sm:gap-3 shrink-0">
                             {/* Groups */}
                             <div className="relative" ref={groupsTooltipRef}>
                                 <Link
@@ -189,9 +168,33 @@ export default function DashboardClient({
                                     )}
                                 </AnimatePresence>
                             </div>
+                            {/* Stats / Ranking */}
+                            <div className="relative" ref={tooltipRef}>
+                                <Link
+                                    href="/dashboard/stats"
+                                    onClick={showRankingTooltip ? dismissRankingTooltip : undefined}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 hover:bg-green-100 border border-green-200 rounded-xl font-bold text-sm text-green-700 transition-colors"
+                                >
+                                    <Trophy className="w-4 h-4 text-green-600" />
+                                    <span>{exercisesSolved}</span>
+                                </Link>
+                                <AnimatePresence>
+                                    {showRankingTooltip && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: -4 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -4 }}
+                                            transition={{ duration: 0.2 }}
+                                            className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 w-52 bg-gray-900 text-white text-xs font-medium rounded-lg px-3 py-2 shadow-lg text-center"
+                                        >
+                                            <div className="absolute left-1/2 -translate-x-1/2 -top-1.5 w-3 h-3 bg-gray-900 rotate-45 rounded-sm" />
+                                            <span className="relative">{t('rankingTooltip')}</span>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
                         </div>
                     </div>
-                    <p className="text-gray-500 mt-2">{t('chooseModule')}</p>
                 </header>
 
                 {/* Daily XP goal bar */}
