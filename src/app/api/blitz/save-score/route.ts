@@ -58,6 +58,15 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Failed to save score' }, { status: 500 });
         }
 
+        // Fire-and-forget activity log for group competitions
+        const logRows: { user_id: string; mode: string; subcategory: string; correct: boolean }[] = [];
+        for (let i = 0; i < score; i++) logRows.push({ user_id: userId, mode: 'blitz', subcategory: module_id, correct: true });
+        for (let i = 0; i < strikes; i++) logRows.push({ user_id: userId, mode: 'blitz', subcategory: module_id, correct: false });
+        if (logRows.length > 0) {
+            getSupabaseAdmin().from('activity_log').insert(logRows)
+                .then(({ error: logErr }) => { if (logErr) console.error('Failed to log blitz activity:', logErr.message); });
+        }
+
         return NextResponse.json(data);
     } catch (err) {
         console.error('Save blitz score error:', err instanceof Error ? err.message : 'Unknown error');

@@ -61,6 +61,14 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Failed to complete exercise' }, { status: 500 });
         }
 
+        // Fire-and-forget activity log for group competitions
+        getSupabaseAdmin()
+            .from('activity_log')
+            .insert({ user_id: userId, mode: 'practice', subcategory, correct: self_rating !== 'wrong' })
+            .then(({ error: logErr }) => {
+                if (logErr) console.error('Failed to log activity:', logErr.message);
+            });
+
         return NextResponse.json({ ...data, xp_earned: xpAmount });
     } catch (err) {
         console.error('Complete exercise error:', err instanceof Error ? err.message : 'Unknown error');

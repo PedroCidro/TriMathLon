@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Flame, Trophy, Zap, Settings, Building2, ArrowRight } from 'lucide-react';
+import { Flame, Trophy, Zap, Settings, Building2, ArrowRight, Users } from 'lucide-react';
 import MathRenderer from '@/components/ui/MathRenderer';
 import { cn } from '@/lib/utils';
 import { Link } from '@/i18n/routing';
@@ -15,6 +15,7 @@ import LocaleToggle from '@/components/ui/LocaleToggle';
 import { curriculum } from '@/data/curriculum';
 
 const RANKING_TOOLTIP_KEY = 'dashboard_ranking_tooltip_seen';
+const GROUPS_TOOLTIP_KEY = 'dashboard_groups_tooltip_seen';
 
 const modules = curriculum;
 
@@ -46,11 +47,16 @@ export default function DashboardClient({
     const xpPercent = Math.min(100, Math.round((xpToday / DAILY_XP_GOAL) * 100));
 
     const [showRankingTooltip, setShowRankingTooltip] = useState(false);
+    const [showGroupsTooltip, setShowGroupsTooltip] = useState(false);
     const tooltipRef = useRef<HTMLDivElement>(null);
+    const groupsTooltipRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (!localStorage.getItem(RANKING_TOOLTIP_KEY)) {
             setShowRankingTooltip(true);
+        } else if (!localStorage.getItem(GROUPS_TOOLTIP_KEY)) {
+            // Ranking already seen — show groups tooltip directly
+            setShowGroupsTooltip(true);
         }
     }, []);
 
@@ -58,16 +64,36 @@ export default function DashboardClient({
         if (!showRankingTooltip) return;
         function handleClick(e: MouseEvent) {
             if (tooltipRef.current && !tooltipRef.current.contains(e.target as Node)) {
-                dismissTooltip();
+                dismissRankingTooltip();
             }
         }
         document.addEventListener('click', handleClick, true);
         return () => document.removeEventListener('click', handleClick, true);
     }, [showRankingTooltip]);
 
-    function dismissTooltip() {
+    useEffect(() => {
+        if (!showGroupsTooltip) return;
+        function handleClick(e: MouseEvent) {
+            if (groupsTooltipRef.current && !groupsTooltipRef.current.contains(e.target as Node)) {
+                dismissGroupsTooltip();
+            }
+        }
+        document.addEventListener('click', handleClick, true);
+        return () => document.removeEventListener('click', handleClick, true);
+    }, [showGroupsTooltip]);
+
+    function dismissRankingTooltip() {
         setShowRankingTooltip(false);
         localStorage.setItem(RANKING_TOOLTIP_KEY, '1');
+        // Chain: show groups tooltip next if not yet seen
+        if (!localStorage.getItem(GROUPS_TOOLTIP_KEY)) {
+            setTimeout(() => setShowGroupsTooltip(true), 300);
+        }
+    }
+
+    function dismissGroupsTooltip() {
+        setShowGroupsTooltip(false);
+        localStorage.setItem(GROUPS_TOOLTIP_KEY, '1');
     }
 
     return (
@@ -80,7 +106,7 @@ export default function DashboardClient({
                     <div className="relative" ref={tooltipRef}>
                         <Link
                             href="/dashboard/stats"
-                            onClick={showRankingTooltip ? dismissTooltip : undefined}
+                            onClick={showRankingTooltip ? dismissRankingTooltip : undefined}
                             className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 hover:bg-green-100 border border-green-200 rounded-xl font-bold text-sm text-green-700 transition-colors"
                         >
                             <Trophy className="w-4 h-4 text-green-600" />
@@ -118,6 +144,31 @@ export default function DashboardClient({
                     <div className="flex items-center gap-1.5 font-bold text-sm text-yellow-600">
                         <Zap className="w-4 h-4 fill-yellow-500 text-yellow-500" />
                         <span className="hidden sm:inline">{xpTotal}</span>
+                    </div>
+
+                    {/* Groups */}
+                    <div className="relative" ref={groupsTooltipRef}>
+                        <Link
+                            href="/groups"
+                            onClick={showGroupsTooltip ? dismissGroupsTooltip : undefined}
+                            className="text-gray-400 hover:text-gray-700 transition-colors"
+                        >
+                            <Users className="w-4.5 h-4.5" />
+                        </Link>
+                        <AnimatePresence>
+                            {showGroupsTooltip && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -4 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -4 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 w-52 bg-gray-900 text-white text-xs font-medium rounded-lg px-3 py-2 shadow-lg text-center"
+                                >
+                                    <div className="absolute left-1/2 -translate-x-1/2 -top-1.5 w-3 h-3 bg-gray-900 rotate-45 rounded-sm" />
+                                    <span className="relative">{t('groupsTooltip')}</span>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
 
                     {/* Settings */}

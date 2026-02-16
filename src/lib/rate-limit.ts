@@ -40,6 +40,8 @@ const CONFIGS = {
     public: { limit: 20, windowSeconds: 60 },
     /** Challenge mode — create, accept, update scores */
     challenge: { limit: 20, windowSeconds: 60 },
+    /** Groups — create, join, manage */
+    groups: { limit: 20, windowSeconds: 60 },
 } as const satisfies Record<string, RateLimitConfig>;
 
 export type RateLimitPreset = keyof typeof CONFIGS;

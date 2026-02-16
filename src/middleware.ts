@@ -11,6 +11,10 @@ const isProtectedRoute = createRouteMatcher([
     '/onboarding(.*)',
     '/:locale/institutional(.*)',
     '/institutional(.*)',
+    '/:locale/groups',
+    '/groups',
+    '/:locale/groups/:groupId',
+    '/groups/:groupId',
 ])
 
 export default clerkMiddleware(async (auth, request) => {

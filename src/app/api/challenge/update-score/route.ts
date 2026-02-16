@@ -35,7 +35,7 @@ export async function POST(request: Request) {
         // Fetch challenge
         const { data: challenge, error: fetchErr } = await supabase
             .from('challenges')
-            .select('creator_id, opponent_id, status, question_ids, creator_finished, opponent_finished')
+            .select('creator_id, opponent_id, status, question_ids, creator_finished, opponent_finished, module_id')
             .eq('id', challenge_id)
             .single();
 
@@ -86,6 +86,17 @@ export async function POST(request: Request) {
         if (updateErr) {
             console.error('Failed to update challenge score:', updateErr.message);
             return NextResponse.json({ error: 'Failed to update score' }, { status: 500 });
+        }
+
+        // Fire-and-forget activity log when a player finishes
+        if (finished) {
+            const logRows: { user_id: string; mode: string; subcategory: string; correct: boolean }[] = [];
+            for (let i = 0; i < score; i++) logRows.push({ user_id: userId, mode: 'challenge', subcategory: challenge.module_id, correct: true });
+            for (let i = 0; i < strikes; i++) logRows.push({ user_id: userId, mode: 'challenge', subcategory: challenge.module_id, correct: false });
+            if (logRows.length > 0) {
+                getSupabaseAdmin().from('activity_log').insert(logRows)
+                    .then(({ error: logErr }) => { if (logErr) console.error('Failed to log challenge activity:', logErr.message); });
+            }
         }
 
         return NextResponse.json({ success: true, both_finished: finished && otherFinished });
