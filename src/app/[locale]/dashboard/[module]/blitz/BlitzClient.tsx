@@ -290,7 +290,7 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
         : recognizeQuestions[currentIndex]?.problem ?? '';
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
+        <div className="min-h-screen bg-[#F8F7F4] flex flex-col">
             {/* Top Bar */}
             <header className="bg-white border-b border-gray-200 px-3 sm:px-6 py-3 sm:py-4 flex items-center justify-between sticky top-0 z-20">
                 <div className="flex items-center gap-4">

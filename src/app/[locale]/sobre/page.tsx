@@ -83,7 +83,7 @@ export default function SobrePage() {
                 <section className="max-w-3xl mx-auto px-6 py-20">
                     <motion.div {...fade(0.3)} className="space-y-8">
                         <div className="flex items-start gap-6">
-                            <div className="hidden md:flex shrink-0 w-16 h-16 items-center justify-center rounded-2xl bg-gray-50 mt-1">
+                            <div className="hidden md:flex shrink-0 w-16 h-16 items-center justify-center rounded-2xl bg-[#F8F7F4] mt-1">
                                 <MathRenderer latex="\neq" className="text-3xl text-gray-300" />
                             </div>
                             <div>
@@ -99,7 +99,7 @@ export default function SobrePage() {
                 </section>
 
                 {/* The Method */}
-                <section className="bg-gray-50">
+                <section className="bg-[#F8F7F4]">
                     <div className="max-w-3xl mx-auto px-6 py-20">
                         <motion.div {...fade(0.4)} className="space-y-8">
                             <div className="flex items-start gap-6">
@@ -123,7 +123,7 @@ export default function SobrePage() {
                 <section className="max-w-3xl mx-auto px-6 py-20">
                     <motion.div {...fade(0.5)} className="space-y-8">
                         <div className="flex items-start gap-6">
-                            <div className="hidden md:flex shrink-0 w-16 h-16 items-center justify-center rounded-2xl bg-gray-50 mt-1">
+                            <div className="hidden md:flex shrink-0 w-16 h-16 items-center justify-center rounded-2xl bg-[#F8F7F4] mt-1">
                                 <MathRenderer latex="\checkmark" className="text-3xl text-green-400 !overflow-hidden" />
                             </div>
                             <div>
@@ -139,7 +139,7 @@ export default function SobrePage() {
                 </section>
 
                 {/* CTA */}
-                <section className="bg-gray-50 border-t border-gray-100">
+                <section className="bg-[#F8F7F4] border-t border-gray-100">
                     <div className="max-w-3xl mx-auto px-6 py-20 text-center">
                         <motion.div {...fade(0.6)}>
                             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">

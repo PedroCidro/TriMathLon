@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { ArrowLeft, Swords, Trophy, Loader2, Crown, Copy, Check, RotateCcw } from 'lucide-react';
-import { Link } from '@/i18n/routing';
+import { Link, useRouter } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
 import MathRenderer from '@/components/ui/MathRenderer';
 import { motion } from 'framer-motion';
@@ -34,7 +34,11 @@ type PollData = {
     opponent_strikes: number;
     opponent_current_index: number;
     opponent_finished: boolean;
+    rematch_challenge_id: string | null;
+    rematch_status: string | null;
 };
+
+type RematchState = 'idle' | 'requesting' | 'waiting' | 'opponent_wants' | 'accepting' | 'expired';
 
 type LeaderboardEntry = {
     rank: number;
@@ -96,6 +100,12 @@ export default function ChallengeBlitzClient({
 
     // Game finished flag for sending final score
     const [myFinished, setMyFinished] = useState(false);
+
+    // Rematch state
+    const [rematchState, setRematchState] = useState<RematchState>('idle');
+    const [rematchChallengeId, setRematchChallengeId] = useState<string | null>(null);
+    const rematchTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const router = useRouter();
 
     // Public challenge results
     const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -229,11 +239,28 @@ export default function ChallengeBlitzClient({
                 }
             }
 
+            // Rematch detection (after game ends)
+            if (data.rematch_challenge_id && data.status === 'finished') {
+                setRematchChallengeId(data.rematch_challenge_id);
+                setRematchState(prev => {
+                    // I'm waiting and opponent accepted → redirect
+                    if (prev === 'waiting' && data.rematch_status === 'ready') {
+                        router.push({ pathname: '/dashboard/[module]/challenge/[challengeId]', params: { module: moduleId, challengeId: data.rematch_challenge_id! } });
+                        return prev;
+                    }
+                    // Opponent requested and I'm idle → show prompt
+                    if (prev === 'idle') {
+                        return 'opponent_wants';
+                    }
+                    return prev;
+                });
+            }
+
             return data;
         } catch (err) {
             console.error('Poll error:', err);
         }
-    }, [challengeId, gameDuration, gameState]);
+    }, [challengeId, gameDuration, gameState, moduleId, router]);
 
     // Initial load: fetch questions and determine state
     useEffect(() => {
@@ -258,6 +285,31 @@ export default function ChallengeBlitzClient({
                     setGameState('finished');
                     setMyFinished(true);
                     setOpponentFinished(true);
+                    // Restore rematch state on page refresh
+                    if (data.rematch_challenge_id) {
+                        setRematchChallengeId(data.rematch_challenge_id);
+                        if (data.rematch_status === 'ready') {
+                            // Already accepted, redirect
+                            router.push({ pathname: '/dashboard/[module]/challenge/[challengeId]', params: { module: moduleId, challengeId: data.rematch_challenge_id! } });
+                        } else if (data.rematch_status === 'waiting') {
+                            // Figure out if I created it or opponent did
+                            // We poll as our userId — if rematch exists and is waiting,
+                            // check via a quick fetch who created it
+                            fetch(`/api/challenge/rematch`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ challenge_id: challengeId }),
+                            }).then(r => r.json()).then(result => {
+                                if (result.action === 'already_requested') {
+                                    setRematchState('waiting');
+                                } else if (result.action === 'accepted') {
+                                    router.push({ pathname: '/dashboard/[module]/challenge/[challengeId]', params: { module: moduleId, challengeId: result.challenge_id } });
+                                }
+                            }).catch(() => {
+                                setRematchState('opponent_wants');
+                            });
+                        }
+                    }
                 } else {
                     setGameState('waiting');
                 }
@@ -325,15 +377,15 @@ export default function ChallengeBlitzClient({
     useEffect(() => {
         if (isPublic) return;
         if (gameState !== 'playing' && gameState !== 'waiting' && gameState !== 'finished') return;
-        // Stop polling once opponent is done
-        if (gameState === 'finished' && opponentFinished) return;
+        // Stop polling when rematch expired (no more reason to poll)
+        if (rematchState === 'expired') return;
 
         pollRef.current = setInterval(pollOpponent, 4000);
 
         return () => {
             if (pollRef.current) clearInterval(pollRef.current);
         };
-    }, [gameState, pollOpponent, isPublic, opponentFinished]);
+    }, [gameState, pollOpponent, isPublic, rematchState]);
 
     // Send final score when game finishes
     useEffect(() => {
@@ -353,8 +405,90 @@ export default function ChallengeBlitzClient({
         return () => {
             if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
             if (scoreUpdateRef.current) clearTimeout(scoreUpdateRef.current);
+            if (rematchTimerRef.current) clearTimeout(rematchTimerRef.current);
         };
     }, []);
+
+    // 5-minute expiry timer for rematch
+    useEffect(() => {
+        if (gameState !== 'finished' || isPublic) return;
+        rematchTimerRef.current = setTimeout(() => {
+            setRematchState(prev => {
+                if (prev === 'idle' || prev === 'waiting' || prev === 'opponent_wants') return 'expired';
+                return prev;
+            });
+        }, 5 * 60 * 1000);
+        return () => {
+            if (rematchTimerRef.current) clearTimeout(rematchTimerRef.current);
+        };
+    }, [gameState, isPublic]);
+
+    // Handle rematch request
+    const handleRematch = async () => {
+        if (isPublic) {
+            setRematchState('requesting');
+            try {
+                const res = await fetch('/api/challenge/rematch', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ challenge_id: challengeId }),
+                });
+                const data = await res.json();
+                if (res.ok && data.challenge_id) {
+                    router.push({ pathname: '/dashboard/[module]/challenge/[challengeId]', params: { module: moduleId, challengeId: data.challenge_id } });
+                } else {
+                    setRematchState('idle');
+                }
+            } catch {
+                setRematchState('idle');
+            }
+            return;
+        }
+
+        // Duel: accepting opponent's rematch
+        if (rematchState === 'opponent_wants') {
+            setRematchState('accepting');
+            try {
+                const res = await fetch('/api/challenge/rematch', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ challenge_id: challengeId }),
+                });
+                const data = await res.json();
+                if (res.ok && data.challenge_id) {
+                    router.push({ pathname: '/dashboard/[module]/challenge/[challengeId]', params: { module: moduleId, challengeId: data.challenge_id } });
+                } else {
+                    setRematchState('opponent_wants');
+                }
+            } catch {
+                setRematchState('opponent_wants');
+            }
+            return;
+        }
+
+        // Duel: requesting a new rematch
+        setRematchState('requesting');
+        try {
+            const res = await fetch('/api/challenge/rematch', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ challenge_id: challengeId }),
+            });
+            const data = await res.json();
+            if (res.ok) {
+                if (data.action === 'accepted') {
+                    router.push({ pathname: '/dashboard/[module]/challenge/[challengeId]', params: { module: moduleId, challengeId: data.challenge_id } });
+                } else {
+                    setRematchChallengeId(data.challenge_id);
+                    setRematchState('waiting');
+                }
+            } else {
+                setRematchState('idle');
+            }
+        } catch {
+            setRematchState('idle');
+        }
+    };
 
     const handleOptionSelect = (index: number) => {
         if (selectedOption !== null) return;
@@ -434,7 +568,7 @@ export default function ChallengeBlitzClient({
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
+        <div className="min-h-screen bg-[#F8F7F4] flex flex-col">
             {/* Top Bar */}
             <header className="bg-white border-b border-gray-200 px-3 sm:px-6 py-3 sm:py-4 flex items-center justify-between sticky top-0 z-20">
                 <div className="flex items-center gap-4">
@@ -710,13 +844,18 @@ export default function ChallengeBlitzClient({
 
                         {/* Action buttons */}
                         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-                            <Link
-                                href={{ pathname: '/dashboard/[module]', params: { module: moduleId } }}
-                                className="px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-bold shadow-lg hover:-translate-y-0.5 hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                            <button
+                                onClick={handleRematch}
+                                disabled={rematchState === 'requesting'}
+                                className="px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-bold shadow-lg hover:-translate-y-0.5 hover:shadow-xl transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
                             >
-                                <RotateCcw className="w-4 h-4" />
-                                {t('playAgain')}
-                            </Link>
+                                {rematchState === 'requesting' ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                    <RotateCcw className="w-4 h-4" />
+                                )}
+                                {rematchState === 'requesting' ? t('requesting') : t('playAgain')}
+                            </button>
                             <Link
                                 href={{ pathname: '/dashboard/[module]', params: { module: moduleId } }}
                                 className="px-6 sm:px-8 py-2.5 sm:py-3 border-2 border-gray-200 rounded-xl font-bold text-gray-600 hover:border-gray-400 transition-all flex items-center justify-center"
@@ -798,15 +937,42 @@ export default function ChallengeBlitzClient({
                             </div>
                         )}
 
+                        {/* Opponent wants rematch banner */}
+                        {rematchState === 'opponent_wants' && (
+                            <div className="bg-green-50 border border-green-200 rounded-2xl p-4 mb-6 animate-pulse">
+                                <p className="text-sm font-bold text-green-700">{t('opponentWantsRematch')}</p>
+                            </div>
+                        )}
+
                         {/* Action buttons */}
                         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-                            <Link
-                                href={{ pathname: '/dashboard/[module]', params: { module: moduleId } }}
-                                className="px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-bold shadow-lg hover:-translate-y-0.5 hover:shadow-xl transition-all flex items-center justify-center gap-2"
-                            >
-                                <RotateCcw className="w-4 h-4" />
-                                {t('playAgain')}
-                            </Link>
+                            {/* Rematch button — hidden when expired */}
+                            {rematchState !== 'expired' && (
+                                <button
+                                    onClick={handleRematch}
+                                    disabled={rematchState === 'requesting' || rematchState === 'waiting' || rematchState === 'accepting'}
+                                    className={cn(
+                                        "px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl font-bold shadow-lg transition-all flex items-center justify-center gap-2",
+                                        rematchState === 'opponent_wants'
+                                            ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:-translate-y-0.5 hover:shadow-xl animate-pulse"
+                                            : rematchState === 'waiting'
+                                                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                                : "bg-gradient-to-r from-orange-500 to-red-500 text-white hover:-translate-y-0.5 hover:shadow-xl",
+                                        (rematchState === 'requesting' || rematchState === 'accepting') && "opacity-60 cursor-not-allowed hover:translate-y-0",
+                                    )}
+                                >
+                                    {(rematchState === 'requesting' || rematchState === 'waiting' || rematchState === 'accepting') ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                    ) : (
+                                        <RotateCcw className="w-4 h-4" />
+                                    )}
+                                    {rematchState === 'requesting' && t('requesting')}
+                                    {rematchState === 'accepting' && t('accepting')}
+                                    {rematchState === 'waiting' && t('waitingForRematch')}
+                                    {rematchState === 'opponent_wants' && t('acceptRematch')}
+                                    {rematchState === 'idle' && t('rematch')}
+                                </button>
+                            )}
                             <Link
                                 href={{ pathname: '/dashboard/[module]', params: { module: moduleId } }}
                                 className="px-6 sm:px-8 py-2.5 sm:py-3 border-2 border-gray-200 rounded-xl font-bold text-gray-600 hover:border-gray-400 transition-all flex items-center justify-center"

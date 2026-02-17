@@ -185,7 +185,7 @@ export default function LandingSections() {
             )}
 
             {/* How it Works */}
-            <section className="bg-gray-50 px-6 py-24 mt-8">
+            <section className="bg-[#F8F7F4] px-6 py-24 mt-8">
                 <div className="max-w-5xl mx-auto">
                     <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-4">
                         {t('howItWorks')}
@@ -256,7 +256,7 @@ export default function LandingSections() {
 
             {/* Hall of Fame — Public Leaderboard */}
             {stats && stats.top_students.length > 0 && (
-                <section className="bg-gray-50 px-6 py-24">
+                <section className="bg-[#F8F7F4] px-6 py-24">
                     <div className="max-w-2xl mx-auto">
                         <FadeInSection>
                             <div className="text-center mb-10">

@@ -93,7 +93,7 @@ export default function GroupJoinClient({ inviteCode }: { inviteCode: string }) 
 
     if (loading || !isLoaded) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="min-h-screen bg-[#F8F7F4] flex items-center justify-center">
                 <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
             </div>
         );
@@ -101,7 +101,7 @@ export default function GroupJoinClient({ inviteCode }: { inviteCode: string }) 
 
     if (error) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+            <div className="min-h-screen bg-[#F8F7F4] flex items-center justify-center p-4">
                 <div className="text-center max-w-md">
                     <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <Users className="w-8 h-8 text-gray-400" />
@@ -120,7 +120,7 @@ export default function GroupJoinClient({ inviteCode }: { inviteCode: string }) 
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-[#F8F7F4] flex items-center justify-center p-4">
             <div className="w-full max-w-md">
                 <div className="bg-white rounded-3xl shadow-lg border border-gray-200 p-8 text-center">
                     {/* Group icon */}

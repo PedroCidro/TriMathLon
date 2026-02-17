@@ -190,7 +190,7 @@ export default function StatsClient({
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 p-4 sm:p-6 md:p-12">
+        <div className="min-h-screen bg-[#F8F7F4] p-4 sm:p-6 md:p-12">
             <div className="max-w-4xl mx-auto">
                 <Link href="/dashboard" className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 font-bold mb-8 transition-colors">
                     <ArrowLeft className="w-5 h-5" />

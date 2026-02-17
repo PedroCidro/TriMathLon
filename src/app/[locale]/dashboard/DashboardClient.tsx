@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Flame, Trophy, Zap, Settings, Building2, ArrowRight, Users } from 'lucide-react';
-import MathRenderer from '@/components/ui/MathRenderer';
 import { cn } from '@/lib/utils';
 import { Link } from '@/i18n/routing';
 import { UserButton } from '@clerk/nextjs';
@@ -12,14 +11,14 @@ import { useTranslations } from 'next-intl';
 
 import UpgradeButton from '@/components/UpgradeButton';
 import LocaleToggle from '@/components/ui/LocaleToggle';
+import CrowGreeting from '@/components/ui/CrowGreeting';
+import ModuleCard from '@/components/ui/ModuleCard';
 import { curriculum } from '@/data/curriculum';
 
 const RANKING_TOOLTIP_KEY = 'dashboard_ranking_tooltip_seen';
 const GROUPS_TOOLTIP_KEY = 'dashboard_groups_tooltip_seen';
 
 const modules = curriculum;
-
-const DAILY_XP_GOAL = 50;
 
 interface DashboardClientProps {
     isPremium: boolean;
@@ -29,6 +28,7 @@ interface DashboardClientProps {
     xpToday: number;
     moduleProgress: Record<string, { practiced: number; total: number }>;
     uniRankingBalloon: { institutionName: string; totalExercises: number; qualified: boolean } | null;
+    lastActiveDate: string | null;
 }
 
 export default function DashboardClient({
@@ -39,12 +39,31 @@ export default function DashboardClient({
     xpToday,
     moduleProgress,
     uniRankingBalloon,
+    lastActiveDate,
 }: DashboardClientProps) {
     const t = useTranslations('Dashboard');
-    const tc = useTranslations('Curriculum');
-    const tCommon = useTranslations('Common');
+    const tCrow = useTranslations('Crow');
 
-    const xpPercent = Math.min(100, Math.round((xpToday / DAILY_XP_GOAL) * 100));
+    // Compute per-module progress percentages
+    const moduleProgressPercents: Record<string, number> = {};
+    for (const mod of modules) {
+        const progress = moduleProgress[mod.id];
+        moduleProgressPercents[mod.id] = progress
+            ? Math.round((progress.practiced / progress.total) * 100)
+            : 0;
+    }
+    const totalProgress = Object.values(moduleProgressPercents).reduce((a, b) => a + b, 0);
+
+    // Find module with lowest progress for glow animation
+    let lowestProgressModuleId = 'derivadas';
+    let lowestVal = Infinity;
+    for (const mod of modules) {
+        const pct = moduleProgressPercents[mod.id];
+        if (pct < lowestVal) {
+            lowestVal = pct;
+            lowestProgressModuleId = mod.id;
+        }
+    }
 
     const [showRankingTooltip, setShowRankingTooltip] = useState(false);
     const [showGroupsTooltip, setShowGroupsTooltip] = useState(false);
@@ -97,7 +116,7 @@ export default function DashboardClient({
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
+        <div className="min-h-screen bg-[#F8F7F4] flex flex-col">
 
             {/* Top Navigation */}
             <nav className="bg-white border-b border-gray-200 px-3 sm:px-6 py-3 sm:py-4 flex justify-between items-center sticky top-0 z-10">
@@ -136,95 +155,67 @@ export default function DashboardClient({
             {/* Main Content */}
             <main className="flex-1 max-w-5xl mx-auto w-full p-4 sm:p-6 md:p-12">
 
-                <header className="mb-10">
-                    <div className="flex items-start justify-between">
-                        <div>
-                            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t('yourArena')}</h1>
-                            <p className="text-gray-500 mt-2">{t('chooseModule')}</p>
-                        </div>
-                        <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2 sm:gap-3 shrink-0">
-                            {/* Groups */}
-                            <div className="relative" ref={groupsTooltipRef}>
-                                <Link
-                                    href="/groups"
-                                    onClick={showGroupsTooltip ? dismissGroupsTooltip : undefined}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-xl font-bold text-sm text-blue-700 transition-colors"
-                                >
-                                    <Users className="w-4 h-4 text-blue-600" />
-                                    <span className="hidden sm:inline">{t('groupsLabel')}</span>
-                                </Link>
-                                <AnimatePresence>
-                                    {showGroupsTooltip && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: -4 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, y: -4 }}
-                                            transition={{ duration: 0.2 }}
-                                            className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 w-52 bg-gray-900 text-white text-xs font-medium rounded-lg px-3 py-2 shadow-lg text-center"
-                                        >
-                                            <div className="absolute left-1/2 -translate-x-1/2 -top-1.5 w-3 h-3 bg-gray-900 rotate-45 rounded-sm" />
-                                            <span className="relative">{t('groupsTooltip')}</span>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
-                            {/* Stats / Ranking */}
-                            <div className="relative" ref={tooltipRef}>
-                                <Link
-                                    href="/dashboard/stats"
-                                    onClick={showRankingTooltip ? dismissRankingTooltip : undefined}
-                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 hover:bg-green-100 border border-green-200 rounded-xl font-bold text-sm text-green-700 transition-colors"
-                                >
-                                    <Trophy className="w-4 h-4 text-green-600" />
-                                    <span>{exercisesSolved}</span>
-                                </Link>
-                                <AnimatePresence>
-                                    {showRankingTooltip && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: -4 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, y: -4 }}
-                                            transition={{ duration: 0.2 }}
-                                            className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 w-52 bg-gray-900 text-white text-xs font-medium rounded-lg px-3 py-2 shadow-lg text-center"
-                                        >
-                                            <div className="absolute left-1/2 -translate-x-1/2 -top-1.5 w-3 h-3 bg-gray-900 rotate-45 rounded-sm" />
-                                            <span className="relative">{t('rankingTooltip')}</span>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
-                        </div>
-                    </div>
-                </header>
+                {/* Crow Greeting + XP Bar */}
+                <CrowGreeting
+                    currentStreak={currentStreak}
+                    xpToday={xpToday}
+                    exercisesSolved={exercisesSolved}
+                    lastActiveDate={lastActiveDate}
+                    totalProgress={totalProgress}
+                />
 
-                {/* Daily XP goal bar */}
-                <div className="mb-10 bg-white rounded-2xl p-4 sm:p-5 border border-gray-200 shadow-sm">
-                    <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                            <Zap className="w-5 h-5 fill-yellow-500 text-yellow-500" />
-                            <span className="font-bold text-gray-900 text-sm">{t('dailyGoal')}</span>
-                        </div>
-                        <span className="text-sm font-bold">
-                            <span className={xpToday >= DAILY_XP_GOAL ? "text-green-600" : "text-gray-700"}>
-                                {xpToday}
-                            </span>
-                            <span className="text-gray-400"> / {DAILY_XP_GOAL} XP</span>
-                        </span>
-                    </div>
-                    <div className="w-full bg-gray-100 h-3 rounded-full overflow-hidden">
-                        <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${xpPercent}%` }}
-                            transition={{ duration: 0.8, ease: 'easeOut' }}
-                            className={cn(
-                                "h-full rounded-full",
-                                xpToday >= DAILY_XP_GOAL ? "bg-green-500" : "bg-yellow-500"
+                {/* Action buttons row */}
+                <div className="flex items-center gap-3 mb-8">
+                    {/* Groups */}
+                    <div className="relative" ref={groupsTooltipRef}>
+                        <Link
+                            href="/groups"
+                            onClick={showGroupsTooltip ? dismissGroupsTooltip : undefined}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-xl font-bold text-sm text-blue-700 transition-colors"
+                        >
+                            <Users className="w-4 h-4 text-blue-600" />
+                            <span className="hidden sm:inline">{t('groupsLabel')}</span>
+                        </Link>
+                        <AnimatePresence>
+                            {showGroupsTooltip && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -4 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -4 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 w-52 bg-gray-900 text-white text-xs font-medium rounded-lg px-3 py-2 shadow-lg text-center"
+                                >
+                                    <div className="absolute left-1/2 -translate-x-1/2 -top-1.5 w-3 h-3 bg-gray-900 rotate-45 rounded-sm" />
+                                    <span className="relative">{t('groupsTooltip')}</span>
+                                </motion.div>
                             )}
-                        />
+                        </AnimatePresence>
                     </div>
-                    {xpToday >= DAILY_XP_GOAL && (
-                        <p className="text-sm text-green-600 font-bold mt-2">{t('dailyGoalDone')}</p>
-                    )}
+                    {/* Stats / Ranking */}
+                    <div className="relative" ref={tooltipRef}>
+                        <Link
+                            href="/dashboard/stats"
+                            onClick={showRankingTooltip ? dismissRankingTooltip : undefined}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 hover:bg-green-100 border border-green-200 rounded-xl font-bold text-sm text-green-700 transition-colors"
+                        >
+                            <Trophy className="w-4 h-4 text-green-600" />
+                            <span>{exercisesSolved}</span>
+                        </Link>
+                        <AnimatePresence>
+                            {showRankingTooltip && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -4 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -4 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 w-52 bg-gray-900 text-white text-xs font-medium rounded-lg px-3 py-2 shadow-lg text-center"
+                                >
+                                    <div className="absolute left-1/2 -translate-x-1/2 -top-1.5 w-3 h-3 bg-gray-900 rotate-45 rounded-sm" />
+                                    <span className="relative">{t('rankingTooltip')}</span>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
                 </div>
 
                 {/* Uni Ranking Balloon */}
@@ -252,55 +243,34 @@ export default function DashboardClient({
                 )}
 
                 {/* Module Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {modules.map((module) => {
-                        const progress = moduleProgress[module.id];
-                        const progressPercent = progress
-                            ? Math.round((progress.practiced / progress.total) * 100)
-                            : 0;
+                <div className="relative">
+                    {/* First-time crow guide */}
+                    {totalProgress === 0 && (
+                        <div className="flex flex-col items-center sm:items-start mb-2 sm:absolute sm:-top-4 sm:left-4 sm:z-10 sm:mb-0">
+                            <Image
+                                src="/munin/happy.png"
+                                alt="Start here"
+                                width={80}
+                                height={80}
+                                className="h-[60px] sm:h-[70px] w-auto"
+                            />
+                            <div className="bg-gray-900 text-white text-xs font-bold rounded-lg px-3 py-1.5 -mt-1 shadow-lg">
+                                {tCrow('startHere')}
+                            </div>
+                        </div>
+                    )}
 
-                        return (
-                            <Link href={{ pathname: '/dashboard/[module]', params: { module: module.id } }} key={module.id} className="block">
-                                <motion.div
-                                    whileHover={{ y: -4 }}
-                                    className={cn(
-                                        "h-full p-6 rounded-2xl border-2 transition-all cursor-pointer bg-white shadow-sm hover:shadow-md",
-                                        module.color
-                                    )}
-                                >
-                                    <div className="flex justify-between items-start mb-8">
-                                        <div className="p-3 bg-white rounded-xl shadow-sm border border-gray-100">
-                                            <MathRenderer latex={module.iconLatex} className={cn("text-3xl", module.id === 'derivadas' ? 'text-blue-600' : module.id === 'integrais' ? 'text-purple-600' : 'text-yellow-600')} />
-                                        </div>
-                                        <div className="text-sm font-bold text-gray-400 bg-white/50 px-2 py-1 rounded-md">
-                                            {module.topics.length} {tCommon('topics')}
-                                        </div>
-                                    </div>
-
-                                    <h2 className="text-2xl font-bold text-gray-900 mb-2">{tc(`${module.id}.title`)}</h2>
-                                    <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
-                                        <motion.div
-                                            initial={{ width: 0 }}
-                                            animate={{ width: `${progressPercent}%` }}
-                                            transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
-                                            className={cn("h-full rounded-full", module.barColor)}
-                                        />
-                                    </div>
-                                    <div className="mt-2 text-sm text-gray-500 font-medium text-right">
-                                        {progressPercent}% {tCommon('complete')}
-                                    </div>
-                                    <div className="mt-4 space-y-1 hidden sm:block">
-                                        {module.topics.map((topic) => (
-                                            <div key={topic.id} className="text-xs text-gray-500 flex items-center gap-1">
-                                                <div className={cn("w-1 h-1 rounded-full", module.barColor)} />
-                                                {tc(`${topic.id}.title`)}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </motion.div>
-                            </Link>
-                        );
-                    })}
+                    <div className={cn("grid grid-cols-1 md:grid-cols-3 gap-6", totalProgress === 0 && "sm:pt-16")}>
+                        {modules.map((module) => (
+                            <ModuleCard
+                                key={module.id}
+                                module={module}
+                                progressPercent={moduleProgressPercents[module.id]}
+                                isLowestProgress={module.id === lowestProgressModuleId}
+                                locale="pt"
+                            />
+                        ))}
+                    </div>
                 </div>
 
             </main>

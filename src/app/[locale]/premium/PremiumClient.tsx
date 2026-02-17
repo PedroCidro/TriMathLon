@@ -192,7 +192,7 @@ export default function PremiumClient({
             </section>
 
             {/* What You Unlock */}
-            <section className="bg-gray-50 px-6 py-20">
+            <section className="bg-[#F8F7F4] px-6 py-20">
                 <div className="max-w-5xl mx-auto">
                     <h2 className="text-3xl font-bold text-gray-900 text-center mb-4">
                         {t('whatYouUnlock')}

@@ -69,7 +69,7 @@ export default function ProfileClient({
     const hasBlitz = Object.keys(blitz_bests).length > 0;
 
     return (
-        <div className="min-h-screen bg-gray-50 p-4 sm:p-6 md:p-12">
+        <div className="min-h-screen bg-[#F8F7F4] p-4 sm:p-6 md:p-12">
             <div className="max-w-3xl mx-auto">
                 {/* Header */}
                 <div className="bg-white rounded-2xl p-6 sm:p-8 border border-gray-200 shadow-sm mb-6 text-center">

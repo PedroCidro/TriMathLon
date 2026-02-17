@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
 import { curriculum } from '@/data/curriculum';
 import { useTranslations } from 'next-intl';
+import CrowFeedback from '@/components/ui/CrowFeedback';
 
 type Tab = 'learn' | 'practice' | 'recognize';
 
@@ -62,6 +63,9 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
     const [recognizeScore, setRecognizeScore] = useState({ correct: 0, total: 0 });
     const recognizeFetched = useRef(false);
 
+    // ── Crow Feedback State ──
+    const [crowFeedback, setCrowFeedback] = useState<'correct' | 'wrong' | null>(null);
+
     const supabaseRef = useRef(createClient());
 
     // Cumulative topics: current topic + all previous in the module
@@ -111,6 +115,10 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
         // Show XP popup
         setXpPopup(xp);
         setTimeout(() => setXpPopup(null), 1200);
+
+        // Show crow feedback
+        setCrowFeedback(rating === 'wrong' ? 'wrong' : 'correct');
+        setTimeout(() => setCrowFeedback(null), 1200);
 
         // Call the new complete endpoint
         fetch('/api/exercises/complete', {
@@ -189,6 +197,10 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
             total: prev.total + 1,
         }));
 
+        // Show crow feedback
+        setCrowFeedback(isCorrect ? 'correct' : 'wrong');
+        setTimeout(() => setCrowFeedback(null), 1200);
+
         // Auto-advance after delay
         setTimeout(() => {
             setSelectedAnswer(null);
@@ -231,7 +243,7 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
+        <div className="min-h-screen bg-[#F8F7F4] flex flex-col">
             {/* Top Bar */}
             <header className="bg-white border-b border-gray-200 px-3 sm:px-6 py-3 sm:py-4 flex items-center justify-between sticky top-0 z-20">
                 <div className="flex items-center gap-4">
@@ -537,6 +549,8 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
             <div className="pb-6 -mt-4 text-center text-lg text-gray-400 font-extrabold tracking-wide select-none">
                 JustMathing.com
             </div>
+
+            <CrowFeedback type={crowFeedback} />
         </div>
     );
 }

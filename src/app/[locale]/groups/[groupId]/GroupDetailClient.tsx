@@ -205,7 +205,7 @@ export default function GroupDetailClient({ groupId }: { groupId: string }) {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="min-h-screen bg-[#F8F7F4] flex items-center justify-center">
                 <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
             </div>
         );
@@ -213,7 +213,7 @@ export default function GroupDetailClient({ groupId }: { groupId: string }) {
 
     if (error || !data) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+            <div className="min-h-screen bg-[#F8F7F4] flex items-center justify-center p-4">
                 <div className="text-center">
                     <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('groupNotFound')}</h1>
                     <Link href="/groups" className="text-blue-600 hover:underline">{t('title')}</Link>
@@ -226,7 +226,7 @@ export default function GroupDetailClient({ groupId }: { groupId: string }) {
     const userId = user?.id;
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-[#F8F7F4]">
             <div className="max-w-3xl mx-auto p-4 sm:p-6 md:p-12">
                 {/* Header */}
                 <div className="mb-8">
