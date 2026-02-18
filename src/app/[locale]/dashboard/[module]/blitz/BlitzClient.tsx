@@ -8,7 +8,7 @@ import MathRenderer from '@/components/ui/MathRenderer';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
 import { curriculum } from '@/data/curriculum';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { GAME_DURATION, MAX_STRIKES, FEEDBACK_DELAY, shuffleArray, stripProblemPrefix, formatTime } from '@/lib/blitz-constants';
 
 type Question = {
@@ -17,6 +17,8 @@ type Question = {
     solution_latex: string;
     distractors: string[];
     difficulty: number;
+    problem_en?: string | null;
+    solution_latex_en?: string | null;
 };
 
 type RecognizeQuestion = {
@@ -39,6 +41,7 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
     const t = useTranslations('Blitz');
     const tc = useTranslations('Curriculum');
     const tCommon = useTranslations('Common');
+    const locale = useLocale();
 
     const [blitzMode, setBlitzMode] = useState<BlitzMode>('solve');
     const [gameState, setGameState] = useState<GameState>('ready');
@@ -81,6 +84,9 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
         return latex.replace(/^\$\s*(?:f'\(x\)\s*=\s*|y'\s*=\s*|y\s*=\s*)/i, '$');
     };
 
+    // Locale-aware field selector
+    const lp = (q: Question | RecognizeQuestion) => locale === 'en' && 'problem_en' in q && q.problem_en ? q.problem_en : q.problem;
+
     // Build shuffled options for solve mode
     const buildSolveOptions = useCallback((question: Question) => {
         const correct = stripAnswerPrefix(question.solution_latex);
@@ -110,7 +116,7 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
 
         const { data, error } = await supabase
             .from('questions')
-            .select('id, problem, solution_latex, distractors, difficulty')
+            .select('id, problem, solution_latex, distractors, difficulty, problem_en, solution_latex_en')
             .in('subcategory', topicIds)
             .not('distractors', 'is', null)
             .limit(50);
@@ -286,8 +292,8 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
 
     // Current problem text
     const currentProblem = blitzMode === 'solve'
-        ? questions[currentIndex]?.problem ?? ''
-        : recognizeQuestions[currentIndex]?.problem ?? '';
+        ? (questions[currentIndex] ? lp(questions[currentIndex]) : '')
+        : (recognizeQuestions[currentIndex] ? lp(recognizeQuestions[currentIndex]) : '');
 
     return (
         <div className="min-h-screen bg-[#F8F7F4] flex flex-col">

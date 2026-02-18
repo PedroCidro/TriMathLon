@@ -29,9 +29,10 @@ interface ProfileClientProps {
 }
 
 const MODULE_COLORS: Record<string, { accent: string; bg: string; text: string }> = {
-    derivadas: { accent: 'border-blue-500', bg: 'bg-blue-50', text: 'text-blue-700' },
-    integrais: { accent: 'border-purple-500', bg: 'bg-purple-50', text: 'text-purple-700' },
-    edos: { accent: 'border-yellow-500', bg: 'bg-yellow-50', text: 'text-yellow-700' },
+    limites: { accent: 'border-teal-500', bg: 'bg-teal-50', text: 'text-teal-700' },
+    derivadas: { accent: 'border-[#7C3AED]', bg: 'bg-purple-50', text: 'text-[#7C3AED]' },
+    aplicacoes: { accent: 'border-emerald-600', bg: 'bg-emerald-50', text: 'text-emerald-700' },
+    integrais: { accent: 'border-[#4A1D96]', bg: 'bg-purple-100', text: 'text-[#4A1D96]' },
 };
 
 const LEVEL_KEYS: Record<string, string> = {
@@ -73,8 +74,8 @@ export default function ProfileClient({
             <div className="max-w-3xl mx-auto">
                 {/* Header */}
                 <div className="bg-white rounded-2xl p-6 sm:p-8 border border-gray-200 shadow-sm mb-6 text-center">
-                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <span className="text-2xl font-bold text-blue-600">
+                    <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span className="text-2xl font-bold text-[#7C3AED]">
                             {display_name.charAt(0).toUpperCase()}
                         </span>
                     </div>
@@ -144,8 +145,8 @@ export default function ProfileClient({
                                     />
                                     <Radar
                                         dataKey="accuracy"
-                                        stroke="#3b82f6"
-                                        fill="#3b82f6"
+                                        stroke="#7C3AED"
+                                        fill="#7C3AED"
                                         fillOpacity={0.2}
                                         strokeWidth={2}
                                     />

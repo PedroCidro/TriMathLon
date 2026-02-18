@@ -3,12 +3,13 @@ import { auth } from '@clerk/nextjs/server';
 import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { rateLimit } from '@/lib/rate-limit';
 
-const VALID_MODULES = ['derivadas', 'integrais', 'edos'];
+const VALID_MODULES = ['derivadas', 'integrais', 'limites', 'aplicacoes'];
 const MAX_STRIKES = 3;
 const GAME_DURATION: Record<string, number> = {
+    limites: 180,    // 3 minutes
     derivadas: 180,  // 3 minutes
+    aplicacoes: 180, // 3 minutes
     integrais: 180,  // 3 minutes
-    edos: 600,       // 10 minutes
 };
 const MAX_SCORE_PER_SECOND = 1; // at most 1 correct answer per second
 

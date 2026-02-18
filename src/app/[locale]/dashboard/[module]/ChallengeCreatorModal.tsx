@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { X, Check, Copy, Loader2, Swords, Trophy, Shuffle } from 'lucide-react';
+import { X, Check, Copy, Loader2, Swords, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useRouter } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
@@ -28,7 +28,7 @@ export default function ChallengeCreatorModal({
         moduleData.topics.map(t => t.id)
     );
     const [difficulty, setDifficulty] = useState<DifficultyFilter>('all');
-    const [randomize, setRandomize] = useState(false);
+    const randomize = true;
     const [creating, setCreating] = useState(false);
     const [challengeId, setChallengeId] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
@@ -139,22 +139,22 @@ export default function ChallengeCreatorModal({
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             {/* Backdrop */}
-            <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
 
             {/* Modal */}
-            <div className="relative bg-white rounded-3xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6">
+            <div className="relative bg-white rounded-2xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 sm:p-7 border border-gray-100">
                 {/* Close button */}
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
+                    className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-xl transition-colors"
                 >
-                    <X className="w-5 h-5 text-gray-500" />
+                    <X className="w-5 h-5 text-gray-400" />
                 </button>
 
                 {/* Header */}
                 <div className="flex items-center gap-3 mb-6">
-                    <div className="p-2.5 bg-gradient-to-br from-orange-100 to-red-100 rounded-xl">
-                        <Swords className="w-6 h-6 text-orange-600" />
+                    <div className="p-2.5 bg-amber-50 rounded-xl">
+                        <Swords className="w-6 h-6 text-[#F5A623]" />
                     </div>
                     <div>
                         <h2 className="text-xl font-bold text-gray-900">{t('challengeFriend')}</h2>
@@ -171,12 +171,15 @@ export default function ChallengeCreatorModal({
                                 className={cn(
                                     "w-full flex items-start gap-3 p-4 rounded-xl border-2 transition-all text-left",
                                     mode === 'duel'
-                                        ? "border-orange-400 bg-orange-50"
+                                        ? "border-[#F5A623] bg-amber-50/60"
                                         : "border-gray-200 hover:border-gray-300"
                                 )}
                             >
-                                <div className="p-2 bg-white rounded-lg shadow-sm">
-                                    <Swords className="w-5 h-5 text-orange-500" />
+                                <div className={cn(
+                                    "p-2 rounded-xl transition-colors",
+                                    mode === 'duel' ? "bg-amber-100" : "bg-gray-50"
+                                )}>
+                                    <Swords className={cn("w-5 h-5", mode === 'duel' ? "text-[#F5A623]" : "text-gray-400")} />
                                 </div>
                                 <div>
                                     <p className="font-bold text-gray-900">{t('duel')}</p>
@@ -189,12 +192,15 @@ export default function ChallengeCreatorModal({
                                 className={cn(
                                     "w-full flex items-start gap-3 p-4 rounded-xl border-2 transition-all text-left",
                                     mode === 'public'
-                                        ? "border-orange-400 bg-orange-50"
+                                        ? "border-[#F5A623] bg-amber-50/60"
                                         : "border-gray-200 hover:border-gray-300"
                                 )}
                             >
-                                <div className="p-2 bg-white rounded-lg shadow-sm">
-                                    <Trophy className="w-5 h-5 text-orange-500" />
+                                <div className={cn(
+                                    "p-2 rounded-xl transition-colors",
+                                    mode === 'public' ? "bg-amber-100" : "bg-gray-50"
+                                )}>
+                                    <Trophy className={cn("w-5 h-5", mode === 'public' ? "text-[#F5A623]" : "text-gray-400")} />
                                 </div>
                                 <div>
                                     <p className="font-bold text-gray-900">{t('scoreAttack')}</p>
@@ -205,7 +211,7 @@ export default function ChallengeCreatorModal({
 
                         <button
                             onClick={() => setStep('select')}
-                            className="w-full px-6 py-3.5 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-bold text-base shadow-lg hover:-translate-y-0.5 hover:shadow-xl transition-all"
+                            className="w-full px-6 py-3.5 bg-[#F5A623] text-white rounded-xl font-bold text-base shadow-[0_4px_0_0_#c47f0a] active:shadow-none active:translate-y-[4px] hover:-translate-y-0.5 hover:shadow-[0_6px_0_0_#c47f0a] transition-all"
                         >
                             {t('selectTopics')}
                         </button>
@@ -215,7 +221,7 @@ export default function ChallengeCreatorModal({
                 {/* Step: Select Topics */}
                 {step === 'select' && (
                     <>
-                        <p className="text-sm font-medium text-gray-700 mb-3">{t('selectTopics')}</p>
+                        <p className="text-sm font-bold text-gray-700 mb-3">{t('selectTopics')}</p>
                         <div className="space-y-2 mb-6">
                             {moduleData.topics.map(topic => (
                                 <button
@@ -224,14 +230,14 @@ export default function ChallengeCreatorModal({
                                     className={cn(
                                         "w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all text-left",
                                         selectedTopics.includes(topic.id)
-                                            ? "border-orange-400 bg-orange-50"
+                                            ? "border-[#F5A623] bg-amber-50/60"
                                             : "border-gray-200 hover:border-gray-300"
                                     )}
                                 >
                                     <div className={cn(
                                         "w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors flex-shrink-0",
                                         selectedTopics.includes(topic.id)
-                                            ? "bg-orange-500 border-orange-500"
+                                            ? "bg-[#F5A623] border-[#F5A623]"
                                             : "border-gray-300"
                                     )}>
                                         {selectedTopics.includes(topic.id) && (
@@ -246,8 +252,8 @@ export default function ChallengeCreatorModal({
                         </div>
 
                         {/* Difficulty filter */}
-                        <p className="text-sm font-medium text-gray-700 mb-2">{t('difficultyLabel')}</p>
-                        <div className="flex gap-2 mb-4">
+                        <p className="text-sm font-bold text-gray-700 mb-2">{t('difficultyLabel')}</p>
+                        <div className="flex gap-2 mb-6">
                             {([['all', t('difficultyAll')], [1, t('difficultyEasy')], [2, t('difficultyMedium')], [3, t('difficultyHard')]] as [DifficultyFilter, string][]).map(([value, label]) => (
                                 <button
                                     key={String(value)}
@@ -255,7 +261,7 @@ export default function ChallengeCreatorModal({
                                     className={cn(
                                         "flex-1 py-2 rounded-xl text-sm font-bold border-2 transition-all",
                                         difficulty === value
-                                            ? "border-orange-400 bg-orange-50 text-orange-700"
+                                            ? "border-[#F5A623] bg-amber-50/60 text-[#b47a0a]"
                                             : "border-gray-200 text-gray-500 hover:border-gray-300"
                                     )}
                                 >
@@ -264,26 +270,6 @@ export default function ChallengeCreatorModal({
                             ))}
                         </div>
 
-                        {/* Randomize toggle */}
-                        <button
-                            onClick={() => setRandomize(prev => !prev)}
-                            className={cn(
-                                "w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all mb-6",
-                                randomize
-                                    ? "border-orange-400 bg-orange-50"
-                                    : "border-gray-200 hover:border-gray-300"
-                            )}
-                        >
-                            <div className={cn(
-                                "w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors flex-shrink-0",
-                                randomize ? "bg-orange-500 border-orange-500" : "border-gray-300"
-                            )}>
-                                {randomize && <Check className="w-3.5 h-3.5 text-white" />}
-                            </div>
-                            <Shuffle className="w-4 h-4 text-gray-500" />
-                            <span className="text-sm font-medium text-gray-800">{t('randomizeOrder')}</span>
-                        </button>
-
                         {error && (
                             <p className="text-sm text-red-500 mb-3">{error}</p>
                         )}
@@ -291,7 +277,7 @@ export default function ChallengeCreatorModal({
                         <button
                             onClick={handleCreate}
                             disabled={creating || selectedTopics.length === 0}
-                            className="w-full px-6 py-3.5 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-bold text-base shadow-lg hover:-translate-y-0.5 hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            className="w-full px-6 py-3.5 bg-[#F5A623] text-white rounded-xl font-bold text-base shadow-[0_4px_0_0_#c47f0a] active:shadow-none active:translate-y-[4px] hover:-translate-y-0.5 hover:shadow-[0_6px_0_0_#c47f0a] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                             {creating ? (
                                 <>
@@ -338,7 +324,7 @@ export default function ChallengeCreatorModal({
                         {/* WhatsApp button */}
                         <button
                             onClick={handleWhatsApp}
-                            className="w-full px-6 py-3.5 bg-[#25D366] text-white rounded-xl font-bold text-base shadow-lg hover:-translate-y-0.5 hover:shadow-xl transition-all flex items-center justify-center gap-2 mb-3"
+                            className="w-full px-6 py-3.5 bg-[#25D366] text-white rounded-xl font-bold text-base shadow-[0_4px_0_0_#1a9e4a] active:shadow-none active:translate-y-[4px] hover:-translate-y-0.5 hover:shadow-[0_6px_0_0_#1a9e4a] transition-all flex items-center justify-center gap-2 mb-3"
                         >
                             {t('shareWhatsApp')}
                         </button>
@@ -356,7 +342,7 @@ export default function ChallengeCreatorModal({
                 {/* Step: Waiting (duel only) */}
                 {step === 'waiting' && (
                     <div className="text-center py-6">
-                        <Loader2 className="w-10 h-10 animate-spin text-orange-500 mx-auto mb-4" />
+                        <Loader2 className="w-10 h-10 animate-spin text-[#F5A623] mx-auto mb-4" />
                         <p className="text-lg font-bold text-gray-900 mb-2">{t('waitingForOpponent')}</p>
                         <p className="text-sm text-gray-500 mb-6">{t('challengeDesc')}</p>
 
@@ -366,9 +352,9 @@ export default function ChallengeCreatorModal({
                                 type="text"
                                 readOnly
                                 value={shareUrl}
-                                className="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-600 font-mono select-all"
+                                className="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-600 font-mono select-all"
                             />
-                            <button onClick={handleCopy} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                            <button onClick={handleCopy} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
                                 {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4 text-gray-400" />}
                             </button>
                         </div>

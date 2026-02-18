@@ -30,7 +30,7 @@ export default async function MethodPage({ params }: { params: Params }) {
 
     const isPremium = !!data?.is_premium
 
-    if (topicIndex >= 3 && !isPremium) {
+    if ((moduleData?.premiumModule || topicIndex >= 3) && !isPremium) {
         return redirect('/premium')
     }
 

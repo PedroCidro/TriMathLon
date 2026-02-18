@@ -62,7 +62,7 @@ export default async function DashboardPage({
     // Read current profile (with engagement data + institution)
     const { data } = await supabase
         .from('profiles')
-        .select('is_premium, exercises_solved, current_streak, xp_total, xp_today, last_xp_reset_date, institution')
+        .select('is_premium, exercises_solved, current_streak, xp_total, xp_today, last_xp_reset_date, institution, last_active_date')
         .eq('id', userId)
         .single()
 
@@ -73,15 +73,17 @@ export default async function DashboardPage({
     // Fetch mastery data for progress bars
     const { data: mastery } = await supabase
         .from('user_topic_mastery')
-        .select('subcategory, attempts')
+        .select('subcategory, attempts, best_streak, easy_count')
         .eq('user_id', userId)
 
-    // Compute per-module progress
+    // Compute per-module progress (topic is "complete" when best_streak >= 6 or easy_count >= 12)
     const moduleProgress: Record<string, { practiced: number; total: number }> = {}
     for (const mod of curriculum) {
-        const practiced = mod.topics.filter(t =>
-            mastery?.some(m => m.subcategory === t.id && m.attempts > 0)
-        ).length
+        const practiced = mod.topics.filter(t => {
+            const m = mastery?.find(row => row.subcategory === t.id)
+            if (!m || m.attempts === 0) return false
+            return (m.best_streak ?? 0) >= 6 || (m.easy_count ?? 0) >= 12
+        }).length
         moduleProgress[mod.id] = { practiced, total: mod.topics.length }
     }
 
@@ -112,5 +114,6 @@ export default async function DashboardPage({
         xpToday={xpToday}
         moduleProgress={moduleProgress}
         uniRankingBalloon={uniRankingBalloon}
+        lastActiveDate={data?.last_active_date ?? null}
     />
 }

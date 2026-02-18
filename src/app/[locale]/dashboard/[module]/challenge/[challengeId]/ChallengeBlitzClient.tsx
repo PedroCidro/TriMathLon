@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import MathRenderer from '@/components/ui/MathRenderer';
 import { motion } from 'framer-motion';
 import { curriculum } from '@/data/curriculum';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import {
     MAX_STRIKES,
     FEEDBACK_DELAY,
@@ -22,6 +22,8 @@ type Question = {
     solution_latex: string;
     distractors: string[];
     difficulty: number;
+    problem_en?: string | null;
+    solution_latex_en?: string | null;
 };
 
 type ChallengeGameState = 'loading' | 'waiting' | 'countdown' | 'playing' | 'finished';
@@ -75,6 +77,7 @@ export default function ChallengeBlitzClient({
     const tBlitz = useTranslations('Blitz');
     const tc = useTranslations('Curriculum');
     const tCommon = useTranslations('Common');
+    const locale = useLocale();
 
     const isPublic = challengeType === 'public';
 
@@ -145,6 +148,9 @@ export default function ChallengeBlitzClient({
     const stripAnswerPrefix = (latex: string): string => {
         return latex.replace(/^\$\s*(?:f'\(x\)\s*=\s*|y'\s*=\s*|y\s*=\s*)/i, '$');
     };
+
+    // Locale-aware field selector
+    const lp = (q: Question) => locale === 'en' && q.problem_en ? q.problem_en : q.problem;
 
     // Build shuffled options
     const buildOptions = useCallback((question: Question) => {
@@ -549,7 +555,7 @@ export default function ChallengeBlitzClient({
         .map(id => tc.has(`${id}.title`) ? tc(`${id}.title`) : id)
         .join(', ');
 
-    const currentProblem = questions[currentIndex]?.problem ?? '';
+    const currentProblem = questions[currentIndex] ? lp(questions[currentIndex]) : '';
 
     // WhatsApp share for public challenges
     const handleShareWhatsApp = () => {

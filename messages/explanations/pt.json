@@ -70,7 +70,7 @@
   "trig_basic": {
     "intuitionTitle": "A Intuição",
     "intuition": "As funções trigonométricas descrevem movimentos circulares e oscilações. A derivada de $\\sin(x)$ é $\\cos(x)$ porque, no círculo unitário, a taxa de variação da coordenada vertical (seno) em um dado ponto é exatamente a coordenada horizontal (cosseno) naquele ponto. Cada função trigonométrica tem uma derivada que pode ser expressa em termos das outras.",
-    "formulaLatex": "\\frac{d}{dx}[\\sin x] = \\cos x \\qquad \\frac{d}{dx}[\\cos x] = -\\sin x",
+    "formulaLatex": "\\frac{d}{dx}\\left(\\sin x\\right) = \\cos x \\qquad \\frac{d}{dx}\\left(\\cos x\\right) = -\\sin x",
     "proofTitle": "Por que funciona?",
     "proof": "Vamos provar que a derivada de $\\sin x$ é $\\cos x$ direto da definição. Calculamos $\\lim_{h \\to 0}\\frac{\\sin(x+h)-\\sin(x)}{h}$. Pela fórmula de soma: $\\sin(x+h) = \\sin x \\cos h + \\cos x \\sin h$. Substituindo no limite: $\\sin x \\cdot \\frac{\\cos h - 1}{h} + \\cos x \\cdot \\frac{\\sin h}{h}$. Tudo depende de dois limites fundamentais. Primeiro: $\\lim_{h \\to 0}\\frac{\\sin h}{h} = 1$ — para ângulos muito pequenos, o arco e a corda do círculo unitário são praticamente iguais. Segundo: $\\lim_{h \\to 0}\\frac{\\cos h - 1}{h} = 0$ — o cosseno se afasta de $1$ muito mais devagar que $h$ se afasta de $0$. Com esses limites, o primeiro termo zera e o segundo dá $\\cos x$. Para $\\cos x$, o argumento é análogo, mas $\\cos(x+h) = \\cos x \\cos h - \\sin x \\sin h$ — o sinal de menos na fórmula de soma é o responsável pelo $-\\sin x$ na derivada.",
     "examples": [
@@ -87,7 +87,7 @@
   "exp_log": {
     "intuitionTitle": "A Intuição",
     "intuition": "A função $e^x$ é a única função que é igual à sua própria derivada — ela cresce a uma taxa proporcional ao seu valor atual. Já $\\ln(x)$, sendo a inversa de $e^x$, tem derivada $\\frac{1}{x}$: quanto maior o valor de $x$, mais devagar o logaritmo cresce. Essas duas funções formam a base de modelos de crescimento e decaimento na natureza.",
-    "formulaLatex": "\\frac{d}{dx}[e^x] = e^x \\qquad \\frac{d}{dx}[\\ln x] = \\frac{1}{x}",
+    "formulaLatex": "\\frac{d}{dx}\\left(e^x\\right) = e^x \\qquad \\frac{d}{dx}\\left(\\ln x\\right) = \\frac{1}{x}",
     "proofTitle": "Por que funciona?",
     "proof": "O que torna $e^x$ especial? Calculamos pela definição: $\\lim_{h \\to 0}\\frac{e^{x+h}-e^x}{h} = e^x \\cdot \\lim_{h \\to 0}\\frac{e^h - 1}{h}$. O número $e \\approx 2{,}718$ é o único valor de base para o qual $\\lim_{h \\to 0}\\frac{b^h - 1}{h} = 1$. Para qualquer outra base, esse limite seria uma constante diferente de $1$, e a derivada teria um fator extra. Com base $e$, o fator é $1$ e a derivada é simplesmente $e^x$ — a função é igual à sua própria taxa de variação. Para $\\ln(x)$, usamos que ela é a inversa de $e^x$: se $y = \\ln x$, então $x = e^y$. Derivando implicitamente: $1 = e^y \\cdot \\frac{dy}{dx}$, logo $\\frac{dy}{dx} = \\frac{1}{e^y} = \\frac{1}{x}$. Quanto maior o $x$, mais devagar $\\ln x$ cresce — e a fórmula $\\frac{1}{x}$ captura isso com precisão.",
     "examples": [
@@ -104,7 +104,7 @@
   "implicit": {
     "intuitionTitle": "A Intuição",
     "intuition": "Às vezes não conseguimos (ou não queremos) isolar $y$ em função de $x$. Na derivação implícita, derivamos os dois lados da equação em relação a $x$, lembrando que $y$ depende de $x$ — então cada vez que derivamos um termo com $y$, aparece um $\\frac{dy}{dx}$ pela regra da cadeia. Depois, basta isolar $\\frac{dy}{dx}$.",
-    "formulaLatex": "\\frac{d}{dx}[F(x,y)] = 0 \\implies \\frac{dy}{dx} = -\\frac{F_x}{F_y}",
+    "formulaLatex": "\\frac{d}{dx}\\left(F(x,y)\\right) = 0 \\implies \\frac{dy}{dx} = -\\frac{F_x}{F_y}",
     "proofTitle": "Por que funciona?",
     "proof": "A derivação implícita não é uma técnica nova — é a regra da cadeia aplicada com um detalhe crucial: $y$ depende de $x$, mesmo que não saibamos explicitar como. Quando temos $F(x,y) = 0$, derivamos ambos os lados em relação a $x$. Termos com $x$ puro são derivados normalmente. Mas cada termo com $y$ recebe um fator $\\frac{dy}{dx}$ pela regra da cadeia — porque $y$ é uma função de $x$, mesmo escondida. Isso dá: $F_x + F_y \\cdot \\frac{dy}{dx} = 0$. Isolando: $\\frac{dy}{dx} = -\\frac{F_x}{F_y}$ (desde que $F_y \\neq 0$). O Teorema da Função Implícita garante que, nessas condições, $y$ de fato é uma função diferenciável de $x$ na vizinhança do ponto. Ou seja: não precisamos isolar $y$ para encontrar sua taxa de variação — basta derivar a equação inteira respeitando a dependência e resolver para $\\frac{dy}{dx}$.",
     "examples": [
@@ -157,7 +157,7 @@
     "intuition": "A substituição é a regra da cadeia ao contrário. Se a integral contém uma função e sua derivada aparece como fator, podemos trocar essa função por uma variável $u$, simplificando tudo. É como trocar a roupa de uma integral complicada por uma mais simples. A chave é encontrar o $u$ certo: geralmente é a função \"de dentro\".",
     "formulaLatex": "\\int f(g(x))\\,g'(x)\\,dx = \\int f(u)\\,du \\quad \\text{com } u = g(x)",
     "proofTitle": "Por que funciona?",
-    "proof": "A substituição é a regra da cadeia lida ao contrário — e entender isso é a chave de tudo. Se $F$ é a antiderivada de $f$ (ou seja, $F' = f$), então pela regra da cadeia: $\\frac{d}{dx}[F(g(x))] = f(g(x)) \\cdot g'(x)$. Lendo essa igualdade de trás para frente: $\\int f(g(x)) \\cdot g'(x)\\,dx = F(g(x)) + C$. A notação $u = g(x)$, $du = g'(x)\\,dx$ é apenas uma forma organizada de enxergar esse fato: o $g'(x)\\,dx$ se transforma em $du$, e a integral complicada em $x$ vira uma simples em $u$. É por isso que procuramos uma função \"de dentro\" cuja derivada aparece como fator \"do lado de fora\": quando isso acontece, a regra da cadeia garante que a substituição vai funcionar.",
+    "proof": "A substituição é a regra da cadeia lida ao contrário — e entender isso é a chave de tudo. Se $F$ é a antiderivada de $f$ (ou seja, $F' = f$), então pela regra da cadeia: $\\frac{d}{dx}\\left(F(g(x))\\right) = f(g(x)) \\cdot g'(x)$. Lendo essa igualdade de trás para frente: $\\int f(g(x)) \\cdot g'(x)\\,dx = F(g(x)) + C$. A notação $u = g(x)$, $du = g'(x)\\,dx$ é apenas uma forma organizada de enxergar esse fato: o $g'(x)\\,dx$ se transforma em $du$, e a integral complicada em $x$ vira uma simples em $u$. É por isso que procuramos uma função \"de dentro\" cuja derivada aparece como fator \"do lado de fora\": quando isso acontece, a regra da cadeia garante que a substituição vai funcionar.",
     "examples": [
       {
         "problem": "Calcule $\\int 2x \\cdot e^{x^2}\\,dx$.",
@@ -174,7 +174,7 @@
     "intuition": "A integração por partes é a regra do produto ao contrário. Quando temos o produto de duas funções e não conseguimos integrar diretamente, \"transferimos\" a derivada de uma para a outra. Escolhemos uma parte para derivar ($u$) e outra para integrar ($dv$). A regra LIATE (Logarítmica, Inversa trig, Algébrica, Trigonométrica, Exponencial) ajuda a escolher $u$.",
     "formulaLatex": "\\int u\\,dv = uv - \\int v\\,du",
     "proofTitle": "Por que funciona?",
-    "proof": "Pela regra do produto: $\\frac{d}{dx}[u \\cdot v] = u'v + uv'$. Integrando ambos os lados: $uv = \\int u'v\\,dx + \\int uv'\\,dx$. Rearranjando: $\\int uv'\\,dx = uv - \\int u'v\\,dx$, ou na notação diferencial: $\\int u\\,dv = uv - \\int v\\,du$. Mas por que isso é útil? Porque transfere a derivada de uma função para a outra. Se $u$ é algo que simplifica ao derivar (como $x^2 \\to 2x \\to 2 \\to 0$) e $dv$ é algo fácil de integrar (como $e^x$ ou $\\sin x$), então a nova integral $\\int v\\,du$ é mais simples que a original. A regra LIATE (Logarítmica, Inversa trig, Algébrica, Trigonométrica, Exponencial) ordena de \"mais quer ser $u$\" para \"mais quer ser $dv$\": logaritmos simplificam muito ao derivar, enquanto exponenciais nem mudam ao integrar. Não é um truque — é a regra do produto ao contrário.",
+    "proof": "Pela regra do produto: $\\frac{d}{dx}\\left(u \\cdot v\\right) = u'v + uv'$. Integrando ambos os lados: $uv = \\int u'v\\,dx + \\int uv'\\,dx$. Rearranjando: $\\int uv'\\,dx = uv - \\int u'v\\,dx$, ou na notação diferencial: $\\int u\\,dv = uv - \\int v\\,du$. Mas por que isso é útil? Porque transfere a derivada de uma função para a outra. Se $u$ é algo que simplifica ao derivar (como $x^2 \\to 2x \\to 2 \\to 0$) e $dv$ é algo fácil de integrar (como $e^x$ ou $\\sin x$), então a nova integral $\\int v\\,du$ é mais simples que a original. A regra LIATE (Logarítmica, Inversa trig, Algébrica, Trigonométrica, Exponencial) ordena de \"mais quer ser $u$\" para \"mais quer ser $dv$\": logaritmos simplificam muito ao derivar, enquanto exponenciais nem mudam ao integrar. Não é um truque — é a regra do produto ao contrário.",
     "examples": [
       {
         "problem": "Calcule $\\int x e^x\\,dx$.",

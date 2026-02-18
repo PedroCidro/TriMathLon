@@ -19,6 +19,7 @@
         "wrong": "wrong",
         "play": "Play",
         "start": "Start",
+        "review": "Review",
         "playAgain": "Play Again",
         "month": "mo"
     },
@@ -34,14 +35,10 @@
         "getStarted": "Get Started",
         "heroTitle": "Master ",
         "heroHighlight": "Calculus",
-        "heroSubtitle": "The best way to learn to <em>do</em> math. Replace passive lectures with interactive problem-solving and deliberate practice.",
+        "heroSubtitle": "The best way to learn to <em>do</em> math.",
         "heroCtaFree": "Start Free Training",
-        "moduleDerivatives": "Derivatives",
-        "moduleDerivativesDesc": "Differentiation rules, chain rule and related rates.",
-        "moduleIntegrals": "Integrals",
-        "moduleIntegralsDesc": "Integration techniques, areas and volumes.",
-        "moduleODEs": "ODEs",
-        "moduleODEsDesc": "First and second order differential equations.",
+        "modulesTitle": "What you'll master",
+        "modulesSubtitle": "4 Calculus modules organized from basic to advanced.",
         "howItWorks": "How it works",
         "howItWorksSubtitle": "Each topic has three study modes, designed to take you from theory to fluency.",
         "modeLearn": "Learn",
@@ -50,20 +47,10 @@
         "modeTrainDesc": "Solve problems at your own pace. Check the answer and rate your confidence — the system adapts to you.",
         "modeRecognize": "Recognize",
         "modeRecognizeDesc": "Given a problem, identify which technique to use. This is the skill that separates knowing the material from passing the exam.",
-        "whatWeOffer": "What we offer",
-        "offer1Title": "22 topics across Calculus I, II and III",
-        "offer1Desc": "From the power rule to the Laplace transform — derivatives, integrals and ODEs organized in increasing difficulty.",
-        "offer2Title": "Problems with instant feedback",
-        "offer2Desc": "Every exercise has an answer and self-assessment. You know exactly where you stand before moving on.",
-        "offer3Title": "Built for learning by doing",
-        "offer3Desc": "Less passive theory, more problem-solving. The focus is putting pen to paper from minute one.",
-        "blitzMode": "Blitz Mode",
-        "blitzModeDesc": "3 minutes on the clock. Maximum problems. 3 strikes and you're out. Test your speed and consistency under pressure — just like the real exam.",
         "statsTitle": "The community in numbers",
         "statsExercisesSolved": "exercises solved",
         "statsActiveStudents": "active students",
         "statsQuestionsAvailable": "questions available",
-        "statsViewRanking": "View ranking",
         "hallOfFame": "Hall of Fame",
         "hallOfFameSubtitle": "The students who trained the most on the platform.",
         "exerciseCount": "exercises",
@@ -119,7 +106,8 @@
         "calculateDerivative": "Calculate the derivative",
         "promptDerivadas": "Calculate the derivative",
         "promptIntegrais": "Evaluate the integral",
-        "promptEdos": "Solve the differential equation",
+        "promptLimites": "Evaluate the limit",
+        "promptAplicacoes": "Solve",
         "answer": "Answer",
         "showAnswer": "Show Answer",
         "howWasIt": "How was it?",
@@ -134,7 +122,16 @@
         "scoreResult": "You got {correct} out of {total} questions right.",
         "noRecognizeQuestions": "No recognition questions found for this topic.",
         "intuitionFallback": "The Intuition",
-        "contentInDevelopment": "Content under development for this topic."
+        "contentInDevelopment": "Content under development for this topic.",
+        "encouragement1": "It's part of the process!",
+        "encouragement2": "Mistakes + understanding why = growth.",
+        "encouragement3": "Almost there! Review the steps.",
+        "encouragement4": "Don't give up, you're improving!",
+        "encouragement5": "Everyone makes mistakes. What matters is learning.",
+        "encouragement6": "Breathe, re-read, and try again.",
+        "streakLabel": "streak",
+        "modeOpen": "Open",
+        "modeAlternatives": "Multiple Choice"
     },
     "Blitz": {
         "title": "Blitz Mode",
@@ -198,7 +195,12 @@
         "ratingGood": "Good",
         "ratingEasy": "Easy",
         "shareProfile": "Share Profile",
-        "linkCopied": "Link copied!"
+        "linkCopied": "Link copied!",
+        "crowNoData": "Solve exercises to start tracking your progress!",
+        "crowHighAccuracy": "Amazing work! {accuracy}% overall accuracy!",
+        "crowLowAccuracy": "How about focusing on {topic}? You'll get better!",
+        "crowStreak": "{days}-day streak! Keep it up!",
+        "crowDefault": "Let's see how you're doing!"
     },
     "Settings": {
         "title": "Settings",
@@ -255,7 +257,8 @@
     },
     "Premium": {
         "heroTitle": "Learn without limits.",
-        "heroSubtitle": "Full access to all topics in Derivatives, Integrals and ODEs.",
+        "heroSubtitle": "Full access to all advanced topics — including the entire Applications of Derivatives module.",
+        "heroBubble": "Unlock everything and train without limits!",
         "subscribe": "Get lifetime access",
         "subscribeMonthly": "Subscribe monthly",
         "processing": "Processing...",
@@ -269,11 +272,23 @@
         "oneTimePayment": "One-time payment. No subscriptions.",
         "oneTimePaymentLong": "Pay once and get access forever.",
         "whatYouUnlock": "What you unlock",
-        "unlockSubtitle": "13 advanced topics across 3 modules",
+        "unlockSubtitle": "4 modules with advanced topics — including the full Applications of Derivatives module",
+        "fullModule": "Full module",
         "recognitionMode": "Recognition Mode",
         "recognitionAvailability": "Available in all topics",
         "recognitionDesc": "Train identifying which technique to use for each problem — the most important skill on exams.",
+        "bottomCtaTitle": "Ready to master calculus?",
+        "bottomCtaSubtitle": "Unlock all topics and train without limits.",
         "checkoutError": "Error starting checkout. Please try again."
+    },
+    "Crow": {
+        "firstVisit": "Let's start? Pick a module!",
+        "hasProgress": "Let's practice?",
+        "longTimeNoSee": "Long time no see...",
+        "activeStreak": "🔥 {days} day streak! Keep it going?",
+        "activeStreakOne": "🔥 1 day streak! Keep it going?",
+        "startHere": "Start here!",
+        "dailyGoalLabel": "Daily Goal"
     },
     "Institutional": {
         "continueToArena": "Continue to the Arena"
@@ -365,7 +380,11 @@
         "difficultyMedium": "Medium",
         "difficultyHard": "Hard",
         "randomizeOrder": "Random order",
-        "playAgain": "Play Again?"
+        "playAgain": "Play Again?",
+        "waitingForRematch": "Waiting for opponent...",
+        "opponentWantsRematch": "Opponent wants a rematch!",
+        "acceptRematch": "Accept Rematch",
+        "requesting": "Requesting..."
     },
     "Groups": {
         "title": "Study Groups",
@@ -420,7 +439,53 @@
         "yesterday": "yesterday",
         "daysAgo": "{count}d ago"
     },
+    "Learn": {
+        "seeSolution": "See solution",
+        "hideSolution": "Hide solution",
+        "readyToPractice": "Ready to practice?",
+        "train": "Train",
+        "solution": "Solution",
+        "result": "Result"
+    },
+    "USP": {
+        "heroTitle": "Train Calculus with ",
+        "heroHighlight": "real USP exams",
+        "heroSubtitle": "Exercises based on past exams and problem sets from USP Calculus courses.",
+        "heroCtaFree": "Create Free Account",
+        "heroCtaMain": "Start now",
+        "whatIsTitle": "What is JustMathing?",
+        "whatIsDesc": "A calculus training platform with three study modes.",
+        "modeLearn": "Learn",
+        "modeLearnDesc": "Clear explanations with step-by-step worked examples.",
+        "modeTrain": "Train",
+        "modeTrainDesc": "Solve problems at your own pace with instant feedback.",
+        "modeRecognize": "Recognize",
+        "modeRecognizeDesc": "Identify which technique to use — the skill exams actually test.",
+        "modulesTitle": "4 modules, 27 topics",
+        "modulesSubtitle": "From Limits to Integrals — organized in the order you'll see in class.",
+        "dealTitle": "USP Freshmen Deal",
+        "dealPrice": "R$ 69.99",
+        "dealOriginal": "R$ 139.99",
+        "dealLabel": "Lifetime access",
+        "dealDesc": "One-time payment. All topics unlocked forever.",
+        "dealCta": "Get the freshmen deal",
+        "ctaTitle": "Start now.",
+        "ctaSubtitle": "Create your free account and unlock everything with the freshmen deal.",
+        "ctaButton": "Sign Up & Subscribe",
+        "fromExams": "Based on real exams",
+        "fromExamsDesc": "Our exercises are generated from past exams and problem sets from USP Calculus courses.",
+        "goToArena": "Go to Arena",
+        "dealCtaStart": "Get started",
+        "dealCtaFree": "Continue for free",
+        "madeBy": "Built by a USP Math student!!!",
+        "processing": "Processing...",
+        "checkoutError": "Error starting checkout. Please try again."
+    },
     "Curriculum": {
+        "limites": {
+            "title": "Limits",
+            "description": "Intuitive limits, one-sided limits, properties and continuity."
+        },
         "derivadas": {
             "title": "Derivatives",
             "description": "Differentiation rules, chain rule and related rates."
@@ -429,9 +494,9 @@
             "title": "Integrals",
             "description": "Integration techniques, areas and volumes."
         },
-        "edos": {
-            "title": "ODEs",
-            "description": "First and second order differential equations."
+        "aplicacoes": {
+            "title": "Applications of Derivatives",
+            "description": "L'Hôpital, related rates, optimization, graph analysis and Taylor."
         },
         "power_rule": { "title": "Power Rule", "description": "Derivative of x^n" },
         "product_rule": { "title": "Product Rule", "description": "d(uv) = uv' + vu'" },
@@ -440,7 +505,12 @@
         "trig_basic": { "title": "Trigonometric Functions", "description": "Sin, Cos, Tan, etc" },
         "exp_log": { "title": "Exponential & Logarithmic", "description": "e^x, ln(x), a^x" },
         "implicit": { "title": "Implicit Differentiation", "description": "When y is not isolated" },
-        "related_rates": { "title": "Related Rates", "description": "Application problems" },
+        "related_rates": { "title": "Related Rates", "description": "Problems with simultaneous rates of change" },
+        "lhopital": { "title": "L'Hôpital's Rule", "description": "Indeterminate forms 0/0, ∞/∞" },
+        "mean_value_theorem": { "title": "Mean Value Theorem", "description": "Existence of point with average derivative" },
+        "graph_sketching": { "title": "Graph Analysis", "description": "Increasing/decreasing, concavity, asymptotes" },
+        "optimization": { "title": "Optimization", "description": "Applied max and min problems" },
+        "taylor_polynomial": { "title": "Taylor Polynomials", "description": "Polynomial approximation of functions" },
         "basic_integrals": { "title": "Basic Integrals", "description": "Basic antiderivatives" },
         "substitution": { "title": "Substitution (u-sub)", "description": "Reverse chain rule" },
         "by_parts": { "title": "Integration by Parts", "description": "Reverse product rule" },
@@ -448,12 +518,12 @@
         "trig_sub": { "title": "Trigonometric Substitution", "description": "For square roots" },
         "partial_fractions": { "title": "Partial Fractions", "description": "Integration of rationals" },
         "improper": { "title": "Improper Integrals", "description": "Limits at infinity" },
-        "separable": { "title": "Separable Variables", "description": "f(y)dy = g(x)dx" },
-        "first_order_linear": { "title": "First Order Linear", "description": "Integrating factor" },
-        "exact": { "title": "Exact Equations", "description": "Mdx + Ndy = 0" },
-        "homogeneous": { "title": "Homogeneous Equations", "description": "Substitution v = y/x" },
-        "second_order_linear": { "title": "2nd Order Linear", "description": "Constant coefficients" },
-        "undetermined_coeffs": { "title": "Undetermined Coefficients", "description": "Particular solution" },
-        "laplace": { "title": "Laplace Transform", "description": "Algebraic solving" }
+        "intuitive_limits": { "title": "Intuitive Limits", "description": "What happens as x approaches?" },
+        "one_sided_limits": { "title": "One-Sided Limits", "description": "Limits from left and right" },
+        "limit_laws": { "title": "Limit Laws", "description": "Sum, product and quotient of limits" },
+        "squeeze_theorem": { "title": "Squeeze Theorem", "description": "Squeezing between two functions" },
+        "continuity": { "title": "Continuity", "description": "No jumps, no holes" },
+        "trig_limits": { "title": "Trigonometric Limits", "description": "sin(x)/x and variations" },
+        "limits_at_infinity": { "title": "Limits at Infinity", "description": "Behavior as x → ∞" }
     }
 }

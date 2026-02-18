@@ -1,7 +1,8 @@
 export const GAME_DURATION: Record<string, number> = {
+    limites: 180,    // 3 minutes
     derivadas: 180,  // 3 minutes
+    aplicacoes: 180, // 3 minutes
     integrais: 180,  // 3 minutes
-    edos: 600,       // 10 minutes
 };
 
 export const MAX_STRIKES = 3;
@@ -17,7 +18,7 @@ export function shuffleArray<T>(arr: T[]): T[] {
 }
 
 export function stripProblemPrefix(text: string): string {
-    return text.replace(/^(Resolva a EDO:\s*|Calcule\s+|Derive\s+|Resolva\s+|Encontre\s+|Determine\s+)/i, '');
+    return text.replace(/^(Calcule\s+|Derive\s+|Resolva\s+|Encontre\s+|Determine\s+)/i, '');
 }
 
 export function formatTime(seconds: number): string {

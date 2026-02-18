@@ -28,7 +28,7 @@ export async function GET(request: Request) {
                 status, game_started_at, game_duration_seconds,
                 creator_id, creator_score, creator_strikes, creator_current_index, creator_finished,
                 opponent_id, opponent_score, opponent_strikes, opponent_current_index, opponent_finished,
-                expires_at
+                expires_at, rematch_challenge_id
             `)
             .eq('id', challengeId)
             .single();
@@ -68,6 +68,19 @@ export async function GET(request: Request) {
 
         const isCreator = challenge.creator_id === userId;
 
+        // Fetch rematch status if rematch exists
+        let rematchStatus: string | null = null;
+        if (challenge.rematch_challenge_id) {
+            const { data: rematch } = await supabase
+                .from('challenges')
+                .select('status, creator_id')
+                .eq('id', challenge.rematch_challenge_id)
+                .single();
+            if (rematch) {
+                rematchStatus = rematch.status;
+            }
+        }
+
         return NextResponse.json({
             status: challenge.status,
             game_started_at: challenge.game_started_at,
@@ -80,6 +93,8 @@ export async function GET(request: Request) {
             opponent_strikes: isCreator ? challenge.opponent_strikes : challenge.creator_strikes,
             opponent_current_index: isCreator ? challenge.opponent_current_index : challenge.creator_current_index,
             opponent_finished: isCreator ? challenge.opponent_finished : challenge.creator_finished,
+            rematch_challenge_id: challenge.rematch_challenge_id,
+            rematch_status: rematchStatus,
         });
     } catch (err) {
         console.error('Poll challenge error:', err instanceof Error ? err.message : 'Unknown error');

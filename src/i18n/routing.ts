@@ -19,6 +19,7 @@ export const routing = defineRouting({
         '/challenge/[challengeId]': '/challenge/[challengeId]',
         '/onboarding': '/onboarding',
         '/profile/[userId]': '/profile/[userId]',
+        '/usp': '/usp',
         '/institutional/[institution]': '/institutional/[institution]',
         '/groups': '/groups',
         '/groups/[groupId]': '/groups/[groupId]',

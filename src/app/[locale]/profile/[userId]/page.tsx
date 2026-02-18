@@ -37,24 +37,34 @@ async function getProfileData(userId: string) {
         (masteryResult.data ?? []).map(m => [m.subcategory, m]),
     );
 
-    const module_accuracy = curriculum.map(mod => {
-        const modTopics = mod.topics
+    // Merge derivadas + aplicacoes into a single "derivadas" entry
+    const mergedGroups = [
+        { module_id: 'limites', sourceIds: ['limites'] },
+        { module_id: 'derivadas', sourceIds: ['derivadas', 'aplicacoes'] },
+        { module_id: 'integrais', sourceIds: ['integrais'] },
+    ];
+    const module_accuracy = mergedGroups.map(group => {
+        const mods = group.sourceIds.map(id => curriculum.find(m => m.id === id)!).filter(Boolean);
+        const allTopics = mods.flatMap(m => m.topics);
+        const practiced = allTopics
             .map(t => masteryMap.get(t.id))
             .filter((m): m is { subcategory: string; attempts: number; correct: number } => !!m && m.attempts > 0);
-        const totalCorrect = modTopics.reduce((s, m) => s + m.correct, 0);
-        const totalAttempts = modTopics.reduce((s, m) => s + m.attempts, 0);
+        const totalCorrect = practiced.reduce((s, m) => s + m.correct, 0);
+        const totalAttempts = practiced.reduce((s, m) => s + m.attempts, 0);
         return {
-            module_id: mod.id,
+            module_id: group.module_id,
             accuracy: totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0,
-            topics_practiced: modTopics.length,
-            topics_total: mod.topics.length,
+            topics_practiced: practiced.length,
+            topics_total: allTopics.length,
         };
     });
 
     const blitzBests: Record<string, number> = {};
     for (const row of blitzResult.data ?? []) {
-        if (!blitzBests[row.module_id] || row.score > blitzBests[row.module_id]) {
-            blitzBests[row.module_id] = row.score;
+        // Merge aplicacoes blitz into derivadas
+        const key = row.module_id === 'aplicacoes' ? 'derivadas' : row.module_id;
+        if (!blitzBests[key] || row.score > blitzBests[key]) {
+            blitzBests[key] = row.score;
         }
     }
 

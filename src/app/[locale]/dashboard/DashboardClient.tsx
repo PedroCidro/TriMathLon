@@ -42,7 +42,10 @@ export default function DashboardClient({
     lastActiveDate,
 }: DashboardClientProps) {
     const t = useTranslations('Dashboard');
+    const tc = useTranslations('Curriculum');
     const tCrow = useTranslations('Crow');
+
+    const [showAplicacoes, setShowAplicacoes] = useState(false);
 
     // Compute per-module progress percentages
     const moduleProgressPercents: Record<string, number> = {};
@@ -244,32 +247,67 @@ export default function DashboardClient({
 
                 {/* Module Cards */}
                 <div className="relative">
-                    {/* First-time crow guide */}
-                    {totalProgress === 0 && (
-                        <div className="flex flex-col items-center sm:items-start mb-2 sm:absolute sm:-top-4 sm:left-4 sm:z-10 sm:mb-0">
-                            <Image
-                                src="/munin/happy.png"
-                                alt="Start here"
-                                width={80}
-                                height={80}
-                                className="h-[60px] sm:h-[70px] w-auto"
-                            />
-                            <div className="bg-gray-900 text-white text-xs font-bold rounded-lg px-3 py-1.5 -mt-1 shadow-lg">
-                                {tCrow('startHere')}
+                    <div className="flex flex-col gap-6">
+                        {/* Limites card centered on top with crow guide */}
+                        {modules.filter(m => m.id === 'limites').map((module) => (
+                            <div key={module.id} className="flex flex-col items-center">
+                                {/* Crow guide above Limites */}
+                                {exercisesSolved === 0 && (
+                                    <div className="flex flex-col items-center mb-2">
+                                        <Image
+                                            src="/munin/happy.png"
+                                            alt="Start here"
+                                            width={80}
+                                            height={80}
+                                            className="h-[60px] sm:h-[70px] w-auto"
+                                        />
+                                        <div className="bg-gray-900 text-white text-xs font-bold rounded-lg px-3 py-1.5 -mt-1 shadow-lg">
+                                            {tCrow('startHere')}
+                                        </div>
+                                    </div>
+                                )}
+                                <div className="w-full md:w-1/3">
+                                    <ModuleCard
+                                        module={module}
+                                        progressPercent={moduleProgressPercents[module.id]}
+                                        isLowestProgress={module.id === lowestProgressModuleId}
+                                        locale="pt"
+                                    />
+                                </div>
                             </div>
-                        </div>
-                    )}
-
-                    <div className={cn("grid grid-cols-1 md:grid-cols-3 gap-6", totalProgress === 0 && "sm:pt-16")}>
-                        {modules.map((module) => (
-                            <ModuleCard
-                                key={module.id}
-                                module={module}
-                                progressPercent={moduleProgressPercents[module.id]}
-                                isLowestProgress={module.id === lowestProgressModuleId}
-                                locale="pt"
-                            />
                         ))}
+                        {/* Remaining modules centered */}
+                        <div className="flex flex-col md:flex-row gap-6 justify-center">
+                            {modules.filter(m => m.id !== 'limites' && m.id !== 'aplicacoes').map((module) => {
+                                if (module.id === 'derivadas') {
+                                    const aplicacoes = modules.find(m => m.id === 'aplicacoes')!;
+                                    const active = showAplicacoes ? aplicacoes : module;
+                                    const inactiveLabel = showAplicacoes ? tc('derivadas.title') : tc('aplicacoes.title');
+                                    return (
+                                        <div key="derivadas-slot" className="w-full md:w-1/3">
+                                            <ModuleCard
+                                                module={active}
+                                                progressPercent={moduleProgressPercents[active.id]}
+                                                isLowestProgress={active.id === lowestProgressModuleId}
+                                                locale="pt"
+                                                toggleLabel={inactiveLabel}
+                                                onToggle={() => setShowAplicacoes(prev => !prev)}
+                                            />
+                                        </div>
+                                    );
+                                }
+                                return (
+                                    <div key={module.id} className="w-full md:w-1/3">
+                                        <ModuleCard
+                                            module={module}
+                                            progressPercent={moduleProgressPercents[module.id]}
+                                            isLowestProgress={module.id === lowestProgressModuleId}
+                                            locale="pt"
+                                        />
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </div>
                 </div>
 

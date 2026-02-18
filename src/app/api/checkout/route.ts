@@ -40,12 +40,35 @@ export async function POST(req: NextRequest) {
         }
 
         const { locale, plan } = await req.json().catch(() => ({ locale: undefined, plan: undefined }));
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        const stripe = getStripe();
+
+        // USP Bixos one-time deal
+        if (plan === 'usp-bixos') {
+            const PRICE_USP_BIXOS = process.env.STRIPE_PRICE_ID_USP_BIXOS;
+            if (!PRICE_USP_BIXOS) {
+                console.error('Missing env var: STRIPE_PRICE_ID_USP_BIXOS');
+                return NextResponse.json(
+                    { error: 'Server misconfiguration: missing STRIPE_PRICE_ID_USP_BIXOS' },
+                    { status: 500 },
+                );
+            }
+
+            const session = await stripe.checkout.sessions.create({
+                payment_method_types: ['card'],
+                line_items: [{ price: PRICE_USP_BIXOS, quantity: 1 }],
+                mode: 'payment',
+                metadata: { clerk_user_id: userId },
+                success_url: `${baseUrl}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
+                cancel_url: `${baseUrl}/usp`,
+            });
+
+            return NextResponse.json({ url: session.url });
+        }
+
         const isInternational = locale === 'en';
         const isInstitutional = !!existingProfile?.institution;
         const isMonthly = plan === 'monthly';
-
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-        const stripe = getStripe();
 
         const priceId = isMonthly
             ? (isInternational

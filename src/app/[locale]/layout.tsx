@@ -30,8 +30,8 @@ export async function generateMetadata({
         description: t("defaultDescription"),
         keywords:
             locale === "pt"
-                ? ["cálculo", "derivadas", "integrais", "EDO", "matemática", "treino", "prática", "universidade"]
-                : ["calculus", "derivatives", "integrals", "ODE", "mathematics", "training", "practice", "university"],
+                ? ["cálculo", "derivadas", "integrais", "matemática", "treino", "prática", "universidade"]
+                : ["calculus", "derivatives", "integrals", "mathematics", "training", "practice", "university"],
         openGraph: {
             title: t("ogTitle"),
             description: t("ogDescription"),

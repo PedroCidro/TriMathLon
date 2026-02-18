@@ -19,7 +19,7 @@ for (const mod of curriculum) {
 const PREMIUM_TOPICS = new Set<string>();
 for (const mod of curriculum) {
     mod.topics.forEach((t, i) => {
-        if (i >= 3) PREMIUM_TOPICS.add(t.id);
+        if (mod.premiumModule || i >= 3) PREMIUM_TOPICS.add(t.id);
     });
 }
 

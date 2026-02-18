@@ -164,7 +164,7 @@ export const explanations: Record<string, TopicExplanation> = {
             "da coordenada vertical (seno) em um dado ponto é exatamente a coordenada horizontal (cosseno) naquele ponto. " +
             "Cada função trigonométrica tem uma derivada que pode ser expressa em termos das outras.",
         formulaLatex:
-            "\\frac{d}{dx}[\\sin x] = \\cos x \\qquad \\frac{d}{dx}[\\cos x] = -\\sin x",
+            "\\frac{d}{dx}\left(\\sin x\right) = \\cos x \\qquad \\frac{d}{dx}\left(\\cos x\right) = -\\sin x",
         proofTitle: "Por que funciona?",
         proof:
             "Vamos provar que a derivada de $\\sin x$ é $\\cos x$ direto da definição. " +
@@ -201,7 +201,7 @@ export const explanations: Record<string, TopicExplanation> = {
             "quanto maior o valor de $x$, mais devagar o logaritmo cresce. " +
             "Essas duas funções formam a base de modelos de crescimento e decaimento na natureza.",
         formulaLatex:
-            "\\frac{d}{dx}[e^x] = e^x \\qquad \\frac{d}{dx}[\\ln x] = \\frac{1}{x}",
+            "\\frac{d}{dx}\left(e^x\right) = e^x \\qquad \\frac{d}{dx}\left(\\ln x\right) = \\frac{1}{x}",
         proofTitle: "Por que funciona?",
         proof:
             "O que torna $e^x$ especial? Calculamos pela definição: " +
@@ -234,7 +234,7 @@ export const explanations: Record<string, TopicExplanation> = {
             "lembrando que $y$ depende de $x$ — então cada vez que derivamos um termo com $y$, " +
             "aparece um $\\frac{dy}{dx}$ pela regra da cadeia. Depois, basta isolar $\\frac{dy}{dx}$.",
         formulaLatex:
-            "\\frac{d}{dx}[F(x,y)] = 0 \\implies \\frac{dy}{dx} = -\\frac{F_x}{F_y}",
+            "\\frac{d}{dx}\left(F(x,y)\right) = 0 \\implies \\frac{dy}{dx} = -\\frac{F_x}{F_y}",
         proofTitle: "Por que funciona?",
         proof:
             "A derivação implícita não é uma técnica nova — é a regra da cadeia aplicada com um detalhe crucial: " +
@@ -356,7 +356,7 @@ export const explanations: Record<string, TopicExplanation> = {
         proof:
             "A substituição é a regra da cadeia lida ao contrário — e entender isso é a chave de tudo. " +
             "Se $F$ é a antiderivada de $f$ (ou seja, $F' = f$), então pela regra da cadeia: " +
-            "$\\frac{d}{dx}[F(g(x))] = f(g(x)) \\cdot g'(x)$. " +
+            "$\\frac{d}{dx}\left(F(g(x))\right) = f(g(x)) \\cdot g'(x)$. " +
             "Lendo essa igualdade de trás para frente: $\\int f(g(x)) \\cdot g'(x)\\,dx = F(g(x)) + C$. " +
             "A notação $u = g(x)$, $du = g'(x)\\,dx$ é apenas uma forma organizada de enxergar esse fato: " +
             "o $g'(x)\\,dx$ se transforma em $du$, e a integral complicada em $x$ vira uma simples em $u$. " +
@@ -388,7 +388,7 @@ export const explanations: Record<string, TopicExplanation> = {
         formulaLatex: "\\int u\\,dv = uv - \\int v\\,du",
         proofTitle: "Por que funciona?",
         proof:
-            "Pela regra do produto: $\\frac{d}{dx}[u \\cdot v] = u'v + uv'$. " +
+            "Pela regra do produto: $\\frac{d}{dx}\left(u \\cdot v\right) = u'v + uv'$. " +
             "Integrando ambos os lados: $uv = \\int u'v\\,dx + \\int uv'\\,dx$. " +
             "Rearranjando: $\\int uv'\\,dx = uv - \\int u'v\\,dx$, ou na notação diferencial: " +
             "$\\int u\\,dv = uv - \\int v\\,du$. Mas por que isso é útil? " +

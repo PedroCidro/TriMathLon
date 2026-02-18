@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { ArrowLeft, Trophy, Flame, Zap, Target, BarChart3, TrendingUp, TrendingDown, Award, Crown, Users, Building2, Share2, Check as CheckIcon } from 'lucide-react';
+import Image from 'next/image';
 import { Link } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
 import { curriculum } from '@/data/curriculum';
@@ -39,9 +40,10 @@ interface StatsClientProps {
 }
 
 const MODULE_COLORS: Record<string, { accent: string; bg: string; text: string; fill: string }> = {
-    derivadas: { accent: 'border-blue-500', bg: 'bg-blue-50', text: 'text-blue-700', fill: '#3b82f6' },
-    integrais: { accent: 'border-purple-500', bg: 'bg-purple-50', text: 'text-purple-700', fill: '#8b5cf6' },
-    edos: { accent: 'border-yellow-500', bg: 'bg-yellow-50', text: 'text-yellow-700', fill: '#eab308' },
+    limites: { accent: 'border-teal-500', bg: 'bg-teal-50', text: 'text-teal-700', fill: '#0D9488' },
+    derivadas: { accent: 'border-[#7C3AED]', bg: 'bg-purple-50', text: 'text-[#7C3AED]', fill: '#7C3AED' },
+    aplicacoes: { accent: 'border-emerald-600', bg: 'bg-emerald-50', text: 'text-emerald-700', fill: '#059669' },
+    integrais: { accent: 'border-[#4A1D96]', bg: 'bg-purple-100', text: 'text-[#4A1D96]', fill: '#4A1D96' },
 };
 
 const RANK_BADGES = ['\u{1F947}', '\u{1F948}', '\u{1F949}'];
@@ -141,20 +143,29 @@ export default function StatsClient({
         }))
         .sort((a, b) => b.accuracy - a.accuracy);
 
-    // Radar chart: per-module aggregated accuracy
-    const radarData = curriculum.map(mod => {
-        const modTopics = mod.topics
-            .map(t => masteryMap.get(t.id))
-            .filter((m): m is MasteryRow => !!m && m.attempts > 0);
-        const totalCorrect = modTopics.reduce((s, m) => s + m.correct, 0);
-        const totalAttempts = modTopics.reduce((s, m) => s + m.attempts, 0);
-        return {
-            module: tc(`${mod.id}.title`),
-            accuracy: totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0,
-            practiced: modTopics.length,
-            total: mod.topics.length,
-        };
-    });
+    // Radar chart: per-module aggregated accuracy (derivadas + aplicacoes merged)
+    const radarData = (() => {
+        const mergedGroups: { label: string; moduleIds: string[] }[] = [
+            { label: tc('limites.title'), moduleIds: ['limites'] },
+            { label: tc('derivadas.title'), moduleIds: ['derivadas', 'aplicacoes'] },
+            { label: tc('integrais.title'), moduleIds: ['integrais'] },
+        ];
+        return mergedGroups.map(group => {
+            const mods = group.moduleIds.map(id => curriculum.find(m => m.id === id)!).filter(Boolean);
+            const allTopics = mods.flatMap(m => m.topics);
+            const practiced = allTopics
+                .map(t => masteryMap.get(t.id))
+                .filter((m): m is MasteryRow => !!m && m.attempts > 0);
+            const totalCorrect = practiced.reduce((s, m) => s + m.correct, 0);
+            const totalAttempts = practiced.reduce((s, m) => s + m.attempts, 0);
+            return {
+                module: group.label,
+                accuracy: totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0,
+                practiced: practiced.length,
+                total: allTopics.length,
+            };
+        });
+    })();
 
     // Donut chart: correct vs wrong overall
     const totalCorrect = practicedMastery.reduce((s, m) => s + m.correct, 0);
@@ -168,6 +179,15 @@ export default function StatsClient({
         : 0;
 
     const hasAnyData = practicedMastery.length > 0;
+
+    // Munin context-aware message
+    const crowMessage = (() => {
+        if (!hasAnyData) return { sprite: '/munin/thinking.png', text: t('crowNoData') };
+        if (overallAccuracy >= 80) return { sprite: '/munin/congrats.png', text: t('crowHighAccuracy', { accuracy: overallAccuracy }) };
+        if (weakestTopic && overallAccuracy < 50) return { sprite: '/munin/bright.png', text: t('crowLowAccuracy', { topic: findTopicTitle(weakestTopic.subcategory) }) };
+        if (currentStreak >= 3) return { sprite: '/munin/happy.png', text: t('crowStreak', { days: currentStreak }) };
+        return { sprite: '/munin/happy.png', text: t('crowDefault') };
+    })();
 
     const institutionConfig = rankingData.institution ? getInstitutionById(rankingData.institution) : null;
 
@@ -251,13 +271,31 @@ export default function StatsClient({
 
                     <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                         <div className="flex items-center gap-2 mb-2">
-                            <Target className="w-5 h-5 text-blue-500" />
+                            <Target className="w-5 h-5 text-[#7C3AED]" />
                             <span className="text-sm font-medium text-gray-500">{t('topicsLabel')}</span>
                         </div>
                         <p className="text-xl sm:text-2xl font-bold text-gray-900">
                             {topicsPracticed}
                             <span className="text-sm font-medium text-gray-400 ml-1">/ {TOTAL_TOPICS}</span>
                         </p>
+                    </div>
+                </div>
+
+                {/* Munin speech bubble */}
+                <div className="flex items-end gap-4 mb-10">
+                    <Image
+                        src={crowMessage.sprite}
+                        alt="Munin the crow"
+                        width={150}
+                        height={150}
+                        className="h-[80px] sm:h-[100px] w-auto shrink-0"
+                        unoptimized
+                    />
+                    <div className="relative bg-white rounded-2xl border border-gray-200 shadow-sm px-5 py-4 flex-1">
+                        <div className="hidden sm:block absolute left-0 top-1/2 -translate-y-1/2 -translate-x-[7px]">
+                            <div className="w-3.5 h-3.5 bg-white border-l border-b border-gray-200 rotate-45" />
+                        </div>
+                        <p className="text-base sm:text-lg font-bold text-gray-900">{crowMessage.text}</p>
                     </div>
                 </div>
 
@@ -321,8 +359,8 @@ export default function StatsClient({
                                         />
                                         <Radar
                                             dataKey="accuracy"
-                                            stroke="#3b82f6"
-                                            fill="#3b82f6"
+                                            stroke="#7C3AED"
+                                            fill="#7C3AED"
                                             fillOpacity={0.2}
                                             strokeWidth={2}
                                         />
@@ -448,7 +486,7 @@ export default function StatsClient({
                         <BarChart3 className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                         <p className="text-gray-500 font-medium">{t('noTopicsPracticed')}</p>
                         <p className="text-sm text-gray-400 mt-1">{t('noTopicsHint')}</p>
-                        <Link href="/dashboard" className="inline-block mt-4 text-blue-600 hover:underline font-bold text-sm">
+                        <Link href="/dashboard" className="inline-block mt-4 text-[#7C3AED] hover:underline font-bold text-sm">
                             {t('goToArena')}
                         </Link>
                     </div>
@@ -538,12 +576,12 @@ export default function StatsClient({
                                         key={user.position}
                                         className={cn(
                                             "flex items-center gap-4 p-3 rounded-xl",
-                                            user.is_self ? "bg-blue-50 border border-blue-200" : "bg-gray-50"
+                                            user.is_self ? "bg-purple-50 border border-purple-200" : "bg-gray-50"
                                         )}
                                     >
                                         <span className="text-2xl w-8 text-center">{RANK_BADGES[user.position - 1]}</span>
                                         <div className="flex-1">
-                                            <p className={cn("font-bold text-sm", user.is_self ? "text-blue-700" : "text-gray-900")}>
+                                            <p className={cn("font-bold text-sm", user.is_self ? "text-[#7C3AED]" : "text-gray-900")}>
                                                 {user.display_name} {user.is_self && `(${t('you')})`}
                                             </p>
                                         </div>
@@ -565,7 +603,7 @@ export default function StatsClient({
                                 <button
                                     onClick={handleToggleOptIn}
                                     disabled={togglingOptIn}
-                                    className="text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors disabled:opacity-50"
+                                    className="text-sm font-bold text-[#7C3AED] hover:text-[#6D28D9] transition-colors disabled:opacity-50"
                                 >
                                     {togglingOptIn ? t('updating') : t('joinRanking')}
                                 </button>
@@ -577,7 +615,7 @@ export default function StatsClient({
                     {rankingData.institution && institutionConfig && (
                         <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
                             <div className="flex items-center gap-2 mb-5">
-                                <Users className="w-5 h-5 text-blue-500" />
+                                <Users className="w-5 h-5 text-[#7C3AED]" />
                                 <h2 className="text-lg font-bold text-gray-900">{t('uniRanking', { name: institutionConfig.name })}</h2>
                             </div>
 
@@ -588,12 +626,12 @@ export default function StatsClient({
                                             key={user.position}
                                             className={cn(
                                                 "flex items-center gap-4 p-3 rounded-xl",
-                                                user.is_self ? "bg-blue-50 border border-blue-200" : "bg-gray-50"
+                                                user.is_self ? "bg-purple-50 border border-purple-200" : "bg-gray-50"
                                             )}
                                         >
                                             <span className="text-sm font-bold text-gray-400 w-8 text-center">#{user.position}</span>
                                             <div className="flex-1">
-                                                <p className={cn("font-bold text-sm", user.is_self ? "text-blue-700" : "text-gray-900")}>
+                                                <p className={cn("font-bold text-sm", user.is_self ? "text-[#7C3AED]" : "text-gray-900")}>
                                                     {user.display_name} {user.is_self && `(${t('you')})`}
                                                 </p>
                                             </div>
@@ -630,7 +668,7 @@ export default function StatsClient({
                                         return (
                                             <div key={uni.institution} className={cn(
                                                 "flex items-center gap-4 p-3 rounded-xl",
-                                                uni.institution === rankingData.institution ? "bg-blue-50 border border-blue-200" : "bg-gray-50"
+                                                uni.institution === rankingData.institution ? "bg-purple-50 border border-purple-200" : "bg-gray-50"
                                             )}>
                                                 <span className="text-sm font-bold text-gray-400 w-8 text-center">#{i + 1}</span>
                                                 <p className="flex-1 font-bold text-sm text-gray-900">{uniConfig?.name ?? uni.institution}</p>

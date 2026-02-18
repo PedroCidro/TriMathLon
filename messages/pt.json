@@ -19,6 +19,7 @@
         "wrong": "erradas",
         "play": "Jogar",
         "start": "Começar",
+        "review": "Revisar",
         "playAgain": "Jogar Novamente",
         "month": "mês"
     },
@@ -34,14 +35,10 @@
         "getStarted": "Começar Agora",
         "heroTitle": "Masterize o ",
         "heroHighlight": "Cálculo",
-        "heroSubtitle": "A melhor maneira de aprender a <em>fazer</em> matemática. Substitua palestras passivas por resolução de problemas interativa e prática deliberada.",
+        "heroSubtitle": "A melhor maneira de aprender a <em>fazer</em> matemática.",
         "heroCtaFree": "Começar Treino Grátis",
-        "moduleDerivatives": "Derivadas",
-        "moduleDerivativesDesc": "Regras de derivação, regra da cadeia e taxas relacionadas.",
-        "moduleIntegrals": "Integrais",
-        "moduleIntegralsDesc": "Técnicas de integração, áreas e volumes.",
-        "moduleODEs": "EDOs",
-        "moduleODEsDesc": "Equações diferenciais de 1ª e 2ª ordem.",
+        "modulesTitle": "O que você vai dominar",
+        "modulesSubtitle": "4 módulos de Cálculo organizados do básico ao avançado.",
         "howItWorks": "Como funciona",
         "howItWorksSubtitle": "Cada tópico tem três modos de estudo, pensados para levar você da teoria à fluência.",
         "modeLearn": "Aprender",
@@ -50,20 +47,10 @@
         "modeTrainDesc": "Resolva problemas no seu ritmo. Confira a resposta e avalie sua confiança — o sistema se adapta a você.",
         "modeRecognize": "Reconhecer",
         "modeRecognizeDesc": "Dado um problema, identifique qual técnica usar. Essa é a habilidade que separa quem sabe a matéria de quem passa na prova.",
-        "whatWeOffer": "O que oferecemos",
-        "offer1Title": "22 tópicos de Cálculo I, II e III",
-        "offer1Desc": "De regra da potência até transformada de Laplace — derivadas, integrais e EDOs organizados em ordem crescente de dificuldade.",
-        "offer2Title": "Problemas com feedback na hora",
-        "offer2Desc": "Cada exercício tem resposta e autoavaliação. Você sabe exatamente onde está antes de ir para o próximo.",
-        "offer3Title": "Feito para quem aprende fazendo",
-        "offer3Desc": "Menos teoria passiva, mais resolução. O foco é colocar a caneta no papel desde o primeiro minuto.",
-        "blitzMode": "Modo Blitz",
-        "blitzModeDesc": "3 minutos no relógio. Máximo de problemas. 3 erros e acabou. Teste sua velocidade e consistência sob pressão — do jeito que a prova vai cobrar.",
         "statsTitle": "A comunidade em números",
         "statsExercisesSolved": "exercícios resolvidos",
         "statsActiveStudents": "estudantes ativos",
         "statsQuestionsAvailable": "questões disponíveis",
-        "statsViewRanking": "Ver ranking",
         "hallOfFame": "Hall da Fama",
         "hallOfFameSubtitle": "Os estudantes que mais treinaram na plataforma.",
         "exerciseCount": "exercícios",
@@ -119,7 +106,8 @@
         "calculateDerivative": "Calcule a derivada",
         "promptDerivadas": "Calcule a derivada",
         "promptIntegrais": "Resolva a integral",
-        "promptEdos": "Resolva a equação diferencial",
+        "promptLimites": "Calcule o limite",
+        "promptAplicacoes": "Resolva",
         "answer": "Resposta",
         "showAnswer": "Mostrar Resposta",
         "howWasIt": "Como foi?",
@@ -134,7 +122,16 @@
         "scoreResult": "Você acertou {correct} de {total} questões.",
         "noRecognizeQuestions": "Nenhuma questão de reconhecimento encontrada para este tópico.",
         "intuitionFallback": "A Intuição",
-        "contentInDevelopment": "Conteúdo em desenvolvimento para este tópico."
+        "contentInDevelopment": "Conteúdo em desenvolvimento para este tópico.",
+        "encouragement1": "Faz parte do processo!",
+        "encouragement2": "Errar e entender por quê é o caminho.",
+        "encouragement3": "Quase lá! Revise o passo a passo.",
+        "encouragement4": "Não desista, você está melhorando!",
+        "encouragement5": "Todo mundo erra. O importante é aprender.",
+        "encouragement6": "Respire, releia e tente novamente.",
+        "streakLabel": "sequência",
+        "modeOpen": "Aberta",
+        "modeAlternatives": "Alternativas"
     },
     "Blitz": {
         "title": "Modo Blitz",
@@ -198,7 +195,12 @@
         "ratingGood": "Bom",
         "ratingEasy": "Fácil",
         "shareProfile": "Compartilhar Perfil",
-        "linkCopied": "Link copiado!"
+        "linkCopied": "Link copiado!",
+        "crowNoData": "Resolva exercícios para acompanhar seu progresso!",
+        "crowHighAccuracy": "Mandando muito bem! {accuracy}% de acerto geral!",
+        "crowLowAccuracy": "Que tal focar em {topic}? Você vai melhorar!",
+        "crowStreak": "Sequência de {days} dias! Continue assim!",
+        "crowDefault": "Vamos ver como você está indo!"
     },
     "Settings": {
         "title": "Configurações",
@@ -255,7 +257,8 @@
     },
     "Premium": {
         "heroTitle": "Aprenda sem limites.",
-        "heroSubtitle": "Acesso completo a todos os tópicos de Derivadas, Integrais e EDOs.",
+        "heroSubtitle": "Acesso completo a todos os tópicos avançados — incluindo Aplicações de Derivadas inteiro.",
+        "heroBubble": "Desbloqueie tudo e treine sem limites!",
         "subscribe": "Garantir acesso vitalício",
         "subscribeMonthly": "Assinar mensal",
         "processing": "Processando...",
@@ -269,11 +272,23 @@
         "oneTimePayment": "Pagamento único. Sem mensalidades.",
         "oneTimePaymentLong": "Pague uma vez e tenha acesso para sempre.",
         "whatYouUnlock": "O que você desbloqueia",
-        "unlockSubtitle": "13 tópicos avançados em 3 módulos",
+        "unlockSubtitle": "4 módulos com tópicos avançados — incluindo Aplicações de Derivadas completo",
+        "fullModule": "Módulo completo",
         "recognitionMode": "Modo Reconhecimento",
         "recognitionAvailability": "Disponível em todos os tópicos",
         "recognitionDesc": "Treine a identificação de qual técnica usar em cada problema — a habilidade mais importante nas provas.",
+        "bottomCtaTitle": "Pronto pra dominar o cálculo?",
+        "bottomCtaSubtitle": "Desbloqueie todos os tópicos e treine sem limites.",
         "checkoutError": "Erro ao iniciar checkout. Tente novamente."
+    },
+    "Crow": {
+        "firstVisit": "Bora começar? Escolhe um módulo!",
+        "hasProgress": "Bora treinar?",
+        "longTimeNoSee": "Sumiu ein...",
+        "activeStreak": "🔥 {days} dias seguidos! Bora manter?",
+        "activeStreakOne": "🔥 1 dia seguido! Bora manter?",
+        "startHere": "Comece por aqui!",
+        "dailyGoalLabel": "Meta Diária"
     },
     "Institutional": {
         "continueToArena": "Continuar para a Arena"
@@ -365,7 +380,11 @@
         "difficultyMedium": "Médio",
         "difficultyHard": "Difícil",
         "randomizeOrder": "Ordem aleatória",
-        "playAgain": "Jogar de Novo?"
+        "playAgain": "Jogar de Novo?",
+        "waitingForRematch": "Aguardando oponente...",
+        "opponentWantsRematch": "O oponente quer revanche!",
+        "acceptRematch": "Aceitar Revanche",
+        "requesting": "Solicitando..."
     },
     "Groups": {
         "title": "Grupos de Estudo",
@@ -420,7 +439,53 @@
         "yesterday": "ontem",
         "daysAgo": "{count}d atrás"
     },
+    "Learn": {
+        "seeSolution": "Ver solução",
+        "hideSolution": "Esconder solução",
+        "readyToPractice": "Pronto pra praticar?",
+        "train": "Treinar",
+        "solution": "Solução",
+        "result": "Resultado"
+    },
+    "USP": {
+        "heroTitle": "Treine Cálculo com ",
+        "heroHighlight": "provas reais da USP",
+        "heroSubtitle": "Exercícios baseados em provas antigas e listas de exercícios dos cursos de Cálculo da USP.",
+        "heroCtaFree": "Criar Conta Grátis",
+        "heroCtaMain": "Começe já",
+        "whatIsTitle": "O que é o JustMathing?",
+        "whatIsDesc": "Uma plataforma de treino de cálculo com três modos de estudo.",
+        "modeLearn": "Aprender",
+        "modeLearnDesc": "Explicações claras com exemplos resolvidos passo a passo.",
+        "modeTrain": "Treinar",
+        "modeTrainDesc": "Resolva problemas no seu ritmo com correção imediata.",
+        "modeRecognize": "Reconhecer",
+        "modeRecognizeDesc": "Identifique qual técnica usar — a habilidade que a prova cobra.",
+        "modulesTitle": "4 módulos, 27 tópicos",
+        "modulesSubtitle": "De Limites a Integrais — organizado na ordem que você vai ver no curso.",
+        "dealTitle": "Oferta Bixo USP",
+        "dealPrice": "R$ 69,99",
+        "dealOriginal": "R$ 139,99",
+        "dealLabel": "Acesso vitalício",
+        "dealDesc": "Pagamento único. Todos os tópicos desbloqueados para sempre.",
+        "dealCta": "Garantir oferta bixo",
+        "ctaTitle": "Comece agora.",
+        "ctaSubtitle": "Crie sua conta grátis e desbloqueie tudo com a oferta bixo.",
+        "ctaButton": "Criar Conta e Assinar",
+        "fromExams": "Baseado em provas reais",
+        "fromExamsDesc": "Nossos exercícios são gerados a partir de provas antigas e listas de exercícios de Cálculo da USP.",
+        "goToArena": "Ir para Arena",
+        "dealCtaStart": "Começar agora",
+        "dealCtaFree": "Continuar gratuitamente",
+        "madeBy": "Feito por um estudante de Matemática da USP!!!",
+        "processing": "Processando...",
+        "checkoutError": "Erro ao iniciar checkout. Tente novamente."
+    },
     "Curriculum": {
+        "limites": {
+            "title": "Limites",
+            "description": "Limites intuitivos, laterais, propriedades e continuidade."
+        },
         "derivadas": {
             "title": "Derivadas",
             "description": "Regras de derivação, regra da cadeia e taxas relacionadas."
@@ -429,9 +494,9 @@
             "title": "Integrais",
             "description": "Técnicas de integração, áreas e volumes."
         },
-        "edos": {
-            "title": "EDOs",
-            "description": "Equações diferenciais de 1ª e 2ª ordem."
+        "aplicacoes": {
+            "title": "Aplicações de Derivadas",
+            "description": "L'Hôpital, taxas relacionadas, otimização, análise de gráficos e Taylor."
         },
         "power_rule": { "title": "Regra da Potência", "description": "Derivada de x^n" },
         "product_rule": { "title": "Regra do Produto", "description": "d(uv) = uv' + vu'" },
@@ -440,7 +505,12 @@
         "trig_basic": { "title": "Funções Trigonométricas", "description": "Sin, Cos, Tan, etc" },
         "exp_log": { "title": "Exponencial e Logarítmica", "description": "e^x, ln(x), a^x" },
         "implicit": { "title": "Derivação Implícita", "description": "Quando y não está isolado" },
-        "related_rates": { "title": "Taxas Relacionadas", "description": "Problemas de aplicação" },
+        "related_rates": { "title": "Taxas Relacionadas", "description": "Problemas com taxas de variação simultâneas" },
+        "lhopital": { "title": "Regra de L'Hôpital", "description": "Limites indeterminados 0/0, ∞/∞" },
+        "mean_value_theorem": { "title": "Teorema do Valor Médio", "description": "Existência de ponto com derivada média" },
+        "graph_sketching": { "title": "Análise de Gráficos", "description": "Crescimento, concavidade e assíntotas" },
+        "optimization": { "title": "Otimização", "description": "Máximos e mínimos aplicados" },
+        "taylor_polynomial": { "title": "Polinômios de Taylor", "description": "Aproximação polinomial de funções" },
         "basic_integrals": { "title": "Integrais Imediatas", "description": "Antiderivadas básicas" },
         "substitution": { "title": "Substituição (u-sub)", "description": "Regra da cadeia inversa" },
         "by_parts": { "title": "Integração por Partes", "description": "Regra do produto inversa" },
@@ -448,12 +518,12 @@
         "trig_sub": { "title": "Substituição Trigonométrica", "description": "Para raízes quadradas" },
         "partial_fractions": { "title": "Frações Parciais", "description": "Integração de racionais" },
         "improper": { "title": "Integrais Impróprias", "description": "Limites no infinito" },
-        "separable": { "title": "Variáveis Separáveis", "description": "f(y)dy = g(x)dx" },
-        "first_order_linear": { "title": "Lineares de 1ª Ordem", "description": "Fator integrante" },
-        "exact": { "title": "Equações Exatas", "description": "Mdx + Ndy = 0" },
-        "homogeneous": { "title": "Equações Homogêneas", "description": "Substituição v = y/x" },
-        "second_order_linear": { "title": "2ª Ordem Lineares", "description": "Coeficientes constantes" },
-        "undetermined_coeffs": { "title": "Coeficientes a Determinar", "description": "Solução particular" },
-        "laplace": { "title": "Transformada de Laplace", "description": "Resolução algébrica" }
+        "intuitive_limits": { "title": "Limites Intuitivos", "description": "O que acontece quando x se aproxima?" },
+        "one_sided_limits": { "title": "Limites Laterais", "description": "Limites pela esquerda e direita" },
+        "limit_laws": { "title": "Propriedades de Limites", "description": "Soma, produto e quociente de limites" },
+        "squeeze_theorem": { "title": "Teorema do Confronto", "description": "Apertando entre duas funções" },
+        "continuity": { "title": "Continuidade", "description": "Sem saltos nem buracos" },
+        "trig_limits": { "title": "Limites Trigonométricos", "description": "sin(x)/x e variações" },
+        "limits_at_infinity": { "title": "Limites no Infinito", "description": "Comportamento quando x → ∞" }
     }
 }
