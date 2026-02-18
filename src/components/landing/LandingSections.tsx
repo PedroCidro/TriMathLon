@@ -101,7 +101,6 @@ export default function LandingSections() {
             {/* ── Nav ── */}
             <nav className="w-full flex justify-between items-center max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
                 <div className="flex items-center gap-2">
-                    <Image src="/logo-icon.png" alt="JustMathing Logo" width={261} height={271} priority className="h-10 sm:h-16 w-auto" />
                 </div>
                 <div className="flex items-center gap-4 sm:gap-6">
                     <Link
@@ -289,42 +288,19 @@ export default function LandingSections() {
                                 </h2>
                             </motion.div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                {[
-                                    {
-                                        icon: <Trophy className="w-6 h-6 text-green-600" />,
-                                        value: stats.total_exercises_solved,
-                                        label: t('statsExercisesSolved'),
-                                        color: 'bg-green-50',
-                                    },
-                                    {
-                                        icon: <Users className="w-6 h-6 text-blue-600" />,
-                                        value: stats.total_active_students,
-                                        label: t('statsActiveStudents'),
-                                        color: 'bg-blue-50',
-                                    },
-                                    {
-                                        icon: <BookOpen className="w-6 h-6 text-purple-600" />,
-                                        value: stats.total_questions_available,
-                                        label: t('statsQuestionsAvailable'),
-                                        color: 'bg-purple-50',
-                                        suffix: '+',
-                                    },
-                                ].map((item, i) => (
-                                    <motion.div
-                                        key={i}
-                                        {...fade(0.15 + i * 0.1)}
-                                        className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 text-center"
-                                    >
-                                        <div className={`w-12 h-12 ${item.color} rounded-xl flex items-center justify-center mx-auto mb-4`}>
-                                            {item.icon}
-                                        </div>
-                                        <p className="text-3xl sm:text-4xl font-bold text-gray-900">
-                                            <AnimatedCounter target={item.value} suffix={'suffix' in item ? item.suffix as string : ''} />
-                                        </p>
-                                        <p className="text-gray-500 font-medium mt-1">{item.label}</p>
-                                    </motion.div>
-                                ))}
+                            <div className="flex justify-center">
+                                <motion.div
+                                    {...fade(0.15)}
+                                    className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 text-center min-w-[200px]"
+                                >
+                                    <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center mx-auto mb-4">
+                                        <BookOpen className="w-6 h-6 text-purple-600" />
+                                    </div>
+                                    <p className="text-3xl sm:text-4xl font-bold text-gray-900">
+                                        <AnimatedCounter target={stats.total_questions_available} suffix="+" />
+                                    </p>
+                                    <p className="text-gray-500 font-medium mt-1">{t('statsQuestionsAvailable')}</p>
+                                </motion.div>
                             </div>
 
                             {/* Hall of Fame */}
