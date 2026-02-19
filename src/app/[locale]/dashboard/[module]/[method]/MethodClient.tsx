@@ -353,13 +353,17 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
                 {parts.map((part, index) => {
                     if (index % 2 === 0) {
                         return <span key={index} className="font-normal">{part}</span>;
-                    } else {
-                        // Use displaystyle for operators with limits (lim, sum, prod) so
-                        // subscripts render below instead of to the side
-                        const needsDisplay = /\\(lim|sum|prod)(?![a-zA-Z])/.test(part);
-                        const latex = needsDisplay ? `\\displaystyle ${part}` : part;
-                        return <MathRenderer key={index} latex={latex} />;
                     }
+                    // Render block-level constructs (cases, matrices) in display mode
+                    const isBlockMath = /\\begin\{(cases|pmatrix|bmatrix|vmatrix|array)/.test(part);
+                    if (isBlockMath) {
+                        return <MathRenderer key={index} latex={part} display />;
+                    }
+                    // Use displaystyle for operators with limits (lim, sum, prod) so
+                    // subscripts render below instead of to the side
+                    const needsDisplay = /\\(lim|sum|prod)(?![a-zA-Z])/.test(part);
+                    const latex = needsDisplay ? `\\displaystyle ${part}` : part;
+                    return <MathRenderer key={index} latex={latex} />;
                 })}
             </span>
         );
@@ -593,9 +597,7 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
                                         </div>
 
                                         <span className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-6 block">
-                                            {practiceMode === 'alternatives' && hasGoodDistractors(questions[currentIndex])
-                                                ? t('modeAlternatives')
-                                                : t(`prompt${moduleId.charAt(0).toUpperCase() + moduleId.slice(1)}`)}
+                                            {t(`prompt${moduleId.charAt(0).toUpperCase() + moduleId.slice(1)}`)}
                                         </span>
 
                                         <div className="mb-12 min-h-[120px] flex items-center justify-center">

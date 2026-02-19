@@ -449,10 +449,24 @@
         "result": "Result"
     },
     "LearnPage": {
-        "heroTitle": "What is a Limit — and why does it exist?",
-        "epigraph": "Before derivatives, before integrals, before everything in Calculus, there is the limit. Without it, nothing works. Let's understand why.",
-        "ctaTitle": "Time to practice",
-        "ctaSubtitle": "Choose a Limits subtopic to start training."
+        "limites": {
+            "heroTitle": "What is a Limit — and why does it exist?",
+            "epigraph": "Before derivatives, before integrals, before everything in Calculus, there is the limit. Without it, nothing works. Let's understand why.",
+            "ctaTitle": "Time to practice",
+            "ctaSubtitle": "Choose a Limits subtopic to start training."
+        },
+        "derivadas": {
+            "heroTitle": "What is a Derivative — and why does it matter?",
+            "epigraph": "You already understand limits. Now let's use limits to measure the most important thing in Calculus: instantaneous change.",
+            "ctaTitle": "Time to practice",
+            "ctaSubtitle": "Choose a Derivatives subtopic to start training."
+        },
+        "integrais": {
+            "heroTitle": "What is an Integral — and why does it exist?",
+            "epigraph": "You already know how to differentiate. Now let's go in reverse: given the rate of change, how do we recover the original function? And as a bonus: how to measure areas.",
+            "ctaTitle": "Time to practice",
+            "ctaSubtitle": "Choose an Integrals subtopic to start training."
+        }
     },
     "USP": {
         "heroTitle": "Train Calculus with ",

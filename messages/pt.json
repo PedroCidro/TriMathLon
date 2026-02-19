@@ -449,10 +449,24 @@
         "result": "Resultado"
     },
     "LearnPage": {
-        "heroTitle": "O que é Limite — e por que ele existe?",
-        "epigraph": "Antes de derivar, antes de integrar, antes de tudo no Cálculo, existe o limite. Sem ele, nada funciona. Vamos entender por quê.",
-        "ctaTitle": "Hora de praticar",
-        "ctaSubtitle": "Escolha um subtópico de Limites para começar a treinar."
+        "limites": {
+            "heroTitle": "O que é Limite — e por que ele existe?",
+            "epigraph": "Antes de derivar, antes de integrar, antes de tudo no Cálculo, existe o limite. Sem ele, nada funciona. Vamos entender por quê.",
+            "ctaTitle": "Hora de praticar",
+            "ctaSubtitle": "Escolha um subtópico de Limites para começar a treinar."
+        },
+        "derivadas": {
+            "heroTitle": "O que é Derivada — e por que ela importa?",
+            "epigraph": "Você já entende limites. Agora vamos usar limites para medir a coisa mais importante do Cálculo: mudança instantânea.",
+            "ctaTitle": "Hora de praticar",
+            "ctaSubtitle": "Escolha um subtópico de Derivadas para começar a treinar."
+        },
+        "integrais": {
+            "heroTitle": "O que é Integral — e por que ela existe?",
+            "epigraph": "Você já sabe derivar. Agora vamos ao contrário: dada a taxa de variação, como recuperar a função original? E de bônus: como medir áreas.",
+            "ctaTitle": "Hora de praticar",
+            "ctaSubtitle": "Escolha um subtópico de Integrais para começar a treinar."
+        }
     },
     "USP": {
         "heroTitle": "Treine Cálculo com ",

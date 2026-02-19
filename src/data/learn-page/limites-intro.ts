@@ -6,7 +6,8 @@ export type LearnSection =
     | { type: 'blockquote'; text: string }
     | { type: 'divider' }
     | { type: 'graph'; id: string }
-    | { type: 'callout'; text: string };
+    | { type: 'callout'; text: string }
+    | { type: 'mascot-tip'; text: string; image?: 'thinking' | 'thinkingcurious' | 'pointing' | 'happy' | 'bright' };
 
 export const limitesIntroSectionsEn: LearnSection[] = [
     // --- The problem algebra can't solve ---

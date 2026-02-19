@@ -126,7 +126,7 @@ export default function DeltaBandGraph() {
             </svg>
 
             {/* Legend */}
-            <div className="flex flex-wrap justify-center gap-4 mt-3 text-xs font-medium">
+            <div className="flex flex-wrap justify-center gap-4 mt-3 text-xs font-medium text-[#334155]">
                 <span className="flex items-center gap-1.5">
                     <span className="inline-block w-3 h-3 rounded" style={{ backgroundColor: 'rgba(34, 197, 94, 0.3)' }} />
                     {en ? 'ε band (tolerance)' : 'Faixa ε (tolerância)'}

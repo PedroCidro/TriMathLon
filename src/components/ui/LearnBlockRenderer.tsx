@@ -22,11 +22,15 @@ export function renderFormattedText(text: string): ReactNode {
     const parts = text.split('$');
     return (
         <>
-            {parts.map((part, index) =>
-                index % 2 === 0
-                    ? <span key={index}>{part}</span>
-                    : <MathRenderer key={index} latex={part} className="text-[#1A1A2E]" />
-            )}
+            {parts.map((part, index) => {
+                if (index % 2 === 0) {
+                    return <span key={index}>{part}</span>;
+                }
+                // Use displaystyle for operators with limits so subscripts render below
+                const needsDisplay = /\\(lim|sum|prod)(?![a-zA-Z])/.test(part);
+                const latex = needsDisplay ? `\\displaystyle ${part}` : part;
+                return <MathRenderer key={index} latex={latex} className="text-[#1A1A2E]" />;
+            })}
         </>
     );
 }

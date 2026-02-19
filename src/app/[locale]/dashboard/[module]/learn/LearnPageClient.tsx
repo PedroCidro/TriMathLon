@@ -7,6 +7,8 @@ import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { curriculum } from '@/data/curriculum';
 import { limitesIntroSections, limitesIntroSectionsEn } from '@/data/learn-page/limites-intro';
+import { derivadasIntroSections, derivadasIntroSectionsEn } from '@/data/learn-page/derivadas-intro';
+import { integraisIntroSections, integraisIntroSectionsEn } from '@/data/learn-page/integrais-intro';
 import SectionRenderer from '@/components/ui/learn-page/SectionRenderer';
 import ScrollProgress from '@/components/ui/ScrollProgress';
 
@@ -26,10 +28,14 @@ export default function LearnPageClient({ moduleId }: LearnPageClientProps) {
     const moduleData = curriculum.find(m => m.id === moduleId);
     if (!moduleData) return null;
 
-    // For now only limites has content
-    const sections = moduleId === 'limites'
-        ? (locale === 'en' ? limitesIntroSectionsEn : limitesIntroSections)
-        : [];
+    const sections =
+        moduleId === 'limites'
+            ? (locale === 'en' ? limitesIntroSectionsEn : limitesIntroSections)
+            : moduleId === 'derivadas'
+                ? (locale === 'en' ? derivadasIntroSectionsEn : derivadasIntroSections)
+                : moduleId === 'integrais'
+                    ? (locale === 'en' ? integraisIntroSectionsEn : integraisIntroSections)
+                    : [];
 
     return (
         <div ref={contentRef} className="min-h-screen bg-[#F8F7F4]">
@@ -49,7 +55,7 @@ export default function LearnPageClient({ moduleId }: LearnPageClientProps) {
                 <header className="mb-10">
                     <div className="flex items-start justify-between mb-6">
                         <h1 className="text-3xl sm:text-4xl font-bold text-[#1A1A2E] leading-tight max-w-[80%]">
-                            {t('heroTitle')}
+                            {t(`${moduleId}.heroTitle`)}
                         </h1>
                         <Image
                             src="/munin/bright.png"
@@ -63,7 +69,7 @@ export default function LearnPageClient({ moduleId }: LearnPageClientProps) {
                     {/* Epigraph */}
                     <blockquote className="border-l-4 border-[#7C3AED] bg-purple-50/40 rounded-r-xl pl-5 pr-4 py-4">
                         <p className="text-[#374151] italic text-base sm:text-lg leading-relaxed">
-                            {t('epigraph')}
+                            {t(`${moduleId}.epigraph`)}
                         </p>
                     </blockquote>
                 </header>
@@ -74,10 +80,10 @@ export default function LearnPageClient({ moduleId }: LearnPageClientProps) {
                 {/* Bottom CTA: topic cards */}
                 <div className="mt-16 mb-8">
                     <h2 className="text-2xl font-bold text-[#1A1A2E] mb-2">
-                        {t('ctaTitle')}
+                        {t(`${moduleId}.ctaTitle`)}
                     </h2>
                     <p className="text-[#6B7280] mb-6">
-                        {t('ctaSubtitle')}
+                        {t(`${moduleId}.ctaSubtitle`)}
                     </p>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

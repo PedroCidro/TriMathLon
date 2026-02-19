@@ -45,7 +45,7 @@ export default function ModuleClient({ isPremium, topicProgress }: ModuleClientP
                 </Link>
 
                 {(() => {
-                    const hasLearnPage = moduleId === 'limites';
+                    const hasLearnPage = moduleId === 'limites' || moduleId === 'derivadas' || moduleId === 'integrais';
                     const headerContent = (
                         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
                             <Image
