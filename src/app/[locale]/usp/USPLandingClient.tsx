@@ -6,9 +6,48 @@ import { Link } from '@/i18n/routing';
 import { motion } from 'framer-motion';
 import MathRenderer from '@/components/ui/MathRenderer';
 import Image from 'next/image';
-import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { curriculum } from '@/data/curriculum';
+
+/* ── Hardcoded pt-BR strings (USP page is always Portuguese) ── */
+const T = {
+    heroTitle: 'Treine Cálculo com ',
+    heroHighlight: 'provas reais da USP',
+    heroSubtitle: 'Exercícios baseados em provas antigas e listas de exercícios dos cursos de Cálculo da USP.',
+    heroCtaFree: 'Criar Conta Grátis',
+    heroCtaMain: 'Começe já',
+    whatIsTitle: 'O que é o JustMathing?',
+    whatIsDesc: 'Uma plataforma de treino de cálculo com três modos de estudo.',
+    modeLearn: 'Aprender',
+    modeLearnDesc: 'Explicações claras com exemplos resolvidos passo a passo.',
+    modeTrain: 'Treinar',
+    modeTrainDesc: 'Resolva problemas no seu ritmo com correção imediata.',
+    modeRecognize: 'Reconhecer',
+    modeRecognizeDesc: 'Identifique qual técnica usar — a habilidade que a prova cobra.',
+    modulesTitle: '4 módulos, 27 tópicos',
+    modulesSubtitle: 'De Limites a Integrais — organizado na ordem que você vai ver no curso.',
+    dealTitle: 'Oferta Bixo USP',
+    dealPrice: 'R$ 69,99',
+    dealOriginal: 'R$ 139,99',
+    dealLabel: 'Acesso vitalício',
+    dealDesc: 'Pagamento único. Todos os tópicos desbloqueados para sempre.',
+    dealCta: 'Garantir oferta bixo',
+    ctaTitle: 'Comece agora.',
+    ctaSubtitle: 'Crie sua conta grátis e desbloqueie tudo com a oferta bixo.',
+    fromExams: 'Baseado em provas reais',
+    fromExamsDesc: 'Nossos exercícios são gerados a partir de provas antigas e listas de exercícios de Cálculo da USP.',
+    dealCtaFree: 'Continuar gratuitamente',
+    madeBy: 'Feito por um estudante de Matemática da USP!!!',
+    processing: 'Processando...',
+    checkoutError: 'Erro ao iniciar checkout. Tente novamente.',
+    signIn: 'Entrar',
+} as const;
+
+const STUDY_MODE_LABELS: Record<string, { name: string; desc: string }> = {
+    Learn: { name: T.modeLearn, desc: T.modeLearnDesc },
+    Train: { name: T.modeTrain, desc: T.modeTrainDesc },
+    Recognize: { name: T.modeRecognize, desc: T.modeRecognizeDesc },
+};
 
 const fade = (delay: number) => ({
     initial: { opacity: 0, y: 24 },
@@ -84,10 +123,6 @@ interface USPLandingClientProps {
 
 export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPLandingClientProps) {
     const [loading, setLoading] = useState(false);
-    const t = useTranslations('USP');
-    const tc = useTranslations('Curriculum');
-    const tCommon = useTranslations('Common');
-    const tLanding = useTranslations('Landing');
 
     const handleCheckout = async () => {
         setLoading(true);
@@ -121,7 +156,7 @@ export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPL
             console.error('Checkout error:', err);
             const message = err instanceof Error
                 ? err.message
-                : String(err) !== '[object Object]' ? String(err) : t('checkoutError');
+                : String(err) !== '[object Object]' ? String(err) : T.checkoutError;
             toast.error(message);
         } finally {
             setLoading(false);
@@ -135,7 +170,7 @@ export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPL
         if (isPremium) {
             return (
                 <Link href="/dashboard" className={base}>
-                    {t('heroCtaFree')}
+                    {T.heroCtaFree}
                     <ArrowRight className="w-5 h-5" />
                 </Link>
             );
@@ -143,14 +178,14 @@ export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPL
         if (isLoggedIn) {
             return (
                 <button onClick={handleCheckout} disabled={loading} className={`${base} disabled:opacity-60 disabled:pointer-events-none`}>
-                    {loading ? t('processing') : t('dealCta')}
+                    {loading ? T.processing : T.dealCta}
                     {!loading && <ArrowRight className="w-5 h-5" />}
                 </button>
             );
         }
         return (
             <Link href="/sign-up/[[...sign-up]]" className={base}>
-                {t('heroCtaFree')}
+                {T.heroCtaFree}
                 <ArrowRight className="w-5 h-5" />
             </Link>
         );
@@ -163,7 +198,7 @@ export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPL
         if (isPremium) {
             return (
                 <Link href="/dashboard" className={base}>
-                    {t('heroCtaMain')}
+                    {T.heroCtaMain}
                     <ArrowRight className="w-5 h-5" />
                 </Link>
             );
@@ -171,14 +206,14 @@ export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPL
         if (isLoggedIn) {
             return (
                 <button onClick={handleCheckout} disabled={loading} className={`${base} disabled:opacity-60 disabled:pointer-events-none`}>
-                    {loading ? t('processing') : t('heroCtaMain')}
+                    {loading ? T.processing : T.heroCtaMain}
                     {!loading && <ArrowRight className="w-5 h-5" />}
                 </button>
             );
         }
         return (
             <Link href="/sign-up/[[...sign-up]]" className={base}>
-                {t('heroCtaMain')}
+                {T.heroCtaMain}
                 <ArrowRight className="w-5 h-5" />
             </Link>
         );
@@ -191,7 +226,7 @@ export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPL
         if (isLoggedIn && !isPremium) {
             return (
                 <button onClick={handleCheckout} disabled={loading} className={`${base} disabled:opacity-60 disabled:pointer-events-none`}>
-                    {loading ? t('processing') : t('dealCta')}
+                    {loading ? T.processing : T.dealCta}
                     {!loading && <ArrowRight className="w-5 h-5" />}
                 </button>
             );
@@ -199,14 +234,14 @@ export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPL
         if (isPremium) {
             return (
                 <Link href="/dashboard" className={base}>
-                    {t('dealCta')}
+                    {T.dealCta}
                     <ArrowRight className="w-5 h-5" />
                 </Link>
             );
         }
         return (
             <Link href="/sign-up/[[...sign-up]]" className={base}>
-                {t('dealCta')}
+                {T.dealCta}
                 <ArrowRight className="w-5 h-5" />
             </Link>
         );
@@ -219,20 +254,20 @@ export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPL
         if (isPremium) {
             return (
                 <Link href="/dashboard" className={base}>
-                    {t('heroCtaFree')}
+                    {T.heroCtaFree}
                 </Link>
             );
         }
         if (isLoggedIn) {
             return (
                 <button onClick={handleCheckout} disabled={loading} className={`${base} disabled:opacity-60 disabled:pointer-events-none`}>
-                    {loading ? t('processing') : t('dealCta')}
+                    {loading ? T.processing : T.dealCta}
                 </button>
             );
         }
         return (
             <Link href="/sign-up/[[...sign-up]]" className={base}>
-                {t('heroCtaFree')}
+                {T.heroCtaFree}
             </Link>
         );
     };
@@ -250,7 +285,7 @@ export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPL
                             href="/sign-in/[[...sign-in]]"
                             className="hidden sm:flex font-bold text-sm text-gray-600 hover:text-[#7C3AED] transition-colors"
                         >
-                            {tLanding('signIn')}
+                            {T.signIn}
                         </Link>
                     )}
                     <NavCTA />
@@ -275,11 +310,11 @@ export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPL
                                     </div>
 
                                     <h1 className="text-xl font-bold text-gray-900 leading-tight sm:text-2xl">
-                                        {t('heroTitle')}
-                                        <span className="text-[#7C3AED]">{t('heroHighlight')}</span>.
+                                        {T.heroTitle}
+                                        <span className="text-[#7C3AED]">{T.heroHighlight}</span>.
                                     </h1>
                                     <p className="mt-2 text-sm text-gray-500 leading-relaxed sm:text-base">
-                                        {t('heroSubtitle')}
+                                        {T.heroSubtitle}
                                     </p>
                                 </div>
                             </motion.div>
@@ -310,7 +345,7 @@ export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPL
                         {/* Made by badge */}
                         <motion.div {...fade(0.35)} className="mt-5 text-center">
                             <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-50 border border-purple-200 text-[#7C3AED] font-semibold text-sm">
-                                {t('madeBy')}
+                                {T.madeBy}
                             </span>
                         </motion.div>
                     </div>
@@ -327,10 +362,10 @@ export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPL
                         </div>
                         <div>
                             <h2 className="text-base font-bold text-gray-900 mb-1 sm:text-lg">
-                                {t('fromExams')}
+                                {T.fromExams}
                             </h2>
                             <p className="text-sm text-gray-500 leading-relaxed">
-                                {t('fromExamsDesc')}
+                                {T.fromExamsDesc}
                             </p>
                         </div>
                     </motion.div>
@@ -341,18 +376,17 @@ export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPL
                     <div className="max-w-lg mx-auto">
                         <motion.div {...fade(0.4)} className="text-center mb-6">
                             <h2 className="text-xl font-bold text-gray-900 mb-1 sm:text-2xl">
-                                {t('whatIsTitle')}
+                                {T.whatIsTitle}
                             </h2>
                             <p className="text-sm text-gray-500 sm:text-base">
-                                {t('whatIsDesc')}
+                                {T.whatIsDesc}
                             </p>
                         </motion.div>
 
                         <div className="flex flex-col gap-3">
                             {STUDY_MODES.map((mode, i) => {
                                 const Icon = mode.icon;
-                                const nameKey = `mode${mode.key}` as const;
-                                const descKey = `mode${mode.key}Desc` as const;
+                                const labels = STUDY_MODE_LABELS[mode.key];
                                 return (
                                     <motion.div
                                         key={mode.key}
@@ -364,10 +398,10 @@ export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPL
                                         </div>
                                         <div>
                                             <h3 className="text-base font-bold text-gray-900 mb-0.5">
-                                                {t(nameKey)}
+                                                {labels.name}
                                             </h3>
                                             <p className="text-sm text-gray-500 leading-relaxed">
-                                                {t(descKey)}
+                                                {labels.desc}
                                             </p>
                                         </div>
                                     </motion.div>
@@ -382,10 +416,10 @@ export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPL
                     <div className="max-w-lg mx-auto">
                         <motion.div {...fade(0.6)} className="text-center mb-6">
                             <h2 className="text-xl font-bold text-gray-900 mb-1 sm:text-2xl">
-                                {t('modulesTitle')}
+                                {T.modulesTitle}
                             </h2>
                             <p className="text-sm text-gray-500 sm:text-base">
-                                {t('modulesSubtitle')}
+                                {T.modulesSubtitle}
                             </p>
                         </motion.div>
 
@@ -407,10 +441,10 @@ export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPL
                                         </div>
                                         <div className="p-3">
                                             <h3 className="text-sm font-bold text-gray-900 mb-0.5 sm:text-base">
-                                                {tc(`${mod.id}.title`)}
+                                                {mod.title}
                                             </h3>
                                             <p className="text-xs text-gray-400">
-                                                {mod.topics.length} {tCommon('topics').toLowerCase()}
+                                                {mod.topics.length} tópicos
                                             </p>
                                         </div>
                                     </motion.div>
@@ -430,24 +464,24 @@ export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPL
 
                         <div className="relative">
                             <div className="inline-flex items-center px-3 py-1 rounded-full bg-purple-50 border border-purple-200 text-[#7C3AED] font-bold text-xs mb-5">
-                                {t('dealLabel')}
+                                {T.dealLabel}
                             </div>
 
                             <h2 className="text-xl font-bold text-gray-900 mb-5 sm:text-2xl">
-                                {t('dealTitle')}
+                                {T.dealTitle}
                             </h2>
 
                             <div className="flex items-baseline justify-center gap-2 mb-1">
                                 <span className="text-3xl font-bold text-gray-900 sm:text-4xl">
-                                    {t('dealPrice')}
+                                    {T.dealPrice}
                                 </span>
                                 <span className="text-lg text-gray-300 line-through">
-                                    {t('dealOriginal')}
+                                    {T.dealOriginal}
                                 </span>
                             </div>
 
                             <p className="text-sm text-gray-400 mb-6">
-                                {t('dealDesc')}
+                                {T.dealDesc}
                             </p>
 
                             <div className="flex flex-col items-center gap-3">
@@ -456,7 +490,7 @@ export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPL
                                     href="/sign-up/[[...sign-up]]"
                                     className="text-xs font-medium text-gray-400 hover:text-gray-600 transition-colors"
                                 >
-                                    {t('dealCtaFree')}
+                                    {T.dealCtaFree}
                                 </Link>
                             </div>
                         </div>
@@ -475,10 +509,10 @@ export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPL
                             unoptimized
                         />
                         <h2 className="text-xl font-bold text-gray-900 mb-2 sm:text-2xl">
-                            {t('ctaTitle')}
+                            {T.ctaTitle}
                         </h2>
                         <p className="text-sm text-gray-500 mb-6">
-                            {t('ctaSubtitle')}
+                            {T.ctaSubtitle}
                         </p>
                         <CTAButton />
                     </motion.div>
