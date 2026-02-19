@@ -1,7 +1,7 @@
 'use client';
 
-import { useRef, useState, useEffect, useCallback, type RefObject } from 'react';
-import { ArrowRight, Dumbbell, Eye, BookOpen, Trophy, Users, Crown } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { ArrowRight, Dumbbell, Eye, BookOpen, Crown } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
@@ -15,11 +15,7 @@ const MathRenderer = dynamic(() => import('../ui/MathRenderer'), { ssr: false })
 
 /* ── Types ── */
 type PublicStats = {
-    total_exercises_solved: number;
-    total_active_students: number;
-    total_questions_available: number;
     top_students: { user_id: string; display_name: string; exercises_solved: number; position: number }[];
-    university_battle: { institution_id: string; institution_name: string; total_exercises: number }[];
 };
 
 /* ── Framer helpers ── */
@@ -28,52 +24,6 @@ const fade = (delay: number) => ({
     animate: { opacity: 1, y: 0 },
     transition: { duration: 0.6, delay },
 });
-
-/* ── Counter helpers (kept from original) ── */
-function useInView(ref: RefObject<HTMLElement | null>, threshold = 0.15) {
-    const [inView, setInView] = useState(false);
-    useEffect(() => {
-        const el = ref.current;
-        if (!el) return;
-        const obs = new IntersectionObserver(
-            ([entry]) => { if (entry.isIntersecting) { setInView(true); obs.disconnect(); } },
-            { threshold },
-        );
-        obs.observe(el);
-        return () => obs.disconnect();
-    }, [ref, threshold]);
-    return inView;
-}
-
-function AnimatedCounter({ target, suffix = '' }: { target: number; suffix?: string }) {
-    const ref = useRef<HTMLSpanElement>(null);
-    const inView = useInView(ref as RefObject<HTMLElement | null>);
-    const [value, setValue] = useState(0);
-
-    useEffect(() => {
-        if (!inView || target === 0) return;
-        const duration = 1500;
-        const steps = 40;
-        const increment = target / steps;
-        let current = 0;
-        const timer = setInterval(() => {
-            current += increment;
-            if (current >= target) {
-                setValue(target);
-                clearInterval(timer);
-            } else {
-                setValue(Math.floor(current));
-            }
-        }, duration / steps);
-        return () => clearInterval(timer);
-    }, [inView, target]);
-
-    return (
-        <span ref={ref}>
-            {value.toLocaleString('pt-BR')}{suffix}
-        </span>
-    );
-}
 
 const RANK_MEDALS = ['\u{1F947}', '\u{1F948}', '\u{1F949}'];
 
@@ -279,67 +229,44 @@ export default function LandingSections() {
                 </section>
 
                 {/* ── Stats + Hall of Fame ── */}
-                {stats && (
+                {stats && stats.top_students.length > 0 && (
                     <section className="px-6 py-20">
                         <div className="max-w-4xl mx-auto">
-                            <motion.div {...fade(0.1)}>
-                                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-12">
-                                    {t('statsTitle')}
-                                </h2>
-                            </motion.div>
-
-                            <div className="flex justify-center">
-                                <motion.div
-                                    {...fade(0.15)}
-                                    className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 text-center min-w-[200px]"
-                                >
-                                    <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center mx-auto mb-4">
-                                        <BookOpen className="w-6 h-6 text-purple-600" />
-                                    </div>
-                                    <p className="text-3xl sm:text-4xl font-bold text-gray-900">
-                                        <AnimatedCounter target={stats.total_questions_available} suffix="+" />
-                                    </p>
-                                    <p className="text-gray-500 font-medium mt-1">{t('statsQuestionsAvailable')}</p>
-                                </motion.div>
-                            </div>
-
                             {/* Hall of Fame */}
-                            {stats.top_students.length > 0 && (
-                                <div className="mt-16">
-                                    <motion.div {...fade(0.3)}>
-                                        <div className="text-center mb-10">
-                                            <div className="w-14 h-14 bg-yellow-50 rounded-2xl flex items-center justify-center mx-auto mb-5">
-                                                <Crown className="w-6 h-6 text-yellow-600" />
-                                            </div>
-                                            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
-                                                {t('hallOfFame')}
-                                            </h2>
-                                            <p className="text-gray-500 text-lg">{t('hallOfFameSubtitle')}</p>
+                            <div>
+                                <motion.div {...fade(0.3)}>
+                                    <div className="text-center mb-10">
+                                        <div className="w-14 h-14 bg-yellow-50 rounded-2xl flex items-center justify-center mx-auto mb-5">
+                                            <Crown className="w-6 h-6 text-yellow-600" />
                                         </div>
-                                    </motion.div>
-
-                                    <div className="max-w-2xl mx-auto space-y-3">
-                                        {stats.top_students.map((student, i) => (
-                                            <motion.div key={student.user_id} {...fade(0.35 + i * 0.08)}>
-                                                <Link
-                                                    href={`/profile/${student.user_id}` as '/'}
-                                                    className="flex items-center gap-4 p-4 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
-                                                >
-                                                    <span className="text-2xl w-8 text-center">
-                                                        {i < 3 ? RANK_MEDALS[i] : `#${student.position}`}
-                                                    </span>
-                                                    <div className="flex-1">
-                                                        <p className="font-bold text-gray-900">{student.display_name}</p>
-                                                    </div>
-                                                    <span className="text-sm font-bold text-gray-500">
-                                                        {student.exercises_solved.toLocaleString('pt-BR')} {t('exerciseCount')}
-                                                    </span>
-                                                </Link>
-                                            </motion.div>
-                                        ))}
+                                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+                                            {t('hallOfFame')}
+                                        </h2>
+                                        <p className="text-gray-500 text-lg">{t('hallOfFameSubtitle')}</p>
                                     </div>
+                                </motion.div>
+
+                                <div className="max-w-2xl mx-auto space-y-3">
+                                    {stats.top_students.map((student, i) => (
+                                        <motion.div key={student.user_id} {...fade(0.35 + i * 0.08)}>
+                                            <Link
+                                                href={`/profile/${student.user_id}` as '/'}
+                                                className="flex items-center gap-4 p-4 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
+                                            >
+                                                <span className="text-2xl w-8 text-center">
+                                                    {i < 3 ? RANK_MEDALS[i] : `#${student.position}`}
+                                                </span>
+                                                <div className="flex-1">
+                                                    <p className="font-bold text-gray-900">{student.display_name}</p>
+                                                </div>
+                                                <span className="text-sm font-bold text-gray-500">
+                                                    {student.exercises_solved.toLocaleString('pt-BR')} {t('exerciseCount')}
+                                                </span>
+                                            </Link>
+                                        </motion.div>
+                                    ))}
                                 </div>
-                            )}
+                            </div>
                         </div>
                     </section>
                 )}
