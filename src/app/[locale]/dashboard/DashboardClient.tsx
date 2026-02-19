@@ -124,7 +124,7 @@ export default function DashboardClient({
             {/* Top Navigation */}
             <nav className="bg-white border-b border-gray-200 px-3 sm:px-6 py-3 sm:py-4 flex justify-between items-center sticky top-0 z-10">
                 <div className="flex items-center gap-3">
-                    <span className="text-xl sm:text-2xl font-black tracking-tight text-gray-400">Justmathing</span>
+                    <span className="text-lg sm:text-xl font-medium tracking-tight text-gray-400">Justmathing</span>
                 </div>
 
                 <div className="flex items-center gap-2 sm:gap-3 md:gap-5">

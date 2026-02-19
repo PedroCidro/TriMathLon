@@ -228,7 +228,7 @@ export default function PremiumClient({
             {/* Navigation */}
             <nav className="w-full flex justify-between items-center max-w-7xl mx-auto p-6">
                 <Link href="/dashboard" className="flex items-center gap-2">
-                    <span className="text-2xl sm:text-3xl font-black tracking-tight text-gray-400">Justmathing</span>
+                    <span className="text-lg sm:text-xl font-medium tracking-tight text-gray-400">Justmathing</span>
                 </Link>
             </nav>
 
