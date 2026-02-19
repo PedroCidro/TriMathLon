@@ -91,7 +91,8 @@
     "Module": {
         "notFound": "Módulo não encontrado",
         "blitzMode": "Modo Blitz",
-        "blitzDesc": "3 minutos. Máximo de problemas. 3 erros e acabou."
+        "blitzDesc": "3 minutos. Máximo de problemas. 3 erros e acabou.",
+        "learnBadge": "Aprender"
     },
     "Method": {
         "topic": "Tópico",
@@ -446,6 +447,12 @@
         "train": "Treinar",
         "solution": "Solução",
         "result": "Resultado"
+    },
+    "LearnPage": {
+        "heroTitle": "O que é Limite — e por que ele existe?",
+        "epigraph": "Antes de derivar, antes de integrar, antes de tudo no Cálculo, existe o limite. Sem ele, nada funciona. Vamos entender por quê.",
+        "ctaTitle": "Hora de praticar",
+        "ctaSubtitle": "Escolha um subtópico de Limites para começar a treinar."
     },
     "USP": {
         "heroTitle": "Treine Cálculo com ",

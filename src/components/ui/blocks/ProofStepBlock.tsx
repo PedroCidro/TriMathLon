@@ -27,11 +27,11 @@ export default function ProofTimeline({ steps }: { steps: ContentBlock[] }) {
 
                 gsap.to(line, {
                     scaleY: 1,
-                    duration: 0.6,
+                    duration: 0.4,
                     ease: 'power2.out',
                     scrollTrigger: {
                         trigger: line,
-                        start: 'top 80%',
+                        start: 'top 90%',
                         once: true,
                     },
                 });

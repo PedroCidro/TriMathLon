@@ -91,7 +91,8 @@
     "Module": {
         "notFound": "Module not found",
         "blitzMode": "Blitz Mode",
-        "blitzDesc": "3 minutes. Maximum problems. 3 strikes and you're out."
+        "blitzDesc": "3 minutes. Maximum problems. 3 strikes and you're out.",
+        "learnBadge": "Learn"
     },
     "Method": {
         "topic": "Topic",
@@ -446,6 +447,12 @@
         "train": "Train",
         "solution": "Solution",
         "result": "Result"
+    },
+    "LearnPage": {
+        "heroTitle": "What is a Limit — and why does it exist?",
+        "epigraph": "Before derivatives, before integrals, before everything in Calculus, there is the limit. Without it, nothing works. Let's understand why.",
+        "ctaTitle": "Time to practice",
+        "ctaSubtitle": "Choose a Limits subtopic to start training."
     },
     "USP": {
         "heroTitle": "Train Calculus with ",

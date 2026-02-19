@@ -44,21 +44,45 @@ export default function ModuleClient({ isPremium, topicProgress }: ModuleClientP
                     {tCommon('backToArena')}
                 </Link>
 
-                <header className="mb-12 bg-gradient-to-r from-purple-500/[0.06] to-transparent rounded-2xl p-6 sm:p-8">
-                    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
-                        <Image
-                            src="/munin/happy.png"
-                            alt="Munin"
-                            width={80}
-                            height={80}
-                            className="drop-shadow-[0_0_8px_rgba(139,92,246,0.4)]"
-                        />
-                        <div className="text-center sm:text-left">
-                            <h1 className="text-3xl sm:text-4xl font-bold text-[#1A1A2E] mb-2">{tc(`${moduleData.id}.title`)}</h1>
-                            <p className="text-[#6B7280] text-lg">{tc(`${moduleData.id}.description`)}</p>
+                {(() => {
+                    const hasLearnPage = moduleId === 'limites';
+                    const headerContent = (
+                        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+                            <Image
+                                src="/munin/happy.png"
+                                alt="Munin"
+                                width={80}
+                                height={80}
+                                className="drop-shadow-[0_0_8px_rgba(139,92,246,0.4)]"
+                            />
+                            <div className="text-center sm:text-left flex-1">
+                                <h1 className="text-3xl sm:text-4xl font-bold text-[#1A1A2E] mb-2">{tc(`${moduleData.id}.title`)}</h1>
+                                <p className="text-[#6B7280] text-lg">{tc(`${moduleData.id}.description`)}</p>
+                            </div>
+                            {hasLearnPage && (
+                                <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#7C3AED] bg-purple-100 px-3 py-1 rounded-full uppercase tracking-wider shrink-0 self-center sm:self-start">
+                                    {t('learnBadge')}
+                                </span>
+                            )}
                         </div>
-                    </div>
-                </header>
+                    );
+
+                    if (hasLearnPage) {
+                        return (
+                            <Link href={{ pathname: '/dashboard/[module]/learn', params: { module: moduleId } }}>
+                                <header className="mb-12 bg-gradient-to-r from-purple-500/[0.15] via-purple-400/[0.08] to-transparent rounded-2xl p-6 sm:p-8 cursor-pointer hover:from-purple-500/[0.22] hover:shadow-lg transition-all">
+                                    {headerContent}
+                                </header>
+                            </Link>
+                        );
+                    }
+
+                    return (
+                        <header className="mb-12 bg-gradient-to-r from-purple-500/[0.06] to-transparent rounded-2xl p-6 sm:p-8">
+                            {headerContent}
+                        </header>
+                    );
+                })()}
 
                 {/* Blitz Mode Card */}
                 <Link

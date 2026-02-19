@@ -69,26 +69,25 @@ export default function LearnBlockRenderer({ blocks, topicTitle, onSwitchToTrain
         const ctx = gsap.context(() => {
             const blockEls = contentRef.current!.querySelectorAll<HTMLElement>('[data-block]');
 
-            blockEls.forEach((el, index) => {
+            blockEls.forEach((el) => {
                 const blockType = el.getAttribute('data-block-type');
                 const isFormula = blockType === 'formula';
 
                 gsap.set(el, {
                     opacity: 0,
-                    y: 20,
-                    ...(isFormula && { scale: 0.95 }),
+                    y: 16,
+                    ...(isFormula && { scale: 0.96 }),
                 });
 
                 gsap.to(el, {
                     opacity: 1,
                     y: 0,
                     ...(isFormula && { scale: 1 }),
-                    duration: 0.6,
+                    duration: 0.4,
                     ease: 'power2.out',
-                    delay: index * 0.1,
                     scrollTrigger: {
                         trigger: el,
-                        start: 'top 85%',
+                        start: 'top 90%',
                         once: true,
                     },
                 });

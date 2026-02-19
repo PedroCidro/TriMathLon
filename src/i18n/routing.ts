@@ -13,6 +13,7 @@ export const routing = defineRouting({
         '/dashboard/stats': '/dashboard/stats',
         '/dashboard/settings': '/dashboard/settings',
         '/dashboard/[module]': '/dashboard/[module]',
+        '/dashboard/[module]/learn': '/dashboard/[module]/learn',
         '/dashboard/[module]/[method]': '/dashboard/[module]/[method]',
         '/dashboard/[module]/blitz': '/dashboard/[module]/blitz',
         '/dashboard/[module]/challenge/[challengeId]': '/dashboard/[module]/challenge/[challengeId]',
