@@ -22,7 +22,7 @@ export default function SobrePage() {
             {/* Nav */}
             <nav className="w-full flex justify-between items-center max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
                 <Link href="/" className="flex items-center gap-2">
-                    <span className="text-2xl sm:text-3xl font-black tracking-tight text-[#7C3AED]">Munin</span>
+                    <span className="text-2xl sm:text-3xl font-black tracking-tight text-gray-400">Justmathing</span>
                 </Link>
                 <div className="flex items-center gap-6">
                     <LocaleToggle />
