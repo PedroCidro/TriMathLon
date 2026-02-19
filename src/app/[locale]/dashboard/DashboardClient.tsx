@@ -124,7 +124,7 @@ export default function DashboardClient({
             {/* Top Navigation */}
             <nav className="bg-white border-b border-gray-200 px-3 sm:px-6 py-3 sm:py-4 flex justify-between items-center sticky top-0 z-10">
                 <div className="flex items-center gap-3">
-                    <Image src="/logo-icon.png" alt="JustMathing Logo" width={261} height={271} priority className="h-8 sm:h-10 w-auto" />
+                    <span className="text-xl sm:text-2xl font-black tracking-tight text-[#7C3AED]">Munin</span>
                 </div>
 
                 <div className="flex items-center gap-2 sm:gap-3 md:gap-5">

@@ -5,7 +5,6 @@ import { Link } from '@/i18n/routing';
 import { motion } from 'framer-motion';
 import MathRenderer from '@/components/ui/MathRenderer';
 import LocaleToggle from '@/components/ui/LocaleToggle';
-import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 
 const fade = (delay: number) => ({
@@ -23,7 +22,7 @@ export default function SobrePage() {
             {/* Nav */}
             <nav className="w-full flex justify-between items-center max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
                 <Link href="/" className="flex items-center gap-2">
-                    <Image src="/logo-icon.png" alt="Logo" width={261} height={271} className="h-10 sm:h-12 w-auto" />
+                    <span className="text-2xl sm:text-3xl font-black tracking-tight text-[#7C3AED]">Munin</span>
                 </Link>
                 <div className="flex items-center gap-6">
                     <LocaleToggle />

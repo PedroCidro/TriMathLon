@@ -242,7 +242,7 @@ export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPL
             {/* Nav */}
             <nav className="bg-white border-b border-gray-200 px-4 py-3 flex justify-between items-center sticky top-0 z-10">
                 <Link href="/" className="flex items-center">
-                    <Image src="/logo-icon.png" alt="Logo" width={261} height={271} priority className="h-8 w-auto hue-rotate-[45deg]" />
+                    <span className="text-xl font-black tracking-tight text-[#7C3AED]">Munin</span>
                 </Link>
                 <div className="flex items-center gap-3">
                     {!isLoggedIn && (
