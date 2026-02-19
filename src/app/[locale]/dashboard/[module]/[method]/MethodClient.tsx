@@ -596,11 +596,7 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
                                             #{currentIndex + 1} / {questions.length}
                                         </div>
 
-                                        <span className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-6 block">
-                                            {t(`prompt${moduleId.charAt(0).toUpperCase() + moduleId.slice(1)}`)}
-                                        </span>
-
-                                        <div className="mb-12 min-h-[120px] flex items-center justify-center">
+                                        <div className="mb-12 mt-6 min-h-[120px] flex items-center justify-center">
                                             {renderFormattedText(stripProblemPrefix(lp(questions[currentIndex])), "text-2xl sm:text-4xl md:text-5xl font-bold text-[#7C3AED]")}
                                         </div>
 
