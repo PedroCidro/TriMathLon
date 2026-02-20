@@ -30,7 +30,7 @@ export async function POST(request: Request) {
         if (limited) return limited;
 
         const body = await request.json();
-        const { subcategory, self_rating } = body;
+        const { subcategory, self_rating, hints_used, total_steps } = body;
 
         if (!subcategory || typeof subcategory !== 'string') {
             return NextResponse.json({ error: 'subcategory is required' }, { status: 400 });
@@ -47,7 +47,18 @@ export async function POST(request: Request) {
         }
 
         // Use server-side difficulty lookup instead of trusting client
-        const xpAmount = XP_MAP[topicDifficulty] || 20;
+        let xpAmount = XP_MAP[topicDifficulty] || 20;
+
+        // Apply hint penalty if provided
+        if (
+            typeof hints_used === 'number' &&
+            typeof total_steps === 'number' &&
+            total_steps > 0 &&
+            hints_used >= 0 &&
+            hints_used <= total_steps
+        ) {
+            xpAmount = Math.floor(xpAmount * Math.max(0, (total_steps - hints_used) / total_steps));
+        }
 
         const { data, error } = await getSupabaseAdmin().rpc('complete_exercise', {
             p_user_id: userId,

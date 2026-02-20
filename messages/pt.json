@@ -132,7 +132,12 @@
         "encouragement6": "Respire, releia e tente novamente.",
         "streakLabel": "sequência",
         "modeOpen": "Aberta",
-        "modeAlternatives": "Alternativas"
+        "modeAlternatives": "Alternativas",
+        "hint": "Dica",
+        "hintCost": "-{xp} XP",
+        "xpRemaining": "+{xp} XP",
+        "noXpLeft": "0 XP",
+        "stepOf": "Passo {current} de {total}"
     },
     "Blitz": {
         "title": "Modo Blitz",

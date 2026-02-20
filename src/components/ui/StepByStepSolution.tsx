@@ -3,84 +3,82 @@
 import { useState } from 'react';
 import MathRenderer from './MathRenderer';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 type Step = {
     annotation: string;
     math: string;
 };
 
-export default function StepByStepSolution({ steps }: { steps: Step[] }) {
+type Props = {
+    steps: Step[];
+    totalXP: number;
+    onHintUsed: (hintsUsed: number) => void;
+};
+
+export default function StepByStepSolution({ steps, totalXP, onHintUsed }: Props) {
     const [revealedCount, setRevealedCount] = useState(0);
+    const t = useTranslations('Method');
+
+    const n = steps.length;
+    const allRevealed = revealedCount >= n;
+    const costPerHint = Math.floor(totalXP / n);
 
     const revealNext = () => {
-        if (revealedCount < steps.length) {
-            setRevealedCount(prev => prev + 1);
+        if (revealedCount < n) {
+            const next = revealedCount + 1;
+            setRevealedCount(next);
+            onHintUsed(next);
         }
     };
 
-    const revealAll = () => {
-        setRevealedCount(steps.length);
-    };
-
-    const allRevealed = revealedCount >= steps.length;
-
     return (
-        <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-5">
-            <span className="text-xs font-bold text-yellow-600 uppercase mb-4 block">
-                Passo a Passo
-            </span>
-
-            {/* Stepper */}
-            <div className="relative ml-1">
-                <AnimatePresence>
-                    {steps.slice(0, revealedCount).map((step, i) => (
-                        <motion.div
-                            key={i}
-                            initial={{ opacity: 0, y: 8 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.25 }}
-                            className="flex gap-4 mb-4 last:mb-0"
-                        >
-                            {/* Badge + line */}
-                            <div className="flex flex-col items-center">
-                                <div className="w-7 h-7 rounded-full bg-yellow-200 text-yellow-800 text-xs font-bold flex items-center justify-center shrink-0">
-                                    {i + 1}
-                                </div>
-                                {i < revealedCount - 1 && (
-                                    <div className="w-0.5 flex-1 bg-yellow-200 mt-1" />
-                                )}
+        <div className="w-full mb-4">
+            {/* Revealed steps */}
+            <AnimatePresence>
+                {steps.slice(0, revealedCount).map((step, i) => (
+                    <motion.div
+                        key={i}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.25 }}
+                        className="mb-3"
+                    >
+                        <div className="bg-amber-50 border border-amber-100 rounded-xl p-4 flex gap-3">
+                            {/* Number badge */}
+                            <div className="w-7 h-7 rounded-full bg-amber-200 text-amber-800 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                                {i + 1}
                             </div>
-
                             {/* Content */}
-                            <div className="min-w-0 flex-1 pb-1">
-                                <p className="text-sm font-medium text-yellow-800 mb-1">
+                            <div className="min-w-0 flex-1">
+                                <p className="text-sm font-medium text-amber-800 mb-1">
                                     {step.annotation}
                                 </p>
-                                <div className="text-base text-yellow-900">
+                                <div className="text-base text-amber-900">
                                     <MathRenderer latex={step.math} />
                                 </div>
                             </div>
-                        </motion.div>
-                    ))}
-                </AnimatePresence>
-            </div>
+                        </div>
+                    </motion.div>
+                ))}
+            </AnimatePresence>
 
-            {/* Buttons */}
+            {/* Hidden steps indicator */}
+            {!allRevealed && revealedCount > 0 && (
+                <div className="h-3 bg-gray-100 rounded-full mx-4 mb-3" />
+            )}
+
+            {/* Hint button */}
             {!allRevealed && (
-                <div className="flex gap-3 mt-4">
-                    <button
-                        onClick={revealNext}
-                        className="px-4 py-2 bg-yellow-200 hover:bg-yellow-300 text-yellow-800 rounded-lg text-sm font-bold transition-colors"
-                    >
-                        Próximo Passo ({revealedCount + 1}/{steps.length})
-                    </button>
-                    <button
-                        onClick={revealAll}
-                        className="px-4 py-2 bg-white hover:bg-yellow-100 text-yellow-700 border border-yellow-200 rounded-lg text-sm font-bold transition-colors"
-                    >
-                        Ver Tudo
-                    </button>
-                </div>
+                <button
+                    onClick={revealNext}
+                    className="inline-flex items-center gap-2 px-5 py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-full text-sm font-bold transition-colors"
+                >
+                    {t('hint')}
+                    <span className="text-amber-600 text-xs">
+                        {t('hintCost', { xp: costPerHint })}
+                    </span>
+                </button>
             )}
         </div>
     );

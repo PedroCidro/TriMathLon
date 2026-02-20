@@ -132,7 +132,12 @@
         "encouragement6": "Breathe, re-read, and try again.",
         "streakLabel": "streak",
         "modeOpen": "Open",
-        "modeAlternatives": "Multiple Choice"
+        "modeAlternatives": "Multiple Choice",
+        "hint": "Hint",
+        "hintCost": "-{xp} XP",
+        "xpRemaining": "+{xp} XP",
+        "noXpLeft": "0 XP",
+        "stepOf": "Step {current} of {total}"
     },
     "Blitz": {
         "title": "Blitz Mode",
