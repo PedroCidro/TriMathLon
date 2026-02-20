@@ -5,7 +5,7 @@ import { renderFormattedText } from '@/components/ui/LearnBlockRenderer';
 
 export default function InsightBlock({ block }: { block: ContentBlock }) {
     return (
-        <div className="bg-gradient-to-r from-amber-50 to-yellow-50 rounded-2xl border-l-4 border-amber-400 p-8">
+        <div className="bg-gradient-to-r from-amber-50 to-yellow-50 rounded-2xl border-l-4 border-amber-400 p-5 sm:p-8">
             <div className="flex items-start gap-3">
                 <span className="text-2xl shrink-0">💡</span>
                 <div>

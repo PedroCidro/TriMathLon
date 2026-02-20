@@ -18,6 +18,7 @@ import LearnBlockRenderer from '@/components/ui/LearnBlockRenderer';
 import FunctionGraphBlock from '@/components/ui/blocks/FunctionGraphBlock';
 import { parseGraphFromQuestion } from '@/lib/latexToJs';
 import { shuffleArray } from '@/lib/blitz-constants';
+import StepByStepSolution from '@/components/ui/StepByStepSolution';
 
 type Tab = 'learn' | 'practice' | 'recognize';
 
@@ -29,6 +30,7 @@ type Question = {
     distractors?: string[] | null;
     problem_en?: string | null;
     solution_latex_en?: string | null;
+    step_by_step_json?: { annotation: string; math: string }[] | null;
 };
 
 type RecognizeQuestion = {
@@ -63,6 +65,9 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
     const [xpPopup, setXpPopup] = useState<number | null>(null);
     const [ratingSubmitted, setRatingSubmitted] = useState(false);
     const questionsFetched = useRef(false);
+
+    // ── Hint State ──
+    const [hintsUsed, setHintsUsed] = useState(0);
 
     // ── Practice Mode Toggle (open vs alternatives) ──
     const [practiceMode, setPracticeMode] = useState<'open' | 'alternatives'>('open');
@@ -122,7 +127,7 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
 
         const { data, error } = await supabase
             .from('questions')
-            .select('id, problem, solution_latex, difficulty, distractors, problem_en, solution_latex_en')
+            .select('id, problem, solution_latex, difficulty, distractors, problem_en, solution_latex_en, step_by_step_json')
             .eq('subcategory', params.method)
             .limit(20);
 
@@ -195,7 +200,13 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
         setRatingSubmitted(true);
 
         const difficulty = topicData?.difficulty || 'Medium';
-        const xp = XP_MAP[difficulty] || 20;
+        const baseXP = XP_MAP[difficulty] || 20;
+        const currentQ = questions[currentIndex];
+        const steps = currentQ?.step_by_step_json;
+        const totalSteps = steps?.length || 0;
+        const xp = totalSteps > 0
+            ? Math.floor(baseXP * Math.max(0, (totalSteps - hintsUsed) / totalSteps))
+            : baseXP;
 
         // Streak logic
         if (rating === 'wrong') {
@@ -246,6 +257,7 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
                 subcategory: methodId,
                 self_rating: rating,
                 difficulty,
+                ...(totalSteps > 0 && { hints_used: hintsUsed, total_steps: totalSteps }),
             }),
         }).catch(() => {});
 
@@ -254,6 +266,7 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
             setShowAnswer(false);
             setRatingSubmitted(false);
             setMcSelected(null);
+            setHintsUsed(0);
             setCurrentIndex((prev) => (prev + 1) % questions.length);
         }, 600);
     };
@@ -430,7 +443,7 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
             </header>
 
             {/* Content Area */}
-            <main className="flex-1 p-6 md:p-12 max-w-4xl mx-auto w-full">
+            <main className="flex-1 p-4 sm:p-6 md:p-12 max-w-4xl mx-auto w-full">
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={activeTab}
@@ -648,87 +661,144 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
                                         ) : (
                                         /* Open mode OR no distractors — existing flow */
                                         <>
-                                        <AnimatePresence>
-                                            {showAnswer && (
-                                                <motion.div
-                                                    initial={{ opacity: 0, height: 0 }}
-                                                    animate={{ opacity: 1, height: 'auto' }}
-                                                    exit={{ opacity: 0, height: 0 }}
-                                                    className="mb-8"
-                                                >
-                                                    <div className="bg-green-50 border border-green-100 rounded-xl p-6">
-                                                        <span className="text-xs font-bold text-green-600 uppercase mb-2 block">{t('answer')}</span>
-                                                        {renderSolution(ls(questions[currentIndex]), "text-xl sm:text-2xl text-green-700 font-bold")}
-                                                    </div>
-                                                    {graphData && (
-                                                        <div className="mt-4">
-                                                            <FunctionGraphBlock block={{
-                                                                id: 'practice-graph',
-                                                                type: 'graph',
-                                                                content: '',
-                                                                fn: graphData.fn,
-                                                                domain: graphData.domain,
-                                                                annotations: graphData.annotations,
-                                                            }} />
+                                        {/* Hint steps (shown before answer in open mode) */}
+                                        {(() => {
+                                            const q = questions[currentIndex];
+                                            const steps = q?.step_by_step_json;
+                                            const hasSteps = steps && steps.length > 0;
+                                            const difficulty = topicData?.difficulty || 'Medium';
+                                            const baseXP = XP_MAP[difficulty] || 20;
+                                            const totalSteps = steps?.length || 0;
+                                            const adjustedXP = totalSteps > 0
+                                                ? Math.floor(baseXP * Math.max(0, (totalSteps - hintsUsed) / totalSteps))
+                                                : baseXP;
+                                            const allHintsRevealed = hasSteps && hintsUsed >= totalSteps;
+
+                                            return (
+                                                <>
+                                                    {/* Hint revealer */}
+                                                    {hasSteps && !showAnswer && (
+                                                        <div className="mb-4">
+                                                            <StepByStepSolution
+                                                                steps={steps}
+                                                                totalXP={baseXP}
+                                                                onHintUsed={(count) => {
+                                                                    setHintsUsed(count);
+                                                                    // Auto-show answer when all hints revealed
+                                                                    if (count >= totalSteps) {
+                                                                        setShowAnswer(true);
+                                                                    }
+                                                                }}
+                                                            />
                                                         </div>
                                                     )}
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
 
-                                        {!showAnswer ? (
-                                            <div className="flex gap-3 justify-center">
-                                                <button
-                                                    onClick={() => setShowAnswer(true)}
-                                                    className="px-6 sm:px-8 py-2 sm:py-2.5 border-2 border-purple-400 text-gray-900 rounded-full hover:bg-purple-50 font-bold transition-all purple-mist"
-                                                >
-                                                    {t('showAnswer')}
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <div className="space-y-4 relative">
-                                                {/* XP popup animation */}
-                                                <AnimatePresence>
-                                                    {xpPopup !== null && (
-                                                        <motion.div
-                                                            initial={{ opacity: 0, y: 0 }}
-                                                            animate={{ opacity: 1, y: -30 }}
-                                                            exit={{ opacity: 0, y: -50 }}
-                                                            className="absolute -top-8 left-1/2 -translate-x-1/2 text-lg font-bold text-amber-500 pointer-events-none"
-                                                        >
-                                                            +{xpPopup} XP
-                                                        </motion.div>
-                                                    )}
-                                                </AnimatePresence>
+                                                    {/* Answer reveal */}
+                                                    <AnimatePresence>
+                                                        {showAnswer && (
+                                                            <motion.div
+                                                                initial={{ opacity: 0, height: 0 }}
+                                                                animate={{ opacity: 1, height: 'auto' }}
+                                                                exit={{ opacity: 0, height: 0 }}
+                                                                className="mb-8"
+                                                            >
+                                                                <div className="bg-green-50 border border-green-100 rounded-xl p-6">
+                                                                    <span className="text-xs font-bold text-green-600 uppercase mb-2 block">{t('answer')}</span>
+                                                                    {renderSolution(ls(questions[currentIndex]), "text-xl sm:text-2xl text-green-700 font-bold")}
+                                                                </div>
+                                                                {graphData && (
+                                                                    <div className="mt-4">
+                                                                        <FunctionGraphBlock block={{
+                                                                            id: 'practice-graph',
+                                                                            type: 'graph',
+                                                                            content: '',
+                                                                            fn: graphData.fn,
+                                                                            domain: graphData.domain,
+                                                                            annotations: graphData.annotations,
+                                                                        }} />
+                                                                    </div>
+                                                                )}
+                                                            </motion.div>
+                                                        )}
+                                                    </AnimatePresence>
 
-                                                {/* Self-rating buttons */}
-                                                <span className="text-sm font-bold text-gray-400 uppercase tracking-widest block">
-                                                    {t('howWasIt')}
-                                                </span>
-                                                <div className="flex flex-wrap gap-2 sm:gap-3 justify-center">
-                                                    {[
-                                                        { id: 'wrong' as const, label: t('ratingWrong'), color: 'border-rose-300 text-rose-500 hover:bg-rose-50' },
-                                                        { id: 'hard' as const, label: t('ratingHard'), color: 'border-orange-300 text-orange-500 hover:bg-orange-50' },
-                                                        { id: 'good' as const, label: t('ratingGood'), color: 'border-purple-300 text-purple-500 hover:bg-purple-50' },
-                                                        { id: 'easy' as const, label: t('ratingEasy'), color: 'bg-emerald-500 text-white border-emerald-500 hover:bg-emerald-600' },
-                                                    ].map((btn) => (
-                                                        <button
-                                                            key={btn.id}
-                                                            onClick={() => handleRate(btn.id)}
-                                                            disabled={ratingSubmitted}
-                                                            className={cn(
-                                                                "px-6 py-2 rounded-full border-2 font-bold transition-all text-xs sm:text-sm purple-mist",
-                                                                ratingSubmitted
-                                                                    ? "opacity-50 cursor-not-allowed border-gray-200 text-gray-400"
-                                                                    : btn.color
+                                                    {!showAnswer ? (
+                                                        <div className="flex flex-col items-center gap-3">
+                                                            {/* XP indicator */}
+                                                            {hasSteps && hintsUsed > 0 && (
+                                                                <span className={cn(
+                                                                    "text-sm font-bold",
+                                                                    adjustedXP > 0 ? "text-amber-500" : "text-gray-400"
+                                                                )}>
+                                                                    {adjustedXP > 0 ? t('xpRemaining', { xp: adjustedXP }) : t('noXpLeft')}
+                                                                </span>
                                                             )}
-                                                        >
-                                                            {btn.label}
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
+                                                            <div className="flex gap-3 justify-center">
+                                                                <button
+                                                                    onClick={() => setShowAnswer(true)}
+                                                                    className="px-6 sm:px-8 py-2 sm:py-2.5 border-2 border-purple-400 text-gray-900 rounded-full hover:bg-purple-50 font-bold transition-all purple-mist"
+                                                                >
+                                                                    {t('showAnswer')}
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="space-y-4 relative">
+                                                            {/* XP popup animation */}
+                                                            <AnimatePresence>
+                                                                {xpPopup !== null && (
+                                                                    <motion.div
+                                                                        initial={{ opacity: 0, y: 0 }}
+                                                                        animate={{ opacity: 1, y: -30 }}
+                                                                        exit={{ opacity: 0, y: -50 }}
+                                                                        className="absolute -top-8 left-1/2 -translate-x-1/2 text-lg font-bold text-amber-500 pointer-events-none"
+                                                                    >
+                                                                        +{xpPopup} XP
+                                                                    </motion.div>
+                                                                )}
+                                                            </AnimatePresence>
+
+                                                            {/* XP indicator before self-rating */}
+                                                            {hasSteps && (
+                                                                <span className={cn(
+                                                                    "text-sm font-bold block",
+                                                                    adjustedXP > 0 ? "text-amber-500" : "text-gray-400"
+                                                                )}>
+                                                                    {allHintsRevealed ? t('noXpLeft') : (adjustedXP > 0 ? t('xpRemaining', { xp: adjustedXP }) : t('noXpLeft'))}
+                                                                </span>
+                                                            )}
+
+                                                            {/* Self-rating buttons */}
+                                                            <span className="text-sm font-bold text-gray-400 uppercase tracking-widest block">
+                                                                {t('howWasIt')}
+                                                            </span>
+                                                            <div className="flex flex-wrap gap-2 sm:gap-3 justify-center">
+                                                                {[
+                                                                    { id: 'wrong' as const, label: t('ratingWrong'), color: 'border-rose-300 text-rose-500 hover:bg-rose-50' },
+                                                                    { id: 'hard' as const, label: t('ratingHard'), color: 'border-orange-300 text-orange-500 hover:bg-orange-50' },
+                                                                    { id: 'good' as const, label: t('ratingGood'), color: 'border-purple-300 text-purple-500 hover:bg-purple-50' },
+                                                                    { id: 'easy' as const, label: t('ratingEasy'), color: 'bg-emerald-500 text-white border-emerald-500 hover:bg-emerald-600' },
+                                                                ].map((btn) => (
+                                                                    <button
+                                                                        key={btn.id}
+                                                                        onClick={() => handleRate(btn.id)}
+                                                                        disabled={ratingSubmitted}
+                                                                        className={cn(
+                                                                            "px-6 py-2 rounded-full border-2 font-bold transition-all text-xs sm:text-sm purple-mist",
+                                                                            ratingSubmitted
+                                                                                ? "opacity-50 cursor-not-allowed border-gray-200 text-gray-400"
+                                                                                : btn.color
+                                                                        )}
+                                                                    >
+                                                                        {btn.label}
+                                                                    </button>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </>
+                                            );
+                                        })()}
                                         </>
                                         )}
                                     </motion.div>

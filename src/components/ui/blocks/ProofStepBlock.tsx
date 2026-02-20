@@ -44,9 +44,9 @@ export default function ProofTimeline({ steps }: { steps: ContentBlock[] }) {
     return (
         <div ref={containerRef} className="flex flex-col gap-4">
             {steps.map((step, index) => (
-                <div key={step.id} className="flex gap-4">
+                <div key={step.id} className="flex gap-2 sm:gap-4">
                     {/* Left column: circle + connecting line */}
-                    <div className="flex flex-col items-center w-12 shrink-0">
+                    <div className="flex flex-col items-center w-9 sm:w-12 shrink-0">
                         <div className="w-8 h-8 bg-[#7C3AED] text-white rounded-full flex items-center justify-center font-bold text-sm shrink-0">
                             {step.stepNumber}
                         </div>
@@ -60,7 +60,7 @@ export default function ProofTimeline({ steps }: { steps: ContentBlock[] }) {
                     </div>
 
                     {/* Card content */}
-                    <div className="bg-white rounded-2xl shadow-sm p-6 flex-1 border border-gray-100">
+                    <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-6 flex-1 min-w-0 border border-gray-100">
                         <h4 className="text-[#7C3AED] uppercase text-sm tracking-widest font-medium mb-2">
                             Passo {step.stepNumber} {step.title ? `— ${step.title}` : ''}
                         </h4>

@@ -5,7 +5,7 @@ import { renderFormattedText } from '@/components/ui/LearnBlockRenderer';
 
 export default function IntuitionBlock({ block }: { block: ContentBlock }) {
     return (
-        <div className="bg-white rounded-2xl border-l-4 border-purple-400 shadow-sm p-8">
+        <div className="bg-white rounded-2xl border-l-4 border-purple-400 shadow-sm p-5 sm:p-8">
             <h3 className="text-purple-500 uppercase text-sm tracking-widest font-medium mb-4">
                 {block.title || 'A INTUIÇÃO'}
             </h3>

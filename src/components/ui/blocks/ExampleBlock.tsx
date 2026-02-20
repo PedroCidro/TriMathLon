@@ -12,7 +12,7 @@ export default function ExampleBlock({ block }: { block: ContentBlock }) {
     const t = useTranslations('Learn');
 
     return (
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 sm:p-6">
             <h3 className="text-gray-400 uppercase text-sm tracking-widest font-medium mb-3">
                 {block.title || 'EXEMPLO'}
             </h3>

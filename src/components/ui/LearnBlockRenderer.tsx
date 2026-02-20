@@ -140,7 +140,7 @@ export default function LearnBlockRenderer({ blocks, topicTitle, onSwitchToTrain
     }, [completed]);
 
     return (
-        <div ref={contentRef} className="max-w-3xl mx-auto px-4 sm:px-0">
+        <div ref={contentRef} className="max-w-3xl mx-auto px-0">
             <ScrollProgress containerRef={contentRef} onComplete={handleComplete} />
 
             {/* Header: title + Munin */}

@@ -111,7 +111,7 @@ export default function FunctionGraphBlock({ block }: { block: ContentBlock }) {
     };
 
     return (
-        <div className="bg-purple-50 rounded-2xl p-6 border border-purple-100">
+        <div className="bg-purple-50 rounded-2xl p-4 sm:p-6 border border-purple-100">
             {block.title && (
                 <h3 className="text-[#7C3AED] uppercase text-sm tracking-widest font-bold mb-4 text-center">
                     {block.title}
