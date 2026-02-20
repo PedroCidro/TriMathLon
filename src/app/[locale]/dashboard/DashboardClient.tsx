@@ -186,9 +186,9 @@ export default function DashboardClient({
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -4 }}
                                     transition={{ duration: 0.2 }}
-                                    className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 w-52 bg-gray-900 text-white text-xs font-medium rounded-lg px-3 py-2 shadow-lg text-center"
+                                    className="absolute left-0 top-full mt-2 z-50 w-52 bg-gray-900 text-white text-xs font-medium rounded-lg px-3 py-2 shadow-lg text-center"
                                 >
-                                    <div className="absolute left-1/2 -translate-x-1/2 -top-1.5 w-3 h-3 bg-gray-900 rotate-45 rounded-sm" />
+                                    <div className="absolute left-4 -top-1.5 w-3 h-3 bg-gray-900 rotate-45 rounded-sm" />
                                     <span className="relative">{t('groupsTooltip')}</span>
                                 </motion.div>
                             )}
