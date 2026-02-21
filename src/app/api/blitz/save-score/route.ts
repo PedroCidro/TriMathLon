@@ -59,6 +59,16 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Failed to save score' }, { status: 500 });
         }
 
+        // Fire-and-forget: credit exercises and XP to profile
+        if (score > 0) {
+            getSupabaseAdmin().rpc('credit_competitive_exercises', {
+                p_user_id: userId,
+                p_correct_count: score,
+            }).then(({ error: creditErr }) => {
+                if (creditErr) console.error('Failed to credit blitz exercises:', creditErr.message);
+            });
+        }
+
         // Fire-and-forget activity log for group competitions
         const logRows: { user_id: string; mode: string; subcategory: string; correct: boolean }[] = [];
         for (let i = 0; i < score; i++) logRows.push({ user_id: userId, mode: 'blitz', subcategory: module_id, correct: true });

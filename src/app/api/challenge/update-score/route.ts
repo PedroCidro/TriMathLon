@@ -88,6 +88,16 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Failed to update score' }, { status: 500 });
         }
 
+        // Fire-and-forget: credit exercises and XP to profile when player finishes
+        if (finished && score > 0) {
+            getSupabaseAdmin().rpc('credit_competitive_exercises', {
+                p_user_id: userId,
+                p_correct_count: score,
+            }).then(({ error: creditErr }) => {
+                if (creditErr) console.error('Failed to credit challenge exercises:', creditErr.message);
+            });
+        }
+
         // Fire-and-forget activity log when a player finishes
         if (finished) {
             const logRows: { user_id: string; mode: string; subcategory: string; correct: boolean }[] = [];

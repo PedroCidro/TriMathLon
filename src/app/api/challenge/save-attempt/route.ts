@@ -108,6 +108,16 @@ export async function POST(request: Request) {
             .select('*', { count: 'exact', head: true })
             .eq('challenge_id', challenge_id);
 
+        // Fire-and-forget: credit exercises and XP to profile
+        if (score > 0) {
+            getSupabaseAdmin().rpc('credit_competitive_exercises', {
+                p_user_id: userId,
+                p_correct_count: score,
+            }).then(({ error: creditErr }) => {
+                if (creditErr) console.error('Failed to credit challenge exercises:', creditErr.message);
+            });
+        }
+
         // Fire-and-forget activity log for group competitions
         const logRows: { user_id: string; mode: string; subcategory: string; correct: boolean }[] = [];
         for (let i = 0; i < score; i++) logRows.push({ user_id: userId, mode: 'challenge', subcategory: challenge.module_id, correct: true });

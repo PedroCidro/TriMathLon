@@ -84,7 +84,7 @@ export async function fetchRankingData(userId: string): Promise<RankingData> {
             .eq('ranking_opt_in', true)
             .eq('institution', myInstitution)
             .order('exercises_solved', { ascending: false })
-            .limit(10);
+            .limit(3);
 
         internal_ranking = (internalTop ?? []).map((u, i) => ({
             display_name: formatDisplayName(u.full_name),
