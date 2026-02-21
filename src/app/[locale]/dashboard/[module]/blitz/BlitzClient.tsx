@@ -25,6 +25,7 @@ type RecognizeQuestion = {
     id: string;
     problem: string;
     subcategory: string;
+    difficulty: number;
 };
 
 type BlitzMode = 'solve' | 'recognize';
@@ -42,6 +43,9 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
     const tc = useTranslations('Curriculum');
     const tCommon = useTranslations('Common');
     const locale = useLocale();
+
+    const allTopicIds = moduleData?.topics.map(t => t.id) || [];
+    const [selectedTopics, setSelectedTopics] = useState<Set<string>>(() => new Set(allTopicIds));
 
     const [blitzMode, setBlitzMode] = useState<BlitzMode>('solve');
     const [gameState, setGameState] = useState<GameState>('ready');
@@ -96,23 +100,22 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
         setSelectedOption(null);
     }, []);
 
-    // Build shuffled options for recognize mode
+    // Build shuffled options for recognize mode (uses selectedTopics for distractors)
     const buildRecognizeOptions = useCallback((question: RecognizeQuestion) => {
         const correctId = question.subcategory;
-        const allTopics = moduleData?.topics.map(t => t.id) || [];
-        const others = allTopics.filter(id => id !== correctId);
+        const others = [...selectedTopics].filter(id => id !== correctId);
         const shuffledOthers = shuffleArray(others);
         const topicOptions = shuffleArray([correctId, ...shuffledOthers.slice(0, 3)]);
         setOptions(topicOptions);
         setCorrectOptionIndex(topicOptions.indexOf(correctId));
         setSelectedOption(null);
-    }, [moduleData]);
+    }, [selectedTopics]);
 
-    // Fetch questions for solve mode
+    // Fetch questions for solve mode (uses selectedTopics, randomizes within difficulty tiers)
     const fetchSolveQuestions = useCallback(async () => {
         setLoading(true);
         const supabase = supabaseRef.current;
-        const topicIds = moduleData?.topics.map(t => t.id) || [];
+        const topicIds = [...selectedTopics];
 
         const { data, error } = await supabase
             .from('questions')
@@ -124,31 +127,46 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
         if (error) {
             console.error('Failed to fetch blitz questions:', error.message);
         } else if (data) {
-            const sorted = [...data].sort((a, b) => a.difficulty - b.difficulty) as Question[];
+            // Group by difficulty, shuffle within each group, then concat easy→hard
+            const grouped = new Map<number, Question[]>();
+            for (const q of data as Question[]) {
+                const group = grouped.get(q.difficulty) || [];
+                group.push(q);
+                grouped.set(q.difficulty, group);
+            }
+            const sorted = [...grouped.keys()].sort((a, b) => a - b).flatMap(d => shuffleArray(grouped.get(d)!));
             setQuestions(sorted);
         }
         setLoading(false);
-    }, [moduleData]);
+    }, [selectedTopics]);
 
-    // Fetch questions for recognize mode
+    // Fetch questions for recognize mode (uses selectedTopics, randomizes within difficulty tiers)
     const fetchRecognizeQuestions = useCallback(async () => {
         setLoading(true);
         const supabase = supabaseRef.current;
-        const topicIds = moduleData?.topics.map(t => t.id) || [];
+        const topicIds = [...selectedTopics];
 
         const { data, error } = await supabase
             .from('questions')
-            .select('id, problem, subcategory')
+            .select('id, problem, subcategory, difficulty')
             .in('subcategory', topicIds)
             .limit(50);
 
         if (error) {
             console.error('Failed to fetch recognize questions:', error.message);
         } else if (data) {
-            setRecognizeQuestions(shuffleArray(data));
+            // Group by difficulty, shuffle within each group, then concat easy→hard
+            const grouped = new Map<number, typeof data>();
+            for (const q of data) {
+                const group = grouped.get(q.difficulty) || [];
+                group.push(q);
+                grouped.set(q.difficulty, group);
+            }
+            const sorted = [...grouped.keys()].sort((a, b) => a - b).flatMap(d => shuffleArray(grouped.get(d)!));
+            setRecognizeQuestions(sorted);
         }
         setLoading(false);
-    }, [moduleData]);
+    }, [selectedTopics]);
 
     // Save score to backend
     const saveScore = useCallback(async (finalScore: number, finalStrikes: number) => {
@@ -355,24 +373,81 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
                         <p className="text-gray-500 text-lg mb-2">
                             {t('readyDesc', { duration: t('readyDuration') })}
                         </p>
-                        <p className="text-gray-400 mb-8">
+                        <p className="text-gray-400 mb-6">
                             {t('readySubdesc')}
                         </p>
+
+                        {/* Topic selector */}
+                        <div className="mb-8 max-w-lg mx-auto">
+                            <div className="flex items-center justify-between mb-3">
+                                <span className="text-sm font-semibold text-gray-700">{t('selectTopics')}</span>
+                                <button
+                                    onClick={() => {
+                                        if (selectedTopics.size === allTopicIds.length) {
+                                            setSelectedTopics(new Set());
+                                        } else {
+                                            setSelectedTopics(new Set(allTopicIds));
+                                        }
+                                    }}
+                                    className="text-xs font-medium text-purple-600 hover:text-purple-800 transition-colors"
+                                >
+                                    {selectedTopics.size === allTopicIds.length ? t('deselectAll') : t('selectAll')}
+                                </button>
+                            </div>
+                            <div className="flex flex-wrap gap-2 justify-center">
+                                {allTopicIds.map(topicId => {
+                                    const isSelected = selectedTopics.has(topicId);
+                                    return (
+                                        <button
+                                            key={topicId}
+                                            onClick={() => {
+                                                setSelectedTopics(prev => {
+                                                    const next = new Set(prev);
+                                                    if (next.has(topicId)) {
+                                                        next.delete(topicId);
+                                                    } else {
+                                                        next.add(topicId);
+                                                    }
+                                                    return next;
+                                                });
+                                            }}
+                                            className={cn(
+                                                "px-3 py-1.5 rounded-full text-sm font-medium transition-all border",
+                                                isSelected
+                                                    ? "bg-purple-600 text-white border-purple-600"
+                                                    : "bg-white text-gray-500 border-gray-200 hover:border-gray-400"
+                                            )}
+                                        >
+                                            {getTopicTitle(topicId)}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                            {selectedTopics.size === 0 && (
+                                <p className="text-xs text-red-500 mt-2">{t('minTopicsWarning')}</p>
+                            )}
+                        </div>
 
                         {/* Mode selector */}
                         <div className="flex flex-col sm:flex-row gap-3 justify-center">
                             <button
                                 onClick={() => startGame('solve')}
-                                disabled={loading}
-                                className="px-8 py-4 bg-yellow-500 text-white rounded-xl font-bold text-lg shadow-[0_4px_0_0_rgb(202,138,4)] hover:-translate-y-1 hover:shadow-[0_6px_0_0_rgb(202,138,4)] active:translate-y-[2px] active:shadow-none transition-all flex items-center justify-center gap-2"
+                                disabled={loading || selectedTopics.size === 0}
+                                className={cn(
+                                    "px-8 py-4 bg-yellow-500 text-white rounded-xl font-bold text-lg shadow-[0_4px_0_0_rgb(202,138,4)] hover:-translate-y-1 hover:shadow-[0_6px_0_0_rgb(202,138,4)] active:translate-y-[2px] active:shadow-none transition-all flex items-center justify-center gap-2",
+                                    (loading || selectedTopics.size === 0) && "opacity-50 cursor-not-allowed hover:translate-y-0 hover:shadow-[0_4px_0_0_rgb(202,138,4)]"
+                                )}
                             >
                                 <Dumbbell className="w-5 h-5" />
                                 {loading ? tCommon('loading') : t('modeSolve')}
                             </button>
                             <button
                                 onClick={() => startGame('recognize')}
-                                disabled={loading}
-                                className="px-8 py-4 bg-purple-500 text-white rounded-xl font-bold text-lg shadow-[0_4px_0_0_rgb(126,34,206)] hover:-translate-y-1 hover:shadow-[0_6px_0_0_rgb(126,34,206)] active:translate-y-[2px] active:shadow-none transition-all flex items-center justify-center gap-2"
+                                disabled={loading || selectedTopics.size < 4}
+                                className={cn(
+                                    "px-8 py-4 bg-purple-500 text-white rounded-xl font-bold text-lg shadow-[0_4px_0_0_rgb(126,34,206)] hover:-translate-y-1 hover:shadow-[0_6px_0_0_rgb(126,34,206)] active:translate-y-[2px] active:shadow-none transition-all flex items-center justify-center gap-2",
+                                    (loading || selectedTopics.size < 4) && "opacity-50 cursor-not-allowed hover:translate-y-0 hover:shadow-[0_6px_0_0_rgb(126,34,206)]"
+                                )}
                             >
                                 <Eye className="w-5 h-5" />
                                 {loading ? tCommon('loading') : t('modeRecognize')}
@@ -380,7 +455,12 @@ export default function BlitzClient({ moduleId }: { moduleId: string }) {
                         </div>
                         <div className="flex flex-col sm:flex-row gap-3 justify-center mt-2">
                             <span className="text-xs text-gray-400 sm:w-40">{t('modeSolveDesc')}</span>
-                            <span className="text-xs text-gray-400 sm:w-40">{t('modeRecognizeDesc')}</span>
+                            <span className="text-xs text-gray-400 sm:w-40">
+                                {selectedTopics.size < 4
+                                    ? t('recognizeMinTopics')
+                                    : t('modeRecognizeDesc')
+                                }
+                            </span>
                         </div>
                     </motion.div>
                 )}

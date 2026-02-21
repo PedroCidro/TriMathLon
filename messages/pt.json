@@ -158,7 +158,12 @@
         "modeSolveDesc": "Escolha a resposta correta",
         "modeRecognize": "Reconhecer",
         "modeRecognizeDesc": "Identifique o método usado",
-        "whichMethod": "Qual método resolve este problema?"
+        "whichMethod": "Qual método resolve este problema?",
+        "selectTopics": "Escolha os tópicos",
+        "selectAll": "Todos",
+        "deselectAll": "Limpar",
+        "minTopicsWarning": "Selecione pelo menos 1 tópico",
+        "recognizeMinTopics": "Reconhecer precisa de 4+ tópicos"
     },
     "Stats": {
         "title": "Suas Estatísticas",
@@ -246,7 +251,7 @@
     },
     "Onboarding": {
         "stepTitle": "Em qual etapa você está?",
-        "institutionDetected": "Detectamos que você é estudante da {name}!",
+        "institutionDetected": "Então você é da {name}?",
         "selectDepartment": "Selecione seu instituto ou faculdade.",
         "personalizeExperience": "Vamos personalizar sua experiência.",
         "levelFundamental": "Ensino Fundamental",

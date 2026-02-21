@@ -39,7 +39,39 @@ export async function POST(req: NextRequest) {
             const supabase = getSupabaseAdmin();
             const fullName = [first_name, last_name].filter(Boolean).join(' ') || null;
 
-            // Create profile if it doesn't exist (don't overwrite accumulated data)
+            // Check if this email already exists under a different Clerk ID
+            // (e.g., user re-registered after switching Clerk environments)
+            if (email) {
+                const { data: existing } = await supabase
+                    .from('profiles')
+                    .select('id')
+                    .eq('email', email)
+                    .neq('id', id)
+                    .maybeSingle();
+
+                if (existing) {
+                    // Migrate all data from old ID to new ID
+                    const { error: migrateError } = await supabase.rpc('migrate_user_id', {
+                        old_id: existing.id,
+                        new_id: id,
+                    });
+
+                    if (migrateError) {
+                        console.error('Failed to migrate user ID:', migrateError.message);
+                        return NextResponse.json({ error: 'User migration failed' }, { status: 500 });
+                    }
+
+                    // Sync latest name from Clerk
+                    await supabase.from('profiles').update({
+                        full_name: fullName,
+                    }).eq('id', id);
+
+                    console.log(`Migrated user ${email} from ${existing.id} to ${id}`);
+                    break;
+                }
+            }
+
+            // No existing profile for this email — create a new one
             await supabase.from('profiles').upsert({
                 id,
                 is_premium: false,

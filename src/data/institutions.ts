@@ -22,12 +22,16 @@ const institutions: InstitutionConfig[] = [
         landingSubline: '50% de desconto para estudantes',
         premiumHeadline: '50% de desconto para estudantes da USP',
         departments: [
+            // São Carlos campus (prioritized)
+            { id: 'icmc', name: 'Instituto de Ciencias Matematicas e de Computacao (ICMC)' },
+            { id: 'eesc', name: 'Escola de Engenharia de Sao Carlos (EESC)' },
+            { id: 'ifsc', name: 'Instituto de Fisica de Sao Carlos (IFSC)' },
+            { id: 'iqsc', name: 'Instituto de Quimica de Sao Carlos (IQSC)' },
+            // São Paulo campus
             { id: 'poli', name: 'Escola Politecnica (Poli)' },
             { id: 'ime', name: 'Instituto de Matematica e Estatistica (IME)' },
             { id: 'if', name: 'Instituto de Fisica (IF)' },
-            { id: 'icmc', name: 'Instituto de Ciencias Matematicas e de Computacao (ICMC)' },
             { id: 'each', name: 'Escola de Artes, Ciencias e Humanidades (EACH)' },
-            { id: 'eesc', name: 'Escola de Engenharia de Sao Carlos (EESC)' },
             { id: 'fea', name: 'Faculdade de Economia, Administracao e Contabilidade (FEA)' },
             { id: 'outro', name: 'Outro' },
         ],

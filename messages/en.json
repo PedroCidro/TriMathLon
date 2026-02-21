@@ -158,7 +158,12 @@
         "modeSolveDesc": "Pick the correct answer",
         "modeRecognize": "Recognize",
         "modeRecognizeDesc": "Identify the method used",
-        "whichMethod": "Which method solves this problem?"
+        "whichMethod": "Which method solves this problem?",
+        "selectTopics": "Choose topics",
+        "selectAll": "All",
+        "deselectAll": "Clear",
+        "minTopicsWarning": "Select at least 1 topic",
+        "recognizeMinTopics": "Recognize needs 4+ topics"
     },
     "Stats": {
         "title": "Your Statistics",
@@ -246,7 +251,7 @@
     },
     "Onboarding": {
         "stepTitle": "What stage are you at?",
-        "institutionDetected": "We detected that you're a student at {name}!",
+        "institutionDetected": "So you're from {name}?",
         "selectDepartment": "Select your institute or school.",
         "personalizeExperience": "Let's personalize your experience.",
         "levelFundamental": "Elementary School",
