@@ -176,27 +176,27 @@ export default function ChallengeBlitzClient({
         }
     }, [challengeId]);
 
-    // Send score update with retry on 429 (absolute values, so any success brings DB current)
+    // Send score update with retry on any failure (absolute values, so any success brings DB current)
     const sendScoreWithRetry = useCallback(async (payload: {
         challenge_id: string;
         score: number;
         strikes: number;
         current_index: number;
         finished: boolean;
-    }, retries = 2) => {
+    }, retries = 3) => {
         try {
             const res = await fetch('/api/challenge/update-score', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
             });
-            if (res.status === 429 && retries > 0) {
-                await new Promise(r => setTimeout(r, 2000));
+            if (!res.ok && retries > 0) {
+                await new Promise(r => setTimeout(r, 1000));
                 return sendScoreWithRetry(payload, retries - 1);
             }
         } catch (err) {
             if (retries > 0) {
-                await new Promise(r => setTimeout(r, 2000));
+                await new Promise(r => setTimeout(r, 1000));
                 return sendScoreWithRetry(payload, retries - 1);
             }
             console.error('Failed to update score:', err);
@@ -355,14 +355,15 @@ export default function ChallengeBlitzClient({
             setCountdownValue(prev => {
                 if (prev <= 1) {
                     clearInterval(interval);
-                    if (isCreator) {
-                        fetch('/api/challenge/start', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ challenge_id: challengeId }),
-                        });
-                    }
-                    setGameState('playing');
+                    // Both players call start for redundancy (endpoint is idempotent).
+                    // Wait for it to complete so status is 'playing' before any score updates.
+                    fetch('/api/challenge/start', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ challenge_id: challengeId }),
+                    })
+                        .catch(() => {})
+                        .finally(() => setGameState('playing'));
                     return 0;
                 }
                 return prev - 1;
@@ -370,7 +371,7 @@ export default function ChallengeBlitzClient({
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [gameState, isCreator, challengeId, isPublic]);
+    }, [gameState, challengeId, isPublic]);
 
     // Set up options when currentIndex changes
     useEffect(() => {
