@@ -34,7 +34,8 @@ export async function GET(request: Request) {
             .single();
 
         if (error || !challenge) {
-            return NextResponse.json({ error: 'Challenge not found' }, { status: 404 });
+            console.error('Poll query failed:', error?.message, error?.code, error?.details);
+            return NextResponse.json({ error: 'Challenge not found', details: error?.message }, { status: 404 });
         }
 
         // Only participants can poll

@@ -40,7 +40,8 @@ export async function POST(request: Request) {
             .single();
 
         if (fetchErr || !challenge) {
-            return NextResponse.json({ error: 'Challenge not found' }, { status: 404 });
+            console.error('Update-score query failed:', fetchErr?.message, fetchErr?.code, fetchErr?.details);
+            return NextResponse.json({ error: 'Challenge not found', details: fetchErr?.message }, { status: 404 });
         }
 
         if (challenge.status !== 'playing' && challenge.status !== 'ready') {
