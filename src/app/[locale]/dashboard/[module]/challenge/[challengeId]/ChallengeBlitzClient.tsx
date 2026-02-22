@@ -95,6 +95,7 @@ export default function ChallengeBlitzClient({
 
     // Opponent state (duel only)
     const [opponentScore, setOpponentScore] = useState(0);
+    const [opponentStrikes, setOpponentStrikes] = useState(0);
     const [opponentIndex, setOpponentIndex] = useState(0);
     const [opponentFinished, setOpponentFinished] = useState(false);
 
@@ -230,6 +231,7 @@ export default function ChallengeBlitzClient({
             const data: PollData = await res.json();
 
             setOpponentScore(data.opponent_score);
+            setOpponentStrikes(data.opponent_strikes);
             setOpponentIndex(data.opponent_current_index);
             setOpponentFinished(data.opponent_finished);
 
@@ -404,14 +406,38 @@ export default function ChallengeBlitzClient({
         };
     }, [gameState, pollOpponent, isPublic, rematchState]);
 
-    // Send final score when game finishes
+    // Send final score when game finishes (with retry as backup)
     useEffect(() => {
         if (gameState === 'finished' && !myFinished) {
             setMyFinished(true);
             if (isPublic) {
                 saveAttempt(score, strikes);
             } else {
-                sendScoreUpdate(true);
+                // Retry up to 3 times — the fire-and-forget in handleOptionSelect
+                // is the primary path, but this covers timer expiry and failures.
+                const sendFinished = async (retries = 3) => {
+                    try {
+                        const res = await fetch('/api/challenge/update-score', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                challenge_id: challengeId,
+                                score,
+                                strikes,
+                                current_index: currentIndex,
+                                finished: true,
+                            }),
+                        });
+                        if (!res.ok && retries > 0) {
+                            setTimeout(() => sendFinished(retries - 1), 2000);
+                        }
+                    } catch {
+                        if (retries > 0) {
+                            setTimeout(() => sendFinished(retries - 1), 2000);
+                        }
+                    }
+                };
+                sendFinished();
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -520,6 +546,9 @@ export default function ChallengeBlitzClient({
 
         answerCountRef.current++;
 
+        // Detect if this answer ends the game
+        const willFinish = newStrikes >= MAX_STRIKES || currentIndex + 1 >= questions.length;
+
         // Send score update after every answer (duel only)
         if (!isPublic) {
             fetch('/api/challenge/update-score', {
@@ -530,7 +559,7 @@ export default function ChallengeBlitzClient({
                     score: newScore,
                     strikes: newStrikes,
                     current_index: currentIndex + 1,
-                    finished: false,
+                    finished: willFinish,
                 }),
             }).catch(console.error);
         }
@@ -940,13 +969,15 @@ export default function ChallengeBlitzClient({
                                 {/* Opponent score */}
                                 <div className="text-center flex-1">
                                     <p className="text-sm font-medium text-gray-500 mb-1">{opponentName || t('opponent')}</p>
+                                    <p className={cn("text-5xl font-bold", opponentFinished ? "text-gray-900" : "text-gray-300")}>
+                                        {opponentScore}
+                                    </p>
                                     {opponentFinished ? (
-                                        <p className="text-5xl font-bold text-gray-900">{opponentScore}</p>
+                                        <p className="text-xs text-gray-400 mt-1">
+                                            {tBlitz('errorsCount', { count: opponentStrikes })}
+                                        </p>
                                     ) : (
-                                        <div className="flex flex-col items-center">
-                                            <p className="text-5xl font-bold text-gray-300">{opponentScore}</p>
-                                            <Loader2 className="w-4 h-4 animate-spin text-gray-400 mt-1" />
-                                        </div>
+                                        <Loader2 className="w-4 h-4 animate-spin text-gray-400 mt-1 mx-auto" />
                                     )}
                                 </div>
                             </div>
