@@ -38,8 +38,10 @@ const CONFIGS = {
     blitz: { limit: 10, windowSeconds: 60 },
     /** Public endpoints — rate limited by IP */
     public: { limit: 20, windowSeconds: 60 },
-    /** Challenge mode — create, accept, update scores */
+    /** Challenge mode — create, accept, start (low-frequency) */
     challenge: { limit: 20, windowSeconds: 60 },
+    /** Challenge gameplay — poll + update-score (high-frequency during play) */
+    challengeGameplay: { limit: 60, windowSeconds: 60 },
     /** Groups — create, join, manage */
     groups: { limit: 20, windowSeconds: 60 },
 } as const satisfies Record<string, RateLimitConfig>;

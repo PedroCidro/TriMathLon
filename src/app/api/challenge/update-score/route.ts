@@ -11,7 +11,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const limited = rateLimit(userId, 'challenge');
+        const limited = rateLimit(userId, 'challengeGameplay');
         if (limited) return limited;
 
         const body = await request.json();

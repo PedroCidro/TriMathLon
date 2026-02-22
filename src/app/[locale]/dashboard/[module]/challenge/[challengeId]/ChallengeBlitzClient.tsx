@@ -176,24 +176,32 @@ export default function ChallengeBlitzClient({
         }
     }, [challengeId]);
 
-    // Send score update (duel only)
-    const sendScoreUpdate = useCallback(async (finished: boolean = false) => {
+    // Send score update with retry on 429 (absolute values, so any success brings DB current)
+    const sendScoreWithRetry = useCallback(async (payload: {
+        challenge_id: string;
+        score: number;
+        strikes: number;
+        current_index: number;
+        finished: boolean;
+    }, retries = 2) => {
         try {
-            await fetch('/api/challenge/update-score', {
+            const res = await fetch('/api/challenge/update-score', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    challenge_id: challengeId,
-                    score,
-                    strikes,
-                    current_index: currentIndex,
-                    finished,
-                }),
+                body: JSON.stringify(payload),
             });
+            if (res.status === 429 && retries > 0) {
+                await new Promise(r => setTimeout(r, 2000));
+                return sendScoreWithRetry(payload, retries - 1);
+            }
         } catch (err) {
+            if (retries > 0) {
+                await new Promise(r => setTimeout(r, 2000));
+                return sendScoreWithRetry(payload, retries - 1);
+            }
             console.error('Failed to update score:', err);
         }
-    }, [challengeId, score, strikes, currentIndex]);
+    }, []);
 
     // Save attempt (public only)
     const saveAttempt = useCallback(async (finalScore: number, finalStrikes: number) => {
@@ -447,14 +455,25 @@ export default function ChallengeBlitzClient({
     const opponentTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     useEffect(() => {
         if (gameState !== 'finished' || isPublic || opponentFinished) return;
-        // Give the opponent 15 extra seconds after our game ends, then stop waiting
-        opponentTimeoutRef.current = setTimeout(() => {
+        // Give the opponent 15 extra seconds, then do a final poll to get latest data before giving up
+        opponentTimeoutRef.current = setTimeout(async () => {
+            try {
+                const res = await fetch(`/api/challenge/poll?challenge_id=${challengeId}`);
+                if (res.ok) {
+                    const data: PollData = await res.json();
+                    setOpponentScore(data.opponent_score);
+                    setOpponentStrikes(data.opponent_strikes);
+                    setOpponentIndex(data.opponent_current_index);
+                }
+            } catch {
+                // Best-effort — proceed to finish regardless
+            }
             setOpponentFinished(true);
         }, 15_000);
         return () => {
             if (opponentTimeoutRef.current) clearTimeout(opponentTimeoutRef.current);
         };
-    }, [gameState, isPublic, opponentFinished]);
+    }, [gameState, isPublic, opponentFinished, challengeId]);
 
     // Clean up timers on unmount
     useEffect(() => {
@@ -563,19 +582,15 @@ export default function ChallengeBlitzClient({
         // Detect if this answer ends the game
         const willFinish = newStrikes >= MAX_STRIKES || currentIndex + 1 >= questions.length;
 
-        // Send score update after every answer (duel only)
+        // Send score update after every answer (duel only), with retry on 429
         if (!isPublic) {
-            fetch('/api/challenge/update-score', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    challenge_id: challengeId,
-                    score: newScore,
-                    strikes: newStrikes,
-                    current_index: currentIndex + 1,
-                    finished: willFinish,
-                }),
-            }).catch(console.error);
+            sendScoreWithRetry({
+                challenge_id: challengeId,
+                score: newScore,
+                strikes: newStrikes,
+                current_index: currentIndex + 1,
+                finished: willFinish,
+            });
         }
 
         feedbackTimerRef.current = setTimeout(() => {
