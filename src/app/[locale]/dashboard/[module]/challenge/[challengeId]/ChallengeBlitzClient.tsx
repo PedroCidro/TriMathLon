@@ -190,11 +190,18 @@ export default function ChallengeBlitzClient({
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
             });
-            if (!res.ok && retries > 0) {
-                await new Promise(r => setTimeout(r, 1000));
-                return sendScoreWithRetry(payload, retries - 1);
+            if (!res.ok) {
+                const errText = await res.text().catch(() => '');
+                console.warn(`[CHALLENGE DEBUG] update-score FAILED ${res.status}: ${errText} | payload: score=${payload.score} strikes=${payload.strikes} idx=${payload.current_index} fin=${payload.finished}`);
+                if (retries > 0) {
+                    await new Promise(r => setTimeout(r, 1000));
+                    return sendScoreWithRetry(payload, retries - 1);
+                }
+            } else {
+                console.warn(`[CHALLENGE DEBUG] update-score OK | score=${payload.score} strikes=${payload.strikes} idx=${payload.current_index} fin=${payload.finished}`);
             }
         } catch (err) {
+            console.warn(`[CHALLENGE DEBUG] update-score NETWORK ERROR:`, err);
             if (retries > 0) {
                 await new Promise(r => setTimeout(r, 1000));
                 return sendScoreWithRetry(payload, retries - 1);
@@ -230,6 +237,8 @@ export default function ChallengeBlitzClient({
         try {
             const res = await fetch(`/api/challenge/poll?challenge_id=${challengeId}`);
             if (!res.ok) {
+                const errText = await res.text().catch(() => '');
+                console.warn(`[CHALLENGE DEBUG] poll FAILED ${res.status}: ${errText}`);
                 pollFailCountRef.current++;
                 if (pollFailCountRef.current >= 5) setPollError(true);
                 return;
@@ -237,6 +246,8 @@ export default function ChallengeBlitzClient({
             pollFailCountRef.current = 0;
             setPollError(false);
             const data: PollData = await res.json();
+
+            console.warn(`[CHALLENGE DEBUG] poll OK | status=${data.status} opp_score=${data.opponent_score} opp_strikes=${data.opponent_strikes} opp_idx=${data.opponent_current_index} opp_fin=${data.opponent_finished}`);
 
             setOpponentScore(data.opponent_score);
             setOpponentStrikes(data.opponent_strikes);
