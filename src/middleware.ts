@@ -1,5 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import createIntlMiddleware from 'next-intl/middleware'
+import { NextResponse } from 'next/server'
 import { routing } from '@/i18n/routing'
 
 const intlMiddleware = createIntlMiddleware(routing)
@@ -24,7 +25,7 @@ export default clerkMiddleware(async (auth, request) => {
 
     // Skip intl middleware for API routes
     if (request.nextUrl.pathname.startsWith('/api/')) {
-        return
+        return NextResponse.next()
     }
 
     return intlMiddleware(request)

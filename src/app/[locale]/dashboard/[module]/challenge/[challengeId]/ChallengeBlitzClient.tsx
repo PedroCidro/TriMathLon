@@ -121,6 +121,8 @@ export default function ChallengeBlitzClient({
     const scoreUpdateRef = useRef<NodeJS.Timeout | null>(null);
     const gameStartedAtRef = useRef<string | null>(null);
     const answerCountRef = useRef(0);
+    const pollFailCountRef = useRef(0);
+    const [pollError, setPollError] = useState(false);
 
     const moduleTitle = tc.has(`${moduleId}.title`) ? tc(`${moduleId}.title`) : (moduleData?.title || moduleId);
 
@@ -218,7 +220,13 @@ export default function ChallengeBlitzClient({
     const pollOpponent = useCallback(async () => {
         try {
             const res = await fetch(`/api/challenge/poll?challenge_id=${challengeId}`);
-            if (!res.ok) return;
+            if (!res.ok) {
+                pollFailCountRef.current++;
+                if (pollFailCountRef.current >= 5) setPollError(true);
+                return;
+            }
+            pollFailCountRef.current = 0;
+            setPollError(false);
             const data: PollData = await res.json();
 
             setOpponentScore(data.opponent_score);
@@ -265,6 +273,8 @@ export default function ChallengeBlitzClient({
             return data;
         } catch (err) {
             console.error('Poll error:', err);
+            pollFailCountRef.current++;
+            if (pollFailCountRef.current >= 5) setPollError(true);
         }
     }, [challengeId, gameDuration, gameState, moduleId, router]);
 
@@ -277,22 +287,23 @@ export default function ChallengeBlitzClient({
                 // Public: start playing immediately (no waiting/countdown)
                 setGameState('playing');
             } else {
-                // Duel: poll to get current status
+                // Duel: poll to get current status, fall back to server-side prop
                 const data = await pollOpponent();
+                const status = data?.status ?? challengeStatus;
 
-                if (data?.status === 'playing' && data.game_started_at) {
+                if (status === 'playing' && data?.game_started_at) {
                     gameStartedAtRef.current = data.game_started_at;
                     const elapsed = Math.floor((Date.now() - new Date(data.game_started_at).getTime()) / 1000);
                     setTimeLeft(Math.max(0, gameDuration - elapsed));
                     setGameState('playing');
-                } else if (data?.status === 'ready') {
+                } else if (status === 'ready') {
                     setGameState('countdown');
-                } else if (data?.status === 'finished') {
+                } else if (status === 'finished') {
                     setGameState('finished');
                     setMyFinished(true);
                     setOpponentFinished(true);
                     // Restore rematch state on page refresh
-                    if (data.rematch_challenge_id) {
+                    if (data?.rematch_challenge_id) {
                         setRematchChallengeId(data.rematch_challenge_id);
                         if (data.rematch_status === 'ready') {
                             // Already accepted, redirect
@@ -645,9 +656,27 @@ export default function ChallengeBlitzClient({
                 {/* Waiting for opponent (duel only) */}
                 {gameState === 'waiting' && !isPublic && (
                     <div className="text-center">
-                        <Loader2 className="w-10 h-10 animate-spin text-orange-500 mx-auto mb-4" />
-                        <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('waitingToStart')}</h2>
-                        <p className="text-gray-500">{t('waitingForOpponent')}</p>
+                        {pollError ? (
+                            <>
+                                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <span className="text-red-500 text-xl font-bold">!</span>
+                                </div>
+                                <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('connectionError')}</h2>
+                                <p className="text-gray-500 mb-4">{t('connectionErrorDesc')}</p>
+                                <button
+                                    onClick={() => window.location.reload()}
+                                    className="px-6 py-2.5 bg-orange-500 text-white rounded-xl font-bold text-sm hover:bg-orange-600 transition-colors"
+                                >
+                                    {tCommon('tryAgain')}
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <Loader2 className="w-10 h-10 animate-spin text-orange-500 mx-auto mb-4" />
+                                <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('waitingToStart')}</h2>
+                                <p className="text-gray-500">{t('waitingForOpponent')}</p>
+                            </>
+                        )}
                     </div>
                 )}
 

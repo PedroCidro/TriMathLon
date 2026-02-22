@@ -395,7 +395,9 @@
         "waitingForRematch": "Waiting for opponent...",
         "opponentWantsRematch": "Opponent wants a rematch!",
         "acceptRematch": "Accept Rematch",
-        "requesting": "Requesting..."
+        "requesting": "Requesting...",
+        "connectionError": "Connection error",
+        "connectionErrorDesc": "Could not connect to the server. Try reloading the page."
     },
     "Groups": {
         "title": "Study Groups",

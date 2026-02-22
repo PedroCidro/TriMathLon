@@ -54,9 +54,9 @@ export default function ChallengeInviteClient({ challengeId }: { challengeId: st
                 const data = await res.json();
                 setChallenge(data);
 
-                // For duel challenges, check if already accepted
+                // For duel challenges, check if already accepted or expired
                 if (data.type !== 'public' && data.status !== 'waiting') {
-                    setError('accepted');
+                    setError(data.status === 'expired' ? 'expired' : 'accepted');
                 }
             } catch {
                 setError('not_found');

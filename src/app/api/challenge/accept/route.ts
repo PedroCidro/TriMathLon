@@ -25,7 +25,7 @@ export async function POST(request: Request) {
         // Fetch challenge
         const { data: challenge, error: fetchErr } = await supabase
             .from('challenges')
-            .select('id, creator_id, status, expires_at')
+            .select('id, creator_id, status, expires_at, module_id')
             .eq('id', challenge_id)
             .single();
 
@@ -49,22 +49,24 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Challenge already accepted' }, { status: 409 });
         }
 
-        // Set opponent and status
-        const { error: updateErr } = await supabase
+        // Set opponent and status — use .select().single() to verify the update matched a row
+        const { data: updated, error: updateErr } = await supabase
             .from('challenges')
             .update({
                 opponent_id: userId,
                 status: 'ready',
             })
             .eq('id', challenge_id)
-            .eq('status', 'waiting'); // Optimistic lock
+            .eq('status', 'waiting') // Optimistic lock
+            .select('id')
+            .single();
 
-        if (updateErr) {
-            console.error('Failed to accept challenge:', updateErr.message);
-            return NextResponse.json({ error: 'Failed to accept challenge' }, { status: 500 });
+        if (updateErr || !updated) {
+            console.error('Failed to accept challenge:', updateErr?.message ?? 'no rows updated');
+            return NextResponse.json({ error: 'Challenge already accepted or expired' }, { status: 409 });
         }
 
-        return NextResponse.json({ success: true, module_id: challenge.id });
+        return NextResponse.json({ success: true, module_id: challenge.module_id });
     } catch (err) {
         console.error('Accept challenge error:', err instanceof Error ? err.message : 'Unknown error');
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

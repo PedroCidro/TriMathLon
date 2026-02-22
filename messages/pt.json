@@ -395,7 +395,9 @@
         "waitingForRematch": "Aguardando oponente...",
         "opponentWantsRematch": "O oponente quer revanche!",
         "acceptRematch": "Aceitar Revanche",
-        "requesting": "Solicitando..."
+        "requesting": "Solicitando...",
+        "connectionError": "Erro de conexão",
+        "connectionErrorDesc": "Não foi possível conectar ao servidor. Tente recarregar a página."
     },
     "Groups": {
         "title": "Grupos de Estudo",
