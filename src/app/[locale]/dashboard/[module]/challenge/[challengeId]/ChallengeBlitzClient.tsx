@@ -443,12 +443,26 @@ export default function ChallengeBlitzClient({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [gameState]);
 
+    // Force-resolve opponent as finished if they don't respond after game duration + grace
+    const opponentTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    useEffect(() => {
+        if (gameState !== 'finished' || isPublic || opponentFinished) return;
+        // Give the opponent 15 extra seconds after our game ends, then stop waiting
+        opponentTimeoutRef.current = setTimeout(() => {
+            setOpponentFinished(true);
+        }, 15_000);
+        return () => {
+            if (opponentTimeoutRef.current) clearTimeout(opponentTimeoutRef.current);
+        };
+    }, [gameState, isPublic, opponentFinished]);
+
     // Clean up timers on unmount
     useEffect(() => {
         return () => {
             if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
             if (scoreUpdateRef.current) clearTimeout(scoreUpdateRef.current);
             if (rematchTimerRef.current) clearTimeout(rematchTimerRef.current);
+            if (opponentTimeoutRef.current) clearTimeout(opponentTimeoutRef.current);
         };
     }, []);
 
