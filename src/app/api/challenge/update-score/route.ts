@@ -43,8 +43,8 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Challenge not found' }, { status: 404 });
         }
 
-        if (challenge.status !== 'playing') {
-            return NextResponse.json({ error: 'Challenge is not in playing state' }, { status: 400 });
+        if (challenge.status !== 'playing' && challenge.status !== 'ready') {
+            return NextResponse.json({ error: 'Challenge is not in a startable state' }, { status: 400 });
         }
 
         const isCreator = challenge.creator_id === userId;
@@ -67,6 +67,12 @@ export async function POST(request: Request) {
             [`${prefix}_strikes`]: strikes,
             [`${prefix}_current_index`]: current_index,
         };
+
+        // Auto-start if still in 'ready' status (handles race with /start endpoint)
+        if (challenge.status === 'ready') {
+            (updateData as Record<string, string | number | boolean>).status = 'playing';
+            (updateData as Record<string, string | number | boolean>).game_started_at = new Date().toISOString();
+        }
 
         if (finished) {
             updateData[`${prefix}_finished`] = true;
