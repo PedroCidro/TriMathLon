@@ -59,12 +59,17 @@ export default async function DashboardPage({
         full_name: fullName,
     }).eq('id', userId)
 
-    // Read current profile (with engagement data + institution)
+    // Read current profile (with engagement data + institution + onboarding)
     const { data } = await supabase
         .from('profiles')
-        .select('is_premium, exercises_solved, current_streak, xp_total, xp_today, last_xp_reset_date, institution, last_active_date')
+        .select('is_premium, exercises_solved, current_streak, xp_total, xp_today, last_xp_reset_date, institution, last_active_date, onboarding_completed, motivation, daily_goal')
         .eq('id', userId)
         .single()
+
+    // Enforce onboarding completion
+    if (!data?.onboarding_completed) {
+        return redirect('/onboarding')
+    }
 
     // Reset xp_today if it's a new day
     const today = new Date().toISOString().slice(0, 10)
@@ -115,5 +120,7 @@ export default async function DashboardPage({
         moduleProgress={moduleProgress}
         uniRankingBalloon={uniRankingBalloon}
         lastActiveDate={data?.last_active_date ?? null}
+        motivation={data?.motivation ?? null}
+        dailyGoal={data?.daily_goal ?? 5}
     />
 }

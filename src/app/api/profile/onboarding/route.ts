@@ -9,6 +9,8 @@ const bodySchema = z.object({
     academic_level: z.enum(['fundamental', 'medio', 'graduacao', 'pos', 'enthusiast']),
     institution: z.string().nullable().optional(),
     institution_department: z.string().nullable().optional(),
+    motivation: z.enum(['passing_exam', 'deeper_understanding', 'review', 'curiosity']).optional(),
+    daily_goal: z.number().int().min(1).max(50).optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -27,7 +29,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Invalid body' }, { status: 400 });
         }
 
-        const { academic_level, institution, institution_department } = parsed.data;
+        const { academic_level, institution, institution_department, motivation, daily_goal } = parsed.data;
 
         // Server-side validation: verify claimed institution matches email domain
         let validatedInstitution: string | null = null;
@@ -52,6 +54,14 @@ export async function POST(req: NextRequest) {
             academic_level,
             onboarding_completed: true,
         };
+
+        if (motivation) {
+            upsertData.motivation = motivation;
+        }
+
+        if (daily_goal) {
+            upsertData.daily_goal = daily_goal;
+        }
 
         if (validatedInstitution !== null) {
             upsertData.institution = validatedInstitution;

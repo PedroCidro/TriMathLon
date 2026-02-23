@@ -14,9 +14,10 @@ import ChallengeCreatorModal from './ChallengeCreatorModal';
 interface ModuleClientProps {
     isPremium: boolean;
     topicProgress: Record<string, { attempts: number; correct: number; bestStreak: number; easyCount: number }>;
+    exercisesSolved: number;
 }
 
-export default function ModuleClient({ isPremium, topicProgress }: ModuleClientProps) {
+export default function ModuleClient({ isPremium, topicProgress, exercisesSolved }: ModuleClientProps) {
     const params = useParams();
     const t = useTranslations('Module');
     const tc = useTranslations('Curriculum');
@@ -141,7 +142,8 @@ export default function ModuleClient({ isPremium, topicProgress }: ModuleClientP
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {moduleData.topics.map((topic, i) => {
-                        const isLocked = (moduleData.premiumModule || i >= 3) && !isPremium;
+                        const isTutorial = exercisesSolved < 3;
+                        const isLocked = (moduleData.premiumModule || i >= 3) && !isPremium && !isTutorial;
                         const progress = topicProgress[topic.id];
                         const hasProgress = progress && progress.attempts > 0;
                         const streakProgress = Math.min((progress?.bestStreak ?? 0) / 6, 1);
@@ -163,7 +165,8 @@ export default function ModuleClient({ isPremium, topicProgress }: ModuleClientP
                                 key={topic.id}
                                 className={cn(
                                     'group relative p-6 bg-[rgba(139,92,246,0.02)] border border-[rgba(139,92,246,0.12)] border-l-[2px] border-l-[rgba(139,92,246,0.15)] rounded-2xl purple-mist',
-                                    isLocked && 'opacity-70'
+                                    isLocked && 'opacity-70',
+                                    isTutorial && !isLocked && 'animate-tutorial-pulse'
                                 )}
                             >
                                 {/* Completed badge */}

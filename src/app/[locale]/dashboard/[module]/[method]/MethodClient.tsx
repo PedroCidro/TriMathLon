@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { ArrowLeft, BookOpen, Dumbbell, Eye, Check, X, RotateCcw, Lock, Zap } from 'lucide-react';
-import { Link } from '@/i18n/routing';
+import { Link, useRouter } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
 import MathRenderer from '@/components/ui/MathRenderer';
 import Image from 'next/image';
@@ -39,7 +39,13 @@ type RecognizeQuestion = {
     subcategory: string;
 };
 
-export default function MethodClient({ isPremium }: { isPremium: boolean }) {
+interface MethodClientProps {
+    isPremium: boolean;
+    exercisesSolved: number;
+    motivation: string | null;
+}
+
+export default function MethodClient({ isPremium, exercisesSolved, motivation }: MethodClientProps) {
     const [activeTab, setActiveTab] = useState<Tab>('learn');
     const params = useParams();
     const t = useTranslations('Method');
@@ -95,6 +101,11 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
     const [streak, setStreak] = useState(0);
 
     const supabaseRef = useRef(createClient());
+    const router = useRouter();
+
+    // ── Tutorial State ──
+    const [sessionCompletions, setSessionCompletions] = useState(0);
+    const [showTutorialModal, setShowTutorialModal] = useState(false);
 
     // Index of current topic in the module (used for recognize gating)
     const currentTopicIndex = useMemo(() => {
@@ -260,6 +271,13 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
                 ...(totalSteps > 0 && { hints_used: hintsUsed, total_steps: totalSteps }),
             }),
         }).catch(() => {});
+
+        // Tutorial modal: show after 3rd exercise for new users
+        const newTotal = exercisesSolved + sessionCompletions + 1;
+        setSessionCompletions(prev => prev + 1);
+        if (exercisesSolved < 3 && newTotal >= 3) {
+            setTimeout(() => setShowTutorialModal(true), 800);
+        }
 
         // Advance to next question after brief delay
         setTimeout(() => {
@@ -927,6 +945,54 @@ export default function MethodClient({ isPremium }: { isPremium: boolean }) {
             </div>
 
             {activeTab === 'recognize' && <CrowFeedback type={crowFeedback} streak={streak} />}
+
+            {/* Tutorial completion modal */}
+            <AnimatePresence>
+                {showTutorialModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.8, opacity: 0 }}
+                            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                            className="bg-white rounded-3xl p-8 sm:p-12 max-w-md w-full text-center shadow-2xl"
+                        >
+                            <Image
+                                src="/munin/happy.png"
+                                alt="Munin"
+                                width={160}
+                                height={160}
+                                className="mx-auto h-[120px] sm:h-[160px] w-auto mb-6 drop-shadow-[0_4px_12px_rgba(139,92,246,0.35)]"
+                            />
+                            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
+                                {t('tutorialModalTitle')}
+                            </h2>
+                            <p className="text-lg text-gray-600 font-medium mb-8">
+                                {motivation === 'passing_exam'
+                                    ? t('tutorialModalExam')
+                                    : motivation === 'deeper_understanding'
+                                    ? t('tutorialModalUnderstand')
+                                    : motivation === 'review'
+                                    ? t('tutorialModalReview')
+                                    : motivation === 'curiosity'
+                                    ? t('tutorialModalCuriosity')
+                                    : t('tutorialModalDefault')}
+                            </p>
+                            <button
+                                onClick={() => router.push('/dashboard')}
+                                className="w-full px-8 py-4 rounded-xl font-bold text-lg bg-black text-white shadow-[0_4px_0_0_black] hover:-translate-y-1 hover:shadow-[0_6px_0_0_black] active:translate-y-[2px] active:shadow-none transition-all"
+                            >
+                                {t('tutorialModalCta')}
+                            </button>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

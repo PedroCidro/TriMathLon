@@ -24,15 +24,22 @@ export default async function MethodPage({ params }: { params: Params }) {
 
     const { data } = await getSupabaseAdmin()
         .from('profiles')
-        .select('is_premium')
+        .select('is_premium, exercises_solved, motivation')
         .eq('id', userId)
         .single()
 
     const isPremium = !!data?.is_premium
+    const isTutorial = (data?.exercises_solved ?? 0) < 3
 
-    if ((moduleData?.premiumModule || topicIndex >= 3) && !isPremium) {
+    if ((moduleData?.premiumModule || topicIndex >= 3) && !isPremium && !isTutorial) {
         return redirect('/premium')
     }
 
-    return <MethodClient isPremium={isPremium} />
+    return (
+        <MethodClient
+            isPremium={isPremium}
+            exercisesSolved={data?.exercises_solved ?? 0}
+            motivation={data?.motivation ?? null}
+        />
+    )
 }

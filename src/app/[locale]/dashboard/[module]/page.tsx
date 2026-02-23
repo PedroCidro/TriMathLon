@@ -14,7 +14,7 @@ export default async function ModulePage() {
     const [{ data: profile }, { data: mastery }] = await Promise.all([
         supabase
             .from('profiles')
-            .select('is_premium')
+            .select('is_premium, exercises_solved')
             .eq('id', userId)
             .single(),
         supabase
@@ -38,6 +38,7 @@ export default async function ModulePage() {
         <ModuleClient
             isPremium={profile?.is_premium ?? false}
             topicProgress={topicProgress}
+            exercisesSolved={profile?.exercises_solved ?? 0}
         />
     )
 }

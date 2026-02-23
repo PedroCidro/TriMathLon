@@ -191,24 +191,16 @@ export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPL
         );
     };
 
-    /* Hero CTA — shows "Começe já" */
+    /* Hero CTA — sends to sign-up/onboarding, not checkout */
     const HeroCTAButton = () => {
         const base = 'purple-mist inline-flex items-center gap-2 text-base px-8 py-3.5 font-bold rounded-full transition-all bg-[#7C3AED] text-white hover:bg-[#6D28D9]';
 
-        if (isPremium) {
+        if (isLoggedIn) {
             return (
                 <Link href="/dashboard" className={base}>
                     {T.heroCtaMain}
                     <ArrowRight className="w-5 h-5" />
                 </Link>
-            );
-        }
-        if (isLoggedIn) {
-            return (
-                <button onClick={handleCheckout} disabled={loading} className={`${base} disabled:opacity-60 disabled:pointer-events-none`}>
-                    {loading ? T.processing : T.heroCtaMain}
-                    {!loading && <ArrowRight className="w-5 h-5" />}
-                </button>
             );
         }
         return (
@@ -219,19 +211,11 @@ export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPL
         );
     };
 
-    /* Deal-card CTA — always shows "oferta bixo" label */
+    /* Deal-card CTA — sends to sign-up/onboarding, not checkout */
     const DealButton = () => {
         const base = 'purple-mist inline-flex items-center gap-2 text-base px-8 py-3.5 font-bold rounded-full transition-all bg-[#7C3AED] text-white hover:bg-[#6D28D9]';
 
-        if (isLoggedIn && !isPremium) {
-            return (
-                <button onClick={handleCheckout} disabled={loading} className={`${base} disabled:opacity-60 disabled:pointer-events-none`}>
-                    {loading ? T.processing : T.dealCta}
-                    {!loading && <ArrowRight className="w-5 h-5" />}
-                </button>
-            );
-        }
-        if (isPremium) {
+        if (isLoggedIn) {
             return (
                 <Link href="/dashboard" className={base}>
                     {T.dealCta}

@@ -29,6 +29,8 @@ interface DashboardClientProps {
     moduleProgress: Record<string, { practiced: number; total: number }>;
     uniRankingBalloon: { institutionName: string; totalExercises: number; qualified: boolean } | null;
     lastActiveDate: string | null;
+    motivation: string | null;
+    dailyGoal: number;
 }
 
 export default function DashboardClient({
@@ -40,12 +42,15 @@ export default function DashboardClient({
     moduleProgress,
     uniRankingBalloon,
     lastActiveDate,
+    motivation,
+    dailyGoal,
 }: DashboardClientProps) {
     const t = useTranslations('Dashboard');
     const tc = useTranslations('Curriculum');
     const tCrow = useTranslations('Crow');
 
     const [showAplicacoes, setShowAplicacoes] = useState(false);
+    const isFirstVisit = exercisesSolved === 0;
 
     // Compute per-module progress percentages
     const moduleProgressPercents: Record<string, number> = {};
@@ -165,10 +170,12 @@ export default function DashboardClient({
                     exercisesSolved={exercisesSolved}
                     lastActiveDate={lastActiveDate}
                     totalProgress={totalProgress}
+                    motivation={motivation}
+                    dailyGoal={dailyGoal}
                 />
 
-                {/* Action buttons row */}
-                <div className="flex items-center gap-3 mb-8">
+                {/* Action buttons row — hidden during tutorial */}
+                <div className={cn("flex items-center gap-3 mb-8", isFirstVisit && "hidden")}>
                     {/* Groups */}
                     <div className="relative" ref={groupsTooltipRef}>
                         <Link
@@ -221,8 +228,8 @@ export default function DashboardClient({
                     </div>
                 </div>
 
-                {/* Uni Ranking Balloon */}
-                {uniRankingBalloon && (
+                {/* Uni Ranking Balloon — hidden during tutorial */}
+                {uniRankingBalloon && !isFirstVisit && (
                     <Link href="/dashboard/stats" className="block mb-10">
                         <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow flex items-center gap-4">
                             <div className="p-2.5 bg-purple-50 rounded-xl shrink-0">
@@ -245,14 +252,19 @@ export default function DashboardClient({
                     </Link>
                 )}
 
+                {/* Dark overlay for first-visit tutorial */}
+                {isFirstVisit && (
+                    <div className="fixed inset-0 bg-black/50 z-20 pointer-events-none" />
+                )}
+
                 {/* Module Cards */}
-                <div className="relative">
+                <div className={cn("relative", isFirstVisit && "relative z-30")}>
                     <div className="flex flex-col gap-6">
                         {/* Limites card centered on top with crow guide */}
                         {modules.filter(m => m.id === 'limites').map((module) => (
                             <div key={module.id} className="flex flex-col items-center">
                                 {/* Crow guide above Limites */}
-                                {exercisesSolved === 0 && (
+                                {isFirstVisit && (
                                     <div className="flex flex-col items-center mb-2">
                                         <Image
                                             src="/munin/happy.png"
@@ -270,7 +282,7 @@ export default function DashboardClient({
                                     <ModuleCard
                                         module={module}
                                         progressPercent={moduleProgressPercents[module.id]}
-                                        isLowestProgress={module.id === lowestProgressModuleId}
+                                        isLowestProgress={isFirstVisit || module.id === lowestProgressModuleId}
                                         locale="pt"
                                     />
                                 </div>
@@ -288,7 +300,7 @@ export default function DashboardClient({
                                             <ModuleCard
                                                 module={active}
                                                 progressPercent={moduleProgressPercents[active.id]}
-                                                isLowestProgress={active.id === lowestProgressModuleId}
+                                                isLowestProgress={isFirstVisit || active.id === lowestProgressModuleId}
                                                 locale="pt"
                                                 toggleLabel={inactiveLabel}
                                                 onToggle={() => setShowAplicacoes(prev => !prev)}
@@ -301,7 +313,7 @@ export default function DashboardClient({
                                         <ModuleCard
                                             module={module}
                                             progressPercent={moduleProgressPercents[module.id]}
-                                            isLowestProgress={module.id === lowestProgressModuleId}
+                                            isLowestProgress={isFirstVisit || module.id === lowestProgressModuleId}
                                             locale="pt"
                                         />
                                     </div>

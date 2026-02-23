@@ -6,14 +6,14 @@ import { useTranslations } from 'next-intl';
 import { Check, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const DAILY_XP_GOAL = 50;
-
 interface CrowGreetingProps {
     currentStreak: number;
     xpToday: number;
     exercisesSolved: number;
     lastActiveDate: string | null;
     totalProgress: number;
+    motivation?: string | null;
+    dailyGoal: number;
 }
 
 function getDaysSince(dateStr: string | null): number {
@@ -24,11 +24,20 @@ function getDaysSince(dateStr: string | null): number {
     return Math.floor(diff / (1000 * 60 * 60 * 24));
 }
 
+const MOTIVATION_GREETING_KEYS: Record<string, string> = {
+    passing_exam: 'firstVisitExam',
+    deeper_understanding: 'firstVisitUnderstand',
+    review: 'firstVisitReview',
+    curiosity: 'firstVisitCuriosity',
+};
+
 export default function CrowGreeting({
     currentStreak,
     xpToday,
     lastActiveDate,
     totalProgress,
+    motivation,
+    dailyGoal,
 }: CrowGreetingProps) {
     const t = useTranslations('Crow');
 
@@ -38,7 +47,10 @@ export default function CrowGreeting({
 
     if (totalProgress === 0) {
         sprite = '/munin/base.png';
-        message = t('firstVisit');
+        const greetingKey = motivation && MOTIVATION_GREETING_KEYS[motivation]
+            ? MOTIVATION_GREETING_KEYS[motivation]
+            : 'firstVisit';
+        message = t(greetingKey);
     } else if (getDaysSince(lastActiveDate) >= 3) {
         sprite = '/munin/pointing-sad.png';
         message = t('longTimeNoSee');
@@ -52,8 +64,10 @@ export default function CrowGreeting({
         message = t('hasProgress');
     }
 
-    const xpPercent = Math.min(100, Math.round((xpToday / DAILY_XP_GOAL) * 100));
-    const goalComplete = xpToday >= DAILY_XP_GOAL;
+    // Convert exercise-based daily goal to XP (avg ~10 XP per exercise)
+    const dailyXpGoal = dailyGoal * 10;
+    const xpPercent = Math.min(100, Math.round((xpToday / dailyXpGoal) * 100));
+    const goalComplete = xpToday >= dailyXpGoal;
 
     return (
         <div className="mb-8">
@@ -112,7 +126,7 @@ export default function CrowGreeting({
                                 <span className={goalComplete ? 'text-green-600' : 'text-gray-700'}>
                                     {xpToday}
                                 </span>
-                                <span className="text-gray-400"> / {DAILY_XP_GOAL} XP</span>
+                                <span className="text-gray-400"> / {dailyXpGoal} XP</span>
                             </span>
                         </div>
                         <div className="w-full bg-gray-100 h-4 rounded-full overflow-hidden">
