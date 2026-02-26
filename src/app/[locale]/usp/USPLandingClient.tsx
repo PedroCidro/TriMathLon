@@ -130,7 +130,7 @@ export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPL
             const response = await fetch('/api/checkout', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ locale, plan: 'usp-bixos' }),
+                body: JSON.stringify({ locale: 'pt', plan: 'usp-bixos' }),
             });
 
             if (!response.ok) {
@@ -169,7 +169,7 @@ export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPL
 
         if (isPremium) {
             return (
-                <Link href="/dashboard" className={base}>
+                <Link href="/dashboard" locale="pt" className={base}>
                     {T.heroCtaFree}
                     <ArrowRight className="w-5 h-5" />
                 </Link>
@@ -184,7 +184,7 @@ export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPL
             );
         }
         return (
-            <Link href="/sign-up/[[...sign-up]]" className={base}>
+            <Link href="/sign-up/[[...sign-up]]" locale="pt" className={base}>
                 {T.heroCtaFree}
                 <ArrowRight className="w-5 h-5" />
             </Link>
@@ -197,14 +197,14 @@ export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPL
 
         if (isLoggedIn) {
             return (
-                <Link href="/dashboard" className={base}>
+                <Link href="/dashboard" locale="pt" className={base}>
                     {T.heroCtaMain}
                     <ArrowRight className="w-5 h-5" />
                 </Link>
             );
         }
         return (
-            <Link href="/sign-up/[[...sign-up]]" className={base}>
+            <Link href="/sign-up/[[...sign-up]]" locale="pt" className={base}>
                 {T.heroCtaMain}
                 <ArrowRight className="w-5 h-5" />
             </Link>
@@ -217,14 +217,14 @@ export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPL
 
         if (isLoggedIn) {
             return (
-                <Link href="/dashboard" className={base}>
+                <Link href="/dashboard" locale="pt" className={base}>
                     {T.dealCta}
                     <ArrowRight className="w-5 h-5" />
                 </Link>
             );
         }
         return (
-            <Link href="/sign-up/[[...sign-up]]" className={base}>
+            <Link href="/sign-up/[[...sign-up]]" locale="pt" className={base}>
                 {T.dealCta}
                 <ArrowRight className="w-5 h-5" />
             </Link>
@@ -237,7 +237,7 @@ export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPL
 
         if (isPremium) {
             return (
-                <Link href="/dashboard" className={base}>
+                <Link href="/dashboard" locale="pt" className={base}>
                     {T.heroCtaFree}
                 </Link>
             );
@@ -250,7 +250,7 @@ export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPL
             );
         }
         return (
-            <Link href="/sign-up/[[...sign-up]]" className={base}>
+            <Link href="/sign-up/[[...sign-up]]" locale="pt" className={base}>
                 {T.heroCtaFree}
             </Link>
         );
@@ -260,13 +260,14 @@ export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPL
         <div className="min-h-screen bg-[#F8F7F4] flex flex-col">
             {/* Nav */}
             <nav className="bg-white border-b border-gray-200 px-4 py-3 flex justify-between items-center sticky top-0 z-10">
-                <Link href="/" className="flex items-center">
+                <Link href="/" locale="pt" className="flex items-center">
                     <span className="text-lg font-medium tracking-tight text-gray-400">Justmathing</span>
                 </Link>
                 <div className="flex items-center gap-3">
                     {!isLoggedIn && (
                         <Link
                             href="/sign-in/[[...sign-in]]"
+                            locale="pt"
                             className="hidden sm:flex font-bold text-sm text-gray-600 hover:text-[#7C3AED] transition-colors"
                         >
                             {T.signIn}
@@ -472,6 +473,7 @@ export default function USPLandingClient({ locale, isLoggedIn, isPremium }: USPL
                                 <DealButton />
                                 <Link
                                     href="/sign-up/[[...sign-up]]"
+                                    locale="pt"
                                     className="text-xs font-medium text-gray-400 hover:text-gray-600 transition-colors"
                                 >
                                     {T.dealCtaFree}
